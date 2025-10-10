@@ -6,7 +6,7 @@ import { Mail, Phone } from 'lucide-react'
 const Header = () => {
   return (
     <header>
-      <div className='bg-color-theme py-2'>
+      <div className='bg-color-theme py-2 '>
         <div className='container custom-container mx-auto flex items-center justify-between'>
           <div className='flex items-center gap-2'>
             <h3 className='text-white'>Language</h3>

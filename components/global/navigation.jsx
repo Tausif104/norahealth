@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { User, ShoppingCart } from 'lucide-react'
-import { Button } from '../ui/button'
 
 const Navigation = () => {
   const menuItems = [
@@ -36,7 +35,7 @@ const Navigation = () => {
       <ul className='flex items-center gap-6'>
         {menuItems.map((item) => (
           <li key={item.id}>
-            <Link className='font-medium' href={item.link}>
+            <Link className='font-medium ' href={item.link}>
               {item.label}
             </Link>
           </li>
