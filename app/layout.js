@@ -1,14 +1,16 @@
-import { Geist, Geist_Mono } from 'next/font/google'
+import { DM_Sans, Inter } from 'next/font/google'
 import './globals.css'
+import Header from '@/components/global/header'
+import Footer from '@/components/global/footer'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const dmSams = DM_Sans({
   subsets: ['latin'],
+  variable: '--font-dm-sans',
 })
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const inter = Inter({
   subsets: ['latin'],
+  variable: '--font-inter',
 })
 
 export const metadata = {
@@ -18,11 +20,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang='en'>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html
+      lang='en'
+      className={`${dmSams.variable} ${inter.variable} antialiased`}
+    >
+      <body>
+        <Header />
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   )
