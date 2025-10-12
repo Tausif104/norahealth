@@ -13,7 +13,7 @@ const Hero = () => {
       <div className='container custom-container mx-auto'>
         <div className='grid grid-cols-5 items-center'>
           <div className='col-span-3'>
-            <h1 className='text-theme text-[72px] font-bold leading-20'>
+            <h1 className='text-theme text-[72px] font-semibold leading-22'>
               Free Oral <br /> Contraception, <br />{' '}
               <span className='text-[#D6866B]'>Delivered to Your Door</span>
             </h1>
