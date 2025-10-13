@@ -16,10 +16,9 @@ const VideoSection = () => {
   return (
     <section>
       <div
-        className={`h-[700px] bg-cover bg-center flex items-center justify-center ${
+        className={`h-[700px] bg-cover bg-center flex items-center justify-center bg-[url(/images/video-thumb.jpg)] bg-fixed ${
           hide && 'hidden'
         }`}
-        style={{ backgroundImage: `url(/images/video-thumb.jpg)` }}
       >
         <button onClick={handlePlay} className='cursor-pointer'>
           <Image
@@ -35,7 +34,7 @@ const VideoSection = () => {
           width='100%'
           height='700px'
           playing={isPlaying}
-          src='https://www.youtube.com/watch?v=LXb3EKWsInQ'
+          src='https://www.youtube.com/watch?v=G5RpJwCJDqc'
         />
       </div>
     </section>
