@@ -6,7 +6,7 @@ const PrimaryBtn = (props) => {
 
   return (
     <Link
-      className='text-white inline-block bg-color-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300'
+      className='text-white inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300'
       href={url}
     >
       <span className='flex items-center'>

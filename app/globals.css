@@ -139,7 +139,7 @@ h6 {
     @apply text-[#CD8936];
   }
 
-  .bg-color-theme {
+  .bg-theme {
     @apply bg-[#CD8936];
   }
 
@@ -153,5 +153,9 @@ h6 {
 
   .custom-container {
     @apply 2xl:max-w-[82.5rem];
+  }
+
+  .section-padding {
+    @apply py-[130px];
   }
 }
