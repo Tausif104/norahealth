@@ -16,8 +16,8 @@ const HomePage = () => {
       <HowItWorks />
       <VideoSection />
       <WhyChooseNora />
-      {/* <ChoicesSection />
-      <Benifits />
+      <ChoicesSection />
+      {/* <Benifits />
       <Stories />
       <Faq /> */}
     </>

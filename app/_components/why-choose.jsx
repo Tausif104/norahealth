@@ -25,7 +25,7 @@ const WhyChooseNora = () => {
   ]
 
   return (
-    <section className='relative py-[60px] md:py-0  z-10 after:absolute after:content-[""] after:w-[50%] after:h-full md:after:bg-[url("/images/why-choose.svg")] after:bg-fixed after:top-0 after:left-[50%] after:-z-10 after:bg-cover after:bg-center'>
+    <section className='relative py-[60px] pb-0 md:py-0  z-10 after:absolute after:content-[""] after:w-[50%] after:h-full md:after:bg-[url("/images/why-choose.svg")] after:bg-fixed after:top-0 after:left-[50%] after:-z-10 after:bg-cover after:bg-center'>
       <div className='container custom-container mx-auto'>
         <div className='grid md:grid-cols-12 grid-cols-1'>
           <div className='col-span-6 md:py-[190px] md:pr-10 sm:px-0 px-[24px]'>
