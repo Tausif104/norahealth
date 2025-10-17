@@ -159,6 +159,14 @@ h6 {
     @apply py-[130px];
   }
 
+  .section-bottom-padding {
+    @apply pb-[130px];
+  }
+
+  .section-top-padding {
+    @apply pt-[130px];
+  }
+
   @media (max-width: 767px) {
     .section-padding {
       @apply py-[60px];

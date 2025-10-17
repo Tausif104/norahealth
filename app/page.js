@@ -13,8 +13,8 @@ const HomePage = () => {
     <>
       <Hero />
       <AboutSection />
-      {/* <HowItWorks />
-      <VideoSection />
+      <HowItWorks />
+      {/* <VideoSection />
       <WhyChooseNora />
       <ChoicesSection />
       <Benifits />

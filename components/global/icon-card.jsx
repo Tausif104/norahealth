@@ -17,7 +17,7 @@ const IconCard = (props) => {
         />
       </div>
       <div>
-        <h4 className='text-heading text-[24px] font-semibold leading-[1.4] mb-5 mt-7'>
+        <h4 className='text-heading sm:text-[24px] text-[20px] font-semibold leading-[1.4] sm:mb-5 mb-3 mt-7'>
           {title}
         </h4>
         <p className='text-pg text-[16px] leading-6'>{description}</p>

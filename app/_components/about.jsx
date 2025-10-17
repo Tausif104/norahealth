@@ -26,7 +26,7 @@ const AboutSection = () => {
               enhance women’s health by offering free contraceptive pill
               delivery to your door.
             </p>
-            <div className='grid grid-cols-2 gap-5'>
+            <div className='grid grid-cols-2 md:gap-5 gap-4'>
               <CounterUpBox
                 num='480'
                 label='Happy Customers'
