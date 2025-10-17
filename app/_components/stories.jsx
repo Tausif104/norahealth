@@ -57,13 +57,13 @@ const Stories = () => {
   ]
 
   return (
-    <section className='section-bottom-padding'>
-      <div className='container mx-auto custom-container'>
-        <div className='flex items-center justify-between mb-[50px]'>
-          <h2 className='text-heading text-5xl font-semibold leading-[1.2]'>
+    <section className='section-bottom-padding md:pt-0 pt-[60px]'>
+      <div className='container mx-auto custom-container sm:px-0 px-[24px]'>
+        <div className='flex items-center md:justify-between justify-center md:mb-[50px] mb-[20px]'>
+          <h2 className='text-heading md:text-left text-center xl:text-5xl lg:text-4xl text-2xl font-semibold leading-[1.2]'>
             Patient Stories
           </h2>
-          <div className='flex gap-4'>
+          <div className='md:flex hidden gap-4'>
             <span
               className='w-[56px] h-[56px] text-theme border border-[#CE8936] bg-transparent hover:bg-[#CE8936] flex text-white items-center justify-center rounded-full cursor-pointer transition duration-300 hover:text-white'
               onClick={() => sliderRef.current?.slickPrev()}

@@ -66,12 +66,30 @@ const MobileHeader = () => {
               className='w-[40px] max-w-[40px]'
             />
 
-            <Link
-              href='/user'
-              className='text-[#D6866B] w-[40px] h-[40px] border border-[#D6866B] flex items-center justify-center rounded-full hover:bg-[#D6866B] hover:text-white transition'
-            >
-              <User width={22} />
-            </Link>
+            <div>
+              <DropdownMenu>
+                <DropdownMenuTrigger className='focus:outline-0'>
+                  <span className='text-[#D6866B] w-[40px] h-[40px] border border-[#D6866B] flex items-center justify-center rounded-full hover:bg-[#D6866B] hover:text-white transition'>
+                    <User width={22} />
+                  </span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  <DropdownMenuLabel className='font-bold'>
+                    My Account
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Link href='/profile'>Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href='/Settings'>Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href='/log-out'>Log Out</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger className='focus:outline-0'>

@@ -50,7 +50,7 @@ const Benifits = () => {
             <PrimaryBtn label='Order Now' url='/' />
           </div>
           <div className='col-span-7 flex items-center'>
-            <div className='bg-[#FFF8EF] md:py-[50px] py-[16px] md:px-[40px] px-[16px] rounded-[16px] flex flex-col gap-[24px]'>
+            <div className='bg-[#FFF8EF] w-full md:py-[50px] py-[16px] md:px-[40px] px-[16px] rounded-[16px] flex flex-col gap-[24px]'>
               {data.map((item) => (
                 <div
                   className='flex md:items-center items-start md:flex-row flex-col  md:gap-[20px] border-b-[#491f402d] border-b pb-[24px] last-of-type:border-0 last-of-type:pb-0'

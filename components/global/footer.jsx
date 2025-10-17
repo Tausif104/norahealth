@@ -32,10 +32,7 @@ const Footer = () => {
 
   return (
     <footer>
-      <div
-        className='2xl:pt-[130px] sm:pt-[60px] pt-[60px] pb-[110px] bg-cover bg-bottom'
-        style={{ backgroundImage: `url(/images/footer-bg.svg)` }}
-      >
+      <div className='2xl:pt-[130px] sm:pt-[60px] pt-[60px] md:pb-[110px] pb-[50px] bg-cover bg-bottom sm:bg-[url(/images/footer-bg.svg)] bg-[url(/images/footer-bg-mobile.png)]'>
         <div className='container custom-container mx-auto'>
           <div className='text-center'>
             <Image
@@ -43,16 +40,16 @@ const Footer = () => {
               width={340}
               height={65}
               alt='Footer Logo'
-              className='mx-auto'
+              className='mx-auto md:max-w-[340px] max-w-[200px]'
             />
           </div>
 
-          <div className='py-[25px]'>
-            <ul className='flex items-center justify-center gap-6 2xl:flex-row xl:flex-row sm:flex-col flex-col'>
+          <div className='py-[25px] sm:px-0 px-[24px]'>
+            <ul className='md:flex items-center grid grid-cols-2 justify-center md:gap-6 gap-3'>
               {menuItems.map((item) => (
                 <li key={item.id}>
                   <Link
-                    className='text-white font-medium hover:underline hover:underline-offset-2'
+                    className='text-white md:text-[16px] text-[14px] font-medium hover:underline hover:underline-offset-2'
                     href={item.link}
                   >
                     {item.label}
