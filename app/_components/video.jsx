@@ -16,7 +16,7 @@ const VideoSection = () => {
   return (
     <section>
       <div
-        className={`h-[700px] bg-cover bg-center flex items-center justify-center bg-[url(/images/video-thumb.jpg)] bg-fixed ${
+        className={`lg:h-[700px] md:h-[400px] sm:h-[300px] h-[265px] bg-cover bg-center flex items-center justify-center bg-[url(/images/video-thumb.jpg)] bg-fixed ${
           hide && 'hidden'
         }`}
       >
@@ -26,6 +26,7 @@ const VideoSection = () => {
             width={100}
             height={100}
             alt='Play Icon'
+            className='md:w-[100px] w-[50px]'
           />
         </button>
       </div>

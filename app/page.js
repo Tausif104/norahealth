@@ -14,8 +14,8 @@ const HomePage = () => {
       <Hero />
       <AboutSection />
       <HowItWorks />
-      {/* <VideoSection />
-      <WhyChooseNora />
+      <VideoSection />
+      {/* <WhyChooseNora />
       <ChoicesSection />
       <Benifits />
       <Stories />
