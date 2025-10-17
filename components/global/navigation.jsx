@@ -1,41 +1,17 @@
 import Link from 'next/link'
 import { User, ShoppingCart } from 'lucide-react'
+import { menuItems } from '@/data/menu'
 
 const Navigation = () => {
-  const menuItems = [
-    {
-      id: 1,
-      label: 'Home',
-      link: '/',
-    },
-    {
-      id: 2,
-      label: 'About Us',
-      link: '/about-us',
-    },
-    {
-      id: 3,
-      label: 'Get Contraception',
-      link: '/get-contraception',
-    },
-    {
-      id: 4,
-      label: 'Contraception Choices',
-      link: '/contraception-choices',
-    },
-    {
-      id: 5,
-      label: 'Contact us',
-      link: '/contact-us',
-    },
-  ]
-
   return (
     <nav className='flex items-center gap-6'>
       <ul className='flex items-center gap-6'>
         {menuItems.map((item) => (
           <li key={item.id}>
-            <Link className='font-medium ' href={item.link}>
+            <Link
+              className='font-medium xl:text-[16px] lg:text-[14px] text-[16px]'
+              href={item.link}
+            >
               {item.label}
             </Link>
           </li>
