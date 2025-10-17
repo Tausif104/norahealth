@@ -3,7 +3,7 @@ import Image from 'next/image'
 const IconCard = (props) => {
   const { index, img, title, description } = props
   return (
-    <div className='rounded-[16px] border border-[#EDEDED] shadow-[0_10px_80px_rgba(30,96,221,0.1)] py-[30px] px-[20px] text-center relative'>
+    <div className='rounded-[16px] border border-[#EDEDED] shadow-[0_10px_80px_rgba(30,96,221,0.1)] py-[30px] px-[20px] text-center relative transition duration-300 hover:-translate-y-2'>
       <span className='text-[#D6866B] text-[80px] absolute top-2 right-2 leading-[1.0] font-bold opacity-10'>
         {index}
       </span>

@@ -25,10 +25,10 @@ const WhyChooseNora = () => {
   ]
 
   return (
-    <section className='relative z-10 after:absolute after:content-[""] after:w-[60%] after:h-full after:bg-[url("/images/why-choose.svg")] after:bg-fixed after:top-0 after:left-[45%] after:-z-10 after:bg-cover after:bg-center'>
+    <section className='relative z-10 after:absolute after:content-[""] after:w-[50%] after:h-full after:bg-[url("/images/why-choose.svg")] after:bg-fixed after:top-0 after:left-[50%] after:-z-10 after:bg-cover after:bg-center'>
       <div className='container custom-container mx-auto'>
         <div className='grid grid-cols-12'>
-          <div className='col-span-5 py-[190px] pr-10'>
+          <div className='col-span-6 py-[190px] pr-10'>
             <h2 className='text-heading text-5xl font-semibold leading-[1.2]'>
               Why Choose Nora Health
             </h2>
@@ -41,7 +41,7 @@ const WhyChooseNora = () => {
             </p>
             <OutlineBtn label='Order Now' url='/' />
           </div>
-          <div className='col-span-7 flex items-center'>
+          <div className='col-span-6 flex items-center'>
             <div className='pl-[80px] flex flex-col gap-5'>
               {data.map((item) => (
                 <div
@@ -61,7 +61,7 @@ const WhyChooseNora = () => {
                     <h3 className='text-[32px] font-semibold text-heading'>
                       {item.title}
                     </h3>
-                    <p className='text-pg text-[24px]'>{item.description}</p>
+                    <p className='text-pg text-[20px]'>{item.description}</p>
                   </div>
                 </div>
               ))}

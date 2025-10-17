@@ -57,7 +57,7 @@ const Stories = () => {
   ]
 
   return (
-    <section>
+    <section className='section-bottom-padding'>
       <div className='container mx-auto custom-container'>
         <div className='flex items-center justify-between mb-[50px]'>
           <h2 className='text-heading text-5xl font-semibold leading-[1.2]'>
