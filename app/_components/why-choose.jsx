@@ -25,14 +25,14 @@ const WhyChooseNora = () => {
   ]
 
   return (
-    <section className='relative z-10 after:absolute after:content-[""] after:w-[50%] after:h-full after:bg-[url("/images/why-choose.svg")] after:bg-fixed after:top-0 after:left-[50%] after:-z-10 after:bg-cover after:bg-center'>
+    <section className='relative py-[60px] md:py-0  z-10 after:absolute after:content-[""] after:w-[50%] after:h-full md:after:bg-[url("/images/why-choose.svg")] after:bg-fixed after:top-0 after:left-[50%] after:-z-10 after:bg-cover after:bg-center'>
       <div className='container custom-container mx-auto'>
-        <div className='grid grid-cols-12'>
-          <div className='col-span-6 py-[190px] pr-10'>
-            <h2 className='text-heading text-5xl font-semibold leading-[1.2]'>
+        <div className='grid md:grid-cols-12 grid-cols-1'>
+          <div className='col-span-6 md:py-[190px] md:pr-10 sm:px-0 px-[24px]'>
+            <h2 className='text-heading xl:text-5xl lg:text-4xl text-2xl font-semibold leading-[1.2]'>
               Why Choose Nora Health
             </h2>
-            <p className='text-[24px] text-pg py-6'>
+            <p className='2xl:text-[24px] xl:text-[24px] lg:text-[20px] text-[14px] text-pg py-6'>
               We combine medical safety with real convenience. Our contraception
               service is designed to fit around your life — not the other way
               around. Whether you value privacy, speed, or professional support,
@@ -41,12 +41,12 @@ const WhyChooseNora = () => {
             </p>
             <OutlineBtn label='Order Now' url='/' />
           </div>
-          <div className='col-span-6 flex items-center'>
-            <div className='pl-[80px] flex flex-col gap-5'>
+          <div className='col-span-6  flex items-center md:mt-0 mt-[60px]'>
+            <div className='md:pl-[80px] flex flex-col md:gap-5 gap-4 md:bg-none bg-[url("/images/why-choose.svg")] sm:px-0 px-[24px] md:py-0 py-[60px] w-full'>
               {data.map((item) => (
                 <div
                   key={item.id}
-                  className='bg-white flex items-center rounded-[16px] py-[24px] px-[30px] gap-5'
+                  className='bg-white flex md:items-center  items-start md:flex-row flex-col rounded-[16px] py-[24px] px-[30px] md:gap-5 gap-2'
                 >
                   <div>
                     <Image
@@ -54,14 +54,16 @@ const WhyChooseNora = () => {
                       alt={item.title}
                       width={80}
                       height={80}
-                      className='min-w-[80px]'
+                      className='lg:min-w-[80px] lg:w-[80px] min-w-[40px] w-[40px]'
                     />
                   </div>
                   <div>
-                    <h3 className='text-[32px] font-semibold text-heading'>
+                    <h3 className='lg:text-[32px] text-[22px]  font-semibold text-heading mb-2'>
                       {item.title}
                     </h3>
-                    <p className='text-pg text-[20px]'>{item.description}</p>
+                    <p className='text-pg xl:text-[20px] lg:text-[20px] text-[14px]'>
+                      {item.description}
+                    </p>
                   </div>
                 </div>
               ))}
