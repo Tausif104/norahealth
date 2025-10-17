@@ -34,14 +34,14 @@ const Benifits = () => {
   ]
 
   return (
-    <section>
+    <section className='sm:px-0 px-[24px]'>
       <div className='container custom-container mx-auto'>
-        <div className='grid grid-cols-12'>
-          <div className='col-span-5 py-[190px] pr-10'>
-            <h2 className='text-heading text-5xl font-semibold leading-[1.2]'>
+        <div className='grid lg:grid-cols-12 grid-cols-1'>
+          <div className='col-span-5 lg:py-[190px] py-[60px] pr-10'>
+            <h2 className='text-heading xl:text-5xl lg:text-4xl text-2xl font-semibold leading-[1.2]'>
               Benefits of Using Nora's Free Oral Contraception Service
             </h2>
-            <p className='text-[24px] text-pg py-6'>
+            <p className='2xl:text-[24px] xl:text-[24px] lg:text-[20px] text-[14px] text-pg lg:py-6 py-4'>
               Nora takes the stress out of getting contraception. No more
               chasing GP appointments, waiting in queues, or feeling
               uncomfortable discussing personal choices in person. With Nora,
@@ -50,10 +50,10 @@ const Benifits = () => {
             <PrimaryBtn label='Order Now' url='/' />
           </div>
           <div className='col-span-7 flex items-center'>
-            <div className='bg-[#FFF8EF] py-[50px] px-[40px] rounded-[16px] flex flex-col gap-[24px]'>
+            <div className='bg-[#FFF8EF] md:py-[50px] py-[16px] md:px-[40px] px-[16px] rounded-[16px] flex flex-col gap-[24px]'>
               {data.map((item) => (
                 <div
-                  className='flex items-center gap-[20px] border-b-[#491f402d] border-b pb-[24px] last-of-type:border-0 last-of-type:pb-0'
+                  className='flex md:items-center items-start md:flex-row flex-col  md:gap-[20px] border-b-[#491f402d] border-b pb-[24px] last-of-type:border-0 last-of-type:pb-0'
                   key={item.id}
                 >
                   <div>
@@ -61,15 +61,17 @@ const Benifits = () => {
                       width={70}
                       height={70}
                       src={item.img}
-                      className='rounded-full min-w-[70px]'
+                      className='rounded-full md:min-w-[70px] md:max-w-[70px] max-w-[40px] min-w-[40px] '
                       alt='icon-one'
                     />
                   </div>
                   <div>
-                    <h3 className='text-heading text-[32px] font-semibold'>
+                    <h3 className='text-heading lg:text-[32px] text-[20px] font-semibold md:my-0 my-[10px]'>
                       {item.title}
                     </h3>
-                    <p className='text-pg text-[18px]'>{item.description}</p>
+                    <p className='text-pg lg:text-[18px] text-[14px]'>
+                      {item.description}
+                    </p>
                   </div>
                 </div>
               ))}
