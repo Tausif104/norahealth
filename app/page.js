@@ -12,8 +12,8 @@ const HomePage = () => {
   return (
     <>
       <Hero />
-      {/* <AboutSection />
-      <HowItWorks />
+      <AboutSection />
+      {/* <HowItWorks />
       <VideoSection />
       <WhyChooseNora />
       <ChoicesSection />
