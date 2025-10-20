@@ -37,7 +37,7 @@ const Benifits = () => {
     <section className='sm:px-0 px-[24px]'>
       <div className='container custom-container mx-auto'>
         <div className='grid lg:grid-cols-12 grid-cols-1'>
-          <div className='col-span-5 lg:py-[190px] py-[60px] pr-10'>
+          <div className='col-span-5 lg:py-[190px] py-[60px] lg:pr-10'>
             <h2 className='text-heading xl:text-5xl lg:text-4xl text-2xl font-semibold leading-[1.2]'>
               Benefits of Using Nora's Free Oral Contraception Service
             </h2>

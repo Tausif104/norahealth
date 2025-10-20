@@ -1,14 +1,21 @@
+import PrimaryBtn from '@/components/global/primary-btn'
+
 const ChoicesSection = () => {
   return (
     <section className='section-padding bg-[#FFF8EF] sm:px-0 px-[24px]'>
       <div className='container custom-container mx-auto'>
-        <div>
-          <h2 className='text-heading xl:text-5xl lg:text-4xl text-2xl font-semibold text-center md:mb-[15px] mb-[10px]'>
-            Contraception Choices
-          </h2>
-          <p className='2xl:text-[24px] xl:text-[24px] lg:text-[20px] text-[14px] text-pg text-center'>
-            Not sure which option is right for you?
-          </p>
+        <div className='sm:items-center flex justify-between sm:flex-row flex-col sm:gap-0 gap-4'>
+          <div>
+            <h2 className='text-heading xl:text-5xl lg:text-4xl text-2xl font-semibold text-left md:mb-[15px] mb-[10px]'>
+              Contraception Choices
+            </h2>
+            <p className='2xl:text-[24px] xl:text-[24px] lg:text-[20px] text-[14px] text-pg text-left'>
+              Not sure which option is right for you?
+            </p>
+          </div>
+          <div>
+            <PrimaryBtn label='Help me Choose' url='/' />
+          </div>
         </div>
         <div className='md:mt-[50px] mt-[30px]'>
           <div className='grid md:grid-cols-2 grid-cols-1 md:gap-8 gap-4'>

@@ -19,6 +19,14 @@ const Stories = () => {
     arrows: false,
     speed: 1000,
     autoplaySpeed: 5000,
+    responsive: [
+      {
+        breakpoint: 767,
+        settings: {
+          dots: true,
+        },
+      },
+    ],
   }
 
   const tstimonials = [

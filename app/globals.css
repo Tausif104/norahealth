@@ -191,3 +191,23 @@ h6 {
 .accordion-trigger[data-state='open'] svg {
   color: #fff;
 }
+
+ul.slick-dots {
+  display: flex !important;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+ul.slick-dots button {
+  background-color: #f7f2e7;
+  font-size: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50px;
+  transition: 0.3s;
+}
+
+ul.slick-dots .slick-active button {
+  background-color: #ce8936;
+}

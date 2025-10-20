@@ -20,7 +20,7 @@ const Hero = () => {
         className='absolute w-full max-h-[60px] bottom-0 right-0 z-20 lg:block md:hidden hidden'
       />
       <div className='container custom-container mx-auto'>
-        <div className='grid 2xl:grid-cols-5 xl:grid-cols-5 lg:grid-cols-5 md:grid-cols-1 items-center 2xl:order-first xl:order-first lg:order-first md:order-last sm:order-last order-last '>
+        <div className='grid 2xl:grid-cols-5 xl:grid-cols-5 lg:grid-cols-5 md:grid-cols-1 items-center 2xl:order-first xl:order-first lg:order-first md:order-last sm:order-last order-last'>
           <div className='2xl:col-span-3 xl:col-span-3 lg:col-span-3 sm:px-0 px-[24px]'>
             <h1 className='text-theme 2xl:text-[72px] xl:text-[65px] lg:text-[52px] text-[30px] font-semibold leading-[1.2] '>
               Free Oral <br /> Contraception, <br />
