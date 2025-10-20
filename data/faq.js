@@ -12,7 +12,7 @@ export const faqData = [
   {
     id: 3,
     title: 'Is contraception confidential?',
-    body: 'Absolutely. All NHS contraception services are confidential, including for those under 16. We won’t share your information without your consent unless there’s a serious risk to your safety.',
+    body: "Absolutely. All NHS contraception services are confidential, including for those under 16. We won't share your information without your consent unless there's a serious risk to your safety.",
   },
   {
     id: 4,
@@ -21,8 +21,8 @@ export const faqData = [
   },
   {
     id: 5,
-    title: 'Can I access contraception if I’m not registered with a GP?',
-    body: 'Yes. You don’t need to be registered with a GP to use our NHS contraception services.',
+    title: "Can I access contraception if I'm not registered with a GP?",
+    body: "Yes. You don't need to be registered with a GP to use our NHS contraception services.",
   },
   {
     id: 6,
@@ -57,22 +57,22 @@ export const faqData = [
   },
   {
     id: 12,
-    title: 'Can I switch contraception methods if one doesn’t suit me?',
-    body: 'Yes. If your current method isn’t working for you, we’ll support you in switching to something more suitable.',
+    title: "Can I switch contraception methods if one doesn't suit me?",
+    body: "Yes. If your current method isn't working for you, we'll support you in switching to something more suitable.",
   },
   {
     id: 13,
     title: 'Will emergency contraception be available?',
-    body: 'This service is not available yet but we’re actively working to offer emergency contraception as part of our NHS services. This will include same-day access and clear guidance on how and when to use it.',
+    body: "This service is not available yet but we're actively working to offer emergency contraception as part of our NHS services. This will include same-day access and clear guidance on how and when to use it.",
   },
   {
     id: 14,
     title: 'Can I get treatment for urinary tract infections (UTIs)?',
-    body: 'Coming soon! We’re developing a pharmacy-led UTI treatment service to help you get fast, effective care without needing a GP appointment.',
+    body: "Coming soon! We're developing a pharmacy-led UTI treatment service to help you get fast, effective care without needing a GP appointment.",
   },
   {
     id: 15,
     title: 'Will Norahealth offer support for menopause and HRT?',
-    body: 'Absolutely. We’re committed to improving access to hormone replacement therapy (HRT) and menopause support, with tailored advice and compassionate care.',
+    body: "Absolutely. We're committed to improving access to hormone replacement therapy (HRT) and menopause support, with tailored advice and compassionate care.",
   },
 ]
