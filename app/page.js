@@ -20,7 +20,6 @@ const HomePage = () => {
       <Benifits />
       <Stories />
       <Faq />
-      hello
     </>
   )
 }

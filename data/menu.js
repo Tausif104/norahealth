@@ -7,7 +7,7 @@ export const menuItems = [
   {
     id: 2,
     label: 'About Us',
-    link: '/about-us',
+    link: '/about',
   },
   {
     id: 3,
@@ -22,6 +22,6 @@ export const menuItems = [
   {
     id: 5,
     label: 'Contact us',
-    link: '/contact-us',
+    link: '/contact',
   },
 ]
