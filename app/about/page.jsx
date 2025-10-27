@@ -2,6 +2,9 @@ import PageBanner from '@/components/global/page-banner'
 import AboutAlt from './_components/about-alt'
 import Mission from './_components/mission'
 import TeamSection from './_components/team'
+import StatisticsBoxes from './_components/statistics'
+import VideoSection from '../_components/video'
+import ReviewsSection from './_components/reviews'
 
 const AboutPage = () => {
   return (
@@ -10,6 +13,9 @@ const AboutPage = () => {
       <AboutAlt />
       <Mission />
       <TeamSection />
+      <VideoSection />
+      <StatisticsBoxes />
+      <ReviewsSection />
     </>
   )
 }

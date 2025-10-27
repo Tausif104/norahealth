@@ -50,7 +50,7 @@ const Mission = () => {
                   </span>
                 </h3>
                 <p className='2xl:text-[22px] xl:text-[20px] text-[16px] text-pg'>
-                  At Nora Health, our mission is simple: to make women’s
+                  At Nora Health, our mission is simple: to make womens
                   healthcare more <span className='text-theme'>accessible</span>
                   , <span className='text-theme'>private</span>, and{' '}
                   <span className='text-theme'>convenient</span>. We believe

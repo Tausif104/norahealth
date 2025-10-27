@@ -10,7 +10,7 @@ const TeamItem = ({ item }) => {
         height={340}
         alt={item.name}
       />
-      <div className='bg-white -mt-8 relative mx-[20px] text-center rounded-[8px] shadow-[0_10px_80px_rgba(30,96,221,0.1)] py-3'>
+      <div className='bg-white -mt-8 relative mx-[20px] text-center rounded-[8px] shadow-theme py-3'>
         <h4 className='lg:text-[24px] text-[20px] font-semibold'>
           {item.name}
         </h4>

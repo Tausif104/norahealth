@@ -1,30 +1,47 @@
 'use client'
 
-import { useRef } from 'react'
 import 'slick-carousel/slick/slick.css'
+import { useRef } from 'react'
 import Slider from 'react-slick'
-import TestimonialItem from './testimonial-item'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import ReviewItem from '@/components/global/review-item'
 import { testimonials } from '@/data/testimonials'
 
-const Stories = () => {
+const ReviewsSection = () => {
   const sliderRef = useRef(null)
 
   const settings = {
     dots: false,
     infinite: true,
     speed: 500,
-    slidesToShow: 1,
+    slidesToShow: 3,
     slidesToScroll: 1,
     autoplay: true,
     arrows: false,
+    rows: 2,
     speed: 1000,
     autoplaySpeed: 5000,
     responsive: [
       {
-        breakpoint: 767,
+        breakpoint: 1199,
         settings: {
-          dots: true,
+          rows: 1,
+          slidesToShow: 3,
+        },
+      },
+      {
+        breakpoint: 1000,
+        settings: {
+          rows: 1,
+          slidesToShow: 2,
+        },
+      },
+      {
+        breakpoint: 991,
+        settings: {
+          rows: 1,
+          slidesToShow: 1,
+          dots: false,
         },
       },
     ],
@@ -52,14 +69,17 @@ const Stories = () => {
             </span>
           </div>
         </div>
-        <Slider ref={sliderRef} {...settings}>
-          {testimonials.map((testimonial) => (
-            <TestimonialItem key={testimonial.id} testimonial={testimonial} />
-          ))}
-        </Slider>
+
+        <div className='review-slide'>
+          <Slider ref={sliderRef} {...settings}>
+            {testimonials.map((item) => (
+              <ReviewItem key={item.id} item={item} />
+            ))}
+          </Slider>
+        </div>
       </div>
     </section>
   )
 }
 
-export default Stories
+export default ReviewsSection
