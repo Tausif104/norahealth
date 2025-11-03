@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 
-export const contraceptionStepOne = async (formData) => {
+export const contraceptionStepOne = async (prevState, formData) => {
   redirect('/contraception-choices/step-2')
 }
 
