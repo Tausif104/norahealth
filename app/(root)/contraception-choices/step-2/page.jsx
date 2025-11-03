@@ -1,23 +1,20 @@
 import OutlineBtn from '@/components/global/outline-btn'
 import PageBanner from '@/components/global/page-banner'
 import PrimaryBtn from '@/components/global/primary-btn'
-import { sexualStatus } from '@/data/contraception'
+import { sexualHealth } from '@/data/contraception'
 import { ArrowRight } from 'lucide-react'
 import { contraceptionStepTwo } from '@/actions/contraception.action'
-import ChoiceCheckBox from '@/components/global/choice-check'
+import ChoiceRadio from '@/components/global/choice-radio'
 
-const StepTwo = async ({ searchParams }) => {
-  const { reason } = await searchParams
-
+const StepTwo = async () => {
   return (
     <>
-      <PageBanner title='Contraception Choices' />
+      <PageBanner title='Sexual Health' />
       <div className='md:my-[130px] my-[60px]'>
         <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
           <div className='flex items-center justify-between lg:flex-row flex-col lg:gap-0 gap-3'>
             <h3 className='font-semibold lg:text-[32px] text-[20px] leading-[1.2] lg:text-left text-center'>
-              Are you sexually active at the
-              <br className='md:block hidden' /> moment?
+              Are you currently sexually active
             </h3>
             <PrimaryBtn url='/' label='Book a Free Call' />
           </div>
@@ -25,14 +22,9 @@ const StepTwo = async ({ searchParams }) => {
           <div className='mt-[50px]'>
             {/* contraception options */}
             <form action={contraceptionStepTwo}>
-              <input type='hidden' name='reason' value={reason} />
               <div className='grid grid-cols-2 md:gap-[30px] gap-[15px]'>
-                {sexualStatus.map((item) => (
-                  <ChoiceCheckBox
-                    key={item.id}
-                    item={item}
-                    name='sexual-status'
-                  />
+                {sexualHealth.map((item) => (
+                  <ChoiceRadio key={item.id} item={item} name='sexual-health' />
                 ))}
               </div>
               <div className='flex items-center sm:flex-row flex-col gap-[20px] justify-center md:mt-[50px] mt-[30px]'>

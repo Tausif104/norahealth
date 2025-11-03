@@ -1,45 +1,29 @@
-export const reasons = [
+export const help = [
   {
-    id: 'reason-one',
-    value: "I don't want to get pregnant",
+    id: 'help-one',
+    value: 'Prevent pregnancy',
   },
   {
-    id: 'reason-two',
-    value: 'I want lighter, less painful periods',
+    id: 'help-two',
+    value: 'Reduce painful periods',
   },
   {
-    id: 'reason-three',
-    value: 'I want more control over when I have periods',
+    id: 'help-three',
+    value: 'Help control & regulate my periods',
   },
   {
-    id: 'reason-four',
-    value: 'I want to stop having periods for now',
-  },
-  {
-    id: 'reason-five',
-    value: 'I want less acne',
-  },
-  {
-    id: 'reason-six',
-    value: 'I want to feel less low or anxious around the time of my period',
+    id: 'help-four',
+    value: 'Stop my periods',
   },
 ]
 
-export const sexualStatus = [
+export const sexualHealth = [
   {
     id: 'sexual-one',
-    value: 'Yes and I only have one sexual partner',
+    value: 'Yes',
   },
   {
     id: 'sexual-two',
-    value: 'Yes and I have more than one sexual partner',
-  },
-  {
-    id: 'sexual-three',
-    value: 'No but I might be soon',
-  },
-  {
-    id: 'sexual-four',
-    value: "No - I'm just researching",
+    value: 'No',
   },
 ]

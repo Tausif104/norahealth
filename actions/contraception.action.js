@@ -3,13 +3,12 @@
 import { redirect } from 'next/navigation'
 
 export const contraceptionStepOne = async (formData) => {
-  const reason = formData.get('reason')
-  redirect(`/contraception-choices/step-2?reason=${encodeURIComponent(reason)}`)
+  redirect('/contraception-choices/step-2')
 }
 
 export const contraceptionStepTwo = async (formData) => {
   const reason = formData.get('reason')
-  const sexualStatus = formData.getAll('sexual-status')
+  const sexualStatus = formData.get('sexual-health')
   redirect(
     `/contraception-choices/step-3?reason=${encodeURIComponent(
       reason

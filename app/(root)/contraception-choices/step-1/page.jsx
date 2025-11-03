@@ -1,15 +1,15 @@
-import ChoiceRadio from '@/components/global/choice-radio'
 import OutlineBtn from '@/components/global/outline-btn'
 import PageBanner from '@/components/global/page-banner'
 import PrimaryBtn from '@/components/global/primary-btn'
-import { reasons } from '@/data/contraception'
 import { ArrowRight } from 'lucide-react'
 import { contraceptionStepOne } from '@/actions/contraception.action'
+import { help } from '@/data/contraception'
+import ChoiceCheckBox from '@/components/global/choice-check'
 
 const ContraceptaionPage = async () => {
   return (
     <>
-      <PageBanner title='Find Your Best Contraception Match' />
+      <PageBanner title='How Can We Help? ' />
       <div className='md:my-[130px] my-[60px]'>
         <div className='container custom-container mx-auto  md:mb-[80px] mb-[60px] sm:px-0 px-[24px]'>
           <h2 className='text-heading md:text-[36px] text-[20px] font-semibold leading-[1.2] text-center'>
@@ -22,9 +22,7 @@ const ContraceptaionPage = async () => {
         <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
           <div className='flex items-center justify-between lg:flex-row flex-col lg:gap-0 gap-3'>
             <h3 className='font-semibold lg:text-[32px] text-[20px] leading-[1.2] lg:text-left text-center'>
-              Which of these best describes the{' '}
-              <br className='md:block hidden' /> main reason you want
-              contraception?
+              I am looking to
             </h3>
             <PrimaryBtn url='/' label='Book a Free Call' />
           </div>
@@ -33,8 +31,8 @@ const ContraceptaionPage = async () => {
             {/* contraception options */}
             <form action={contraceptionStepOne}>
               <div className='grid grid-cols-2 md:gap-[30px] gap-[15px]'>
-                {reasons.map((item) => (
-                  <ChoiceRadio key={item.id} item={item} name='reason' />
+                {help.map((item) => (
+                  <ChoiceCheckBox key={item.id} item={item} name='reason' />
                 ))}
               </div>
               <div className='flex items-center sm:flex-row flex-col gap-[20px] justify-center md:mt-[50px] mt-[30px]'>
