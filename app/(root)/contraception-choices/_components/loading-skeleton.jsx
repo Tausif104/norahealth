@@ -8,7 +8,7 @@ const SkeletonLoading = ({ items }) => {
           <Skeleton key={index} className='w-full h-[120px] bg-gray-100' />
         ))}
       </div>
-      <div className='flex justify-center items-center gap-[20px] mt-[30px]'>
+      <div className='flex justify-center items-center gap-[20px] md:mt-[50px] mt-[30px]'>
         <Skeleton className='w-[140px] h-[56px] rounded-full' />
         <Skeleton className='w-[190px] h-[56px] rounded-full' />
       </div>
