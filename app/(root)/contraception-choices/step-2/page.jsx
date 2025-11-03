@@ -1,22 +1,29 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import PageBanner from '@/components/global/page-banner'
 import PrimaryBtn from '@/components/global/primary-btn'
 import { contraceptionStepTwo } from '@/actions/contraception.action'
 import StepTwoForm from './_components/step-two-form'
-import LoadingIcon from '@/components/global/loading'
 import SkeletonLoading from '../_components/loading-skeleton'
+import { toast } from 'sonner'
 
 const StepTwo = () => {
   const initialState = {
-    date: {},
+    msg: '',
   }
 
   const [state, action, loading] = useActionState(
     contraceptionStepTwo,
     initialState
   )
+
+  useEffect(() => {
+    if (state.msg) {
+      toast.warning(state.msg)
+      state.msg = ''
+    }
+  }, [state.msg])
 
   return (
     <>
@@ -32,7 +39,11 @@ const StepTwo = () => {
 
           <div className='mt-[50px]'>
             {/* contraception options */}
-            {loading ? <SkeletonLoading /> : <StepTwoForm action={action} />}
+            {loading ? (
+              <SkeletonLoading items={2} />
+            ) : (
+              <StepTwoForm action={action} />
+            )}
           </div>
         </div>
       </div>

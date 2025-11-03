@@ -39,7 +39,11 @@ const ContraceptaionPage = () => {
           </div>
 
           <div className='mt-[50px]'>
-            {loading ? <SkeletonLoading /> : <StepOneForm action={action} />}
+            {loading ? (
+              <SkeletonLoading items={4} />
+            ) : (
+              <StepOneForm action={action} />
+            )}
           </div>
         </div>
       </div>

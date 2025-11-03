@@ -1,7 +1,6 @@
 import { DM_Sans, Inter } from 'next/font/google'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
-import Header from '@/components/global/header'
-import Footer from '@/components/global/footer'
 
 const dmSams = DM_Sans({
   subsets: ['latin'],
@@ -26,6 +25,7 @@ export default function RootLayout({ children }) {
     >
       <body>
         <main>{children}</main>
+        <Toaster position='top-center' />
       </body>
     </html>
   )
