@@ -17,10 +17,6 @@ const ContraceptaionPage = () => {
     initialState
   )
 
-  if (loading) {
-    return <LoadingIcon />
-  }
-
   return (
     <>
       <PageBanner title='How Can We Help? ' />
@@ -42,7 +38,7 @@ const ContraceptaionPage = () => {
           </div>
 
           <div className='mt-[50px]'>
-            <StepOneForm action={action} />
+            {loading ? <LoadingIcon /> : <StepOneForm action={action} />}
           </div>
         </div>
       </div>

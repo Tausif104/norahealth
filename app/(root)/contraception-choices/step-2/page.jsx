@@ -17,10 +17,6 @@ const StepTwo = () => {
     initialState
   )
 
-  if (loading) {
-    return <LoadingIcon />
-  }
-
   return (
     <>
       <PageBanner title='Sexual Health' />
@@ -35,7 +31,7 @@ const StepTwo = () => {
 
           <div className='mt-[50px]'>
             {/* contraception options */}
-            <StepTwoForm action={action} />
+            {loading ? <LoadingIcon /> : <StepTwoForm action={action} />}
           </div>
         </div>
       </div>
