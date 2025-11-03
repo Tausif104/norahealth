@@ -6,6 +6,7 @@ import PrimaryBtn from '@/components/global/primary-btn'
 import { contraceptionStepTwo } from '@/actions/contraception.action'
 import StepTwoForm from './_components/step-two-form'
 import LoadingIcon from '@/components/global/loading'
+import SkeletonLoading from '../_components/loading-skeleton'
 
 const StepTwo = () => {
   const initialState = {
@@ -31,7 +32,7 @@ const StepTwo = () => {
 
           <div className='mt-[50px]'>
             {/* contraception options */}
-            {loading ? <LoadingIcon /> : <StepTwoForm action={action} />}
+            {loading ? <SkeletonLoading /> : <StepTwoForm action={action} />}
           </div>
         </div>
       </div>
