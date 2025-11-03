@@ -4,7 +4,6 @@ import { useActionState } from 'react'
 import PageBanner from '@/components/global/page-banner'
 import PrimaryBtn from '@/components/global/primary-btn'
 import { contraceptionStepOne } from '@/actions/contraception.action'
-import LoadingIcon from '@/components/global/loading'
 import StepOneForm from './_components/step-one-form'
 import SkeletonLoading from '../_components/loading-skeleton'
 
