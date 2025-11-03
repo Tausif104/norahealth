@@ -2,7 +2,7 @@ import Footer from '@/components/global/footer'
 import Header from '@/components/global/header'
 
 export const metadata = {
-  title: 'Nora Health',
+  title: 'Home',
   description: 'Free Oral Contraception, Delivered to Your Door',
 }
 
