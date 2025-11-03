@@ -1,9 +1,9 @@
-const ChoiceRadio = ({ item, name }) => {
+const ChoiceCheckBox = ({ item, name }) => {
   return (
     <div key={item.id}>
       <input
         name={name}
-        type='radio'
+        type='checkbox'
         id={item.id}
         className='peer hidden'
         value={item.value}
@@ -18,4 +18,4 @@ const ChoiceRadio = ({ item, name }) => {
   )
 }
 
-export default ChoiceRadio
+export default ChoiceCheckBox

@@ -24,3 +24,22 @@ export const reasons = [
     value: 'I want to feel less low or anxious around the time of my period',
   },
 ]
+
+export const sexualStatus = [
+  {
+    id: 'sexual-one',
+    value: 'Yes and I only have one sexual partner',
+  },
+  {
+    id: 'sexual-two',
+    value: 'Yes and I have more than one sexual partner',
+  },
+  {
+    id: 'sexual-three',
+    value: 'No but I might be soon',
+  },
+  {
+    id: 'sexual-four',
+    value: "No - I'm just researching",
+  },
+]

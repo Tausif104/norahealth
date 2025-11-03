@@ -25,9 +25,7 @@ export default function RootLayout({ children }) {
       className={`${dmSams.variable} ${inter.variable} antialiased`}
     >
       <body>
-        <Header />
         <main>{children}</main>
-        <Footer />
       </body>
     </html>
   )

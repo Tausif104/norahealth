@@ -17,7 +17,7 @@ export const menuItems = [
   {
     id: 4,
     label: 'Contraception Choices',
-    link: '/contraception-choices',
+    link: '/contraception-choices/step-1',
   },
   {
     id: 5,

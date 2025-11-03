@@ -4,6 +4,7 @@ import PageBanner from '@/components/global/page-banner'
 import PrimaryBtn from '@/components/global/primary-btn'
 import { reasons } from '@/data/contraception'
 import { ArrowRight } from 'lucide-react'
+import { contraceptionStepOne } from '@/actions/contraception.action'
 
 const ContraceptaionPage = async () => {
   return (
@@ -30,10 +31,10 @@ const ContraceptaionPage = async () => {
 
           <div className='mt-[50px]'>
             {/* contraception options */}
-            <form>
+            <form action={contraceptionStepOne}>
               <div className='grid grid-cols-2 md:gap-[30px] gap-[15px]'>
-                {reasons.map((reason) => (
-                  <ChoiceRadio key={reason.id} reason={reason} name='reason' />
+                {reasons.map((item) => (
+                  <ChoiceRadio key={item.id} item={item} name='reason' />
                 ))}
               </div>
               <div className='flex items-center sm:flex-row flex-col gap-[20px] justify-center md:mt-[50px] mt-[30px]'>
