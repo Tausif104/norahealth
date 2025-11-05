@@ -40,7 +40,7 @@ const StepFour = () => {
           <div className='mt-[50px]'>
             {/* contraception options */}
             {loading ? (
-              <SkeletonLoading items={4} />
+              <SkeletonLoading items={5} />
             ) : (
               <StepFourForm action={action} />
             )}
