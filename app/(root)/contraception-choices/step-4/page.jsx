@@ -3,18 +3,18 @@
 import PageBanner from '@/components/global/page-banner'
 import PrimaryBtn from '@/components/global/primary-btn'
 import { useActionState, useEffect } from 'react'
-import { contraceptionStepThree } from '@/actions/contraception.action'
+import { contraceptionStepFour } from '@/actions/contraception.action'
 import SkeletonLoading from '../_components/loading-skeleton'
-import StepThreeForm from './_components/step-three-form'
+import StepFourForm from './_components/step-four-form'
 import { toast } from 'sonner'
 
-const StepThree = () => {
+const StepFour = () => {
   const initialState = {
     msg: '',
   }
 
   const [state, action, loading] = useActionState(
-    contraceptionStepThree,
+    contraceptionStepFour,
     initialState
   )
 
@@ -32,7 +32,7 @@ const StepThree = () => {
         <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
           <div className='flex items-center justify-between lg:flex-row flex-col lg:gap-0 gap-3'>
             <h3 className='font-semibold lg:text-[32px] text-[20px] leading-[1.2] lg:text-left text-center'>
-              Select all that apply to you
+              Do you suffer from any of the following?
             </h3>
             <PrimaryBtn url='/' label='Book a Free Call' />
           </div>
@@ -42,7 +42,7 @@ const StepThree = () => {
             {loading ? (
               <SkeletonLoading items={4} />
             ) : (
-              <StepThreeForm action={action} />
+              <StepFourForm action={action} />
             )}
           </div>
         </div>
@@ -51,4 +51,4 @@ const StepThree = () => {
   )
 }
 
-export default StepThree
+export default StepFour
