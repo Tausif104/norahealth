@@ -72,10 +72,6 @@ export const myHealthTwo = [
 
 export const contraceptive = [
   {
-    id: 'contraceptive-one',
-    value: 'None of these apply',
-  },
-  {
     id: 'contraceptive-two',
     value: 'My periods stopping completely',
   },

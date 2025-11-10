@@ -1,6 +1,5 @@
 'use server'
 
-import { myHealthTwo } from '@/data/contraception'
 import { redirect } from 'next/navigation'
 
 // step one

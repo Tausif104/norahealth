@@ -7,6 +7,7 @@ import { contraceptionStepThree } from '@/actions/contraception.action'
 import SkeletonLoading from '../_components/loading-skeleton'
 import StepThreeForm from './_components/step-three-form'
 import { toast } from 'sonner'
+import StepsCount from '../_components/steps'
 
 const StepThree = () => {
   const initialState = {
@@ -30,6 +31,7 @@ const StepThree = () => {
       <PageBanner title='My Health' />
       <div className='md:my-[130px] my-[60px]'>
         <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
+          <StepsCount step={3} />
           <div className='flex items-center justify-between lg:flex-row flex-col lg:gap-0 gap-3'>
             <h3 className='font-semibold lg:text-[32px] text-[20px] leading-[1.2] lg:text-left text-center'>
               Select all that apply to you

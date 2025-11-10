@@ -6,6 +6,7 @@ import PrimaryBtn from '@/components/global/primary-btn'
 import { contraceptionStepOne } from '@/actions/contraception.action'
 import StepOneForm from './_components/step-one-form'
 import SkeletonLoading from '../_components/loading-skeleton'
+import StepsCount from '../_components/steps'
 
 const ContraceptaionPage = () => {
   const initialState = {
@@ -22,6 +23,8 @@ const ContraceptaionPage = () => {
       <PageBanner title='How Can We Help? ' />
       <div className='md:my-[130px] my-[60px]'>
         <div className='container custom-container mx-auto  md:mb-[80px] mb-[60px] sm:px-0 px-[24px]'>
+          <StepsCount step={1} />
+
           <h2 className='text-heading md:text-[36px] text-[20px] font-semibold leading-[1.2] text-center'>
             This tool is designed to help you learn about your contraception
             choices but it doesn't replace medical advice. Always book an
