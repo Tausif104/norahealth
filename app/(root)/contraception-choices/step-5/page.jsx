@@ -28,7 +28,7 @@ const StepFour = () => {
 
   return (
     <>
-      <PageBanner title='My Contraceptive' />
+      {/* <PageBanner title='My Contraceptive' /> */}
       <div className='md:my-[130px] my-[60px]'>
         <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
           <StepsCount step={5} />

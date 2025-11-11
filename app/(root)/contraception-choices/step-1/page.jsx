@@ -20,7 +20,7 @@ const ContraceptaionPage = () => {
 
   return (
     <>
-      <PageBanner title='How Can We Help? ' />
+      {/* <PageBanner title='How Can We Help? ' /> */}
       <div className='md:my-[130px] my-[60px]'>
         <div className='container custom-container mx-auto  md:mb-[80px] mb-[60px] sm:px-0 px-[24px]'>
           <StepsCount step={1} />

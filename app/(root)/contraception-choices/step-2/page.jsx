@@ -28,7 +28,7 @@ const StepTwo = () => {
 
   return (
     <>
-      <PageBanner title='Sexual Health' />
+      {/* <PageBanner title='Sexual Health' /> */}
       <div className='md:my-[130px] my-[60px]'>
         <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
           <StepsCount step={2} />
