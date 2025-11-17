@@ -1,13 +1,31 @@
-import ChoiceCheckBox from '@/components/global/choice-check'
 import OutlineBtn from '@/components/global/outline-btn'
+import PrimaryBtn from '@/components/global/primary-btn'
 import { myHealthTwo } from '@/data/contraception'
 import { ArrowRight } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 
 const StepFourForm = ({ action }) => {
   const searchParams = useSearchParams()
   const sexhealth = searchParams.get('sexhealth')
   const myhealth = searchParams.get('myhealth')
+
+  const [selected, setSelected] = useState([])
+  const [noneSelected, setNoneSelected] = useState(false)
+
+  const handleChoiceChange = (value) => {
+    setNoneSelected(false)
+    if (selected.includes(value)) {
+      setSelected(selected.filter((v) => v !== value))
+    } else {
+      setSelected([...selected, value])
+    }
+  }
+
+  const handleNoneChange = () => {
+    setNoneSelected(!noneSelected)
+    if (!noneSelected) setSelected([])
+  }
 
   return (
     <>
@@ -15,8 +33,41 @@ const StepFourForm = ({ action }) => {
         <input type='hidden' value={sexhealth} name='sex-health' />
         <input type='hidden' value={myhealth} name='my-health' />
         <div className='grid grid-cols-2 md:gap-[30px] gap-[15px]'>
+          <div>
+            <input
+              id='none'
+              type='checkbox'
+              className='peer hidden'
+              value='None'
+              name='my-health-two'
+              checked={noneSelected}
+              onChange={handleNoneChange}
+            />
+            <label
+              htmlFor='none'
+              className='peer-checked:text-white peer-checked:bg-[#D6866B] hover:bg-[#D6866B] hover:text-white transition duration-100 lg:text-[24px] md:text-[20px] font-semibold text-[#D6866B] bg-[#FFF2EE] w-full flex items-center text-center justify-center md:px-[24px] px-[15px] cursor-pointer rounded-[8px] md:min-h-[120px] min-h-[150px]'
+            >
+              None of these apply
+            </label>
+          </div>
           {myHealthTwo.map((item) => (
-            <ChoiceCheckBox key={item.id} item={item} name='my-health-two' />
+            <div key={item.id}>
+              <input
+                name='my-health-two'
+                type='checkbox'
+                id={item.id}
+                className='peer hidden'
+                value={item.value}
+                checked={selected.includes(item.value)}
+                onChange={() => handleChoiceChange(item.value)}
+              />
+              <label
+                htmlFor={item.id}
+                className='peer-checked:text-white peer-checked:bg-[#D6866B] hover:bg-[#D6866B] hover:text-white transition duration-100 lg:text-[24px] md:text-[20px] font-semibold text-[#D6866B] bg-[#FFF2EE] w-full flex items-center text-center justify-center md:px-[24px] px-[15px] cursor-pointer rounded-[8px] md:min-h-[120px] min-h-[150px]'
+              >
+                {item.value}
+              </label>
+            </div>
           ))}
         </div>
         <div className='flex items-center sm:flex-row flex-col gap-[20px] justify-center md:mt-[50px] mt-[30px]'>
@@ -32,6 +83,7 @@ const StepFourForm = ({ action }) => {
             </span>
           </button>
           <OutlineBtn url='/contraception-choices/step-1' label='Start Again' />
+          <PrimaryBtn label='Book a free call' url='/' />
         </div>
       </form>
     </>

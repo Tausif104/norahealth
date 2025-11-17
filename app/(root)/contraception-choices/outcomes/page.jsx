@@ -6,6 +6,10 @@ import {
   rings,
   implantInjection,
 } from '@/data/contraception-strings'
+import CoppurIud from './_components/coppur-iud'
+import Condoms from './_components/condoms'
+import Rings from './_components/rings'
+import Tool from './_components/tool'
 
 const OutComesPage = async ({ searchParams }) => {
   const { contraceptive, myhealthtwo, myhealth, sexhealth } = await searchParams
@@ -32,31 +36,58 @@ const OutComesPage = async ({ searchParams }) => {
 
   return (
     <>
-      <PageBanner title='Contraception Choices' />
-      <div className='container custom-container mx-auto'>
-        <h1 className='font-bold text-5xl'>Outcomes</h1>
-        <ul>
-          <li className={excludeCoc ? 'hidden' : 'flex'}>
-            Combined oral contraceptives (COC)
-          </li>
-          <li className={excludePop ? 'hidden' : 'flex'}>
-            Progesterone only contraceptives (POP)
-          </li>
-          <li className={excludeCondom ? 'hidden' : 'flex'}>Condoms</li>
-          <li className={excludeImplantInjection ? 'hidden' : 'flex'}>
-            Implants & injections
-          </li>
-          <li className={excludeRings ? 'hidden' : 'flex'}>Rings</li>
-          <li>Copper IUD</li>
-        </ul>
+      {/* <PageBanner title='Contraception Choices' /> */}
 
-        {myhealthtwo.includes('Current or recent breast cancer') && (
-          <p>
-            You have indicated that you have breast cancer and therefore we
-            strongly recommend you to book a consultation with us before
-            proceeding
-          </p>
-        )}
+      <div className='bg-[#FFF2EE] md:py-[130px] py-[80px]'>
+        <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
+          <div className='grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-8 gap-4 justify-center'>
+            <Tool
+              img='/images/tools/copper-iud.png'
+              name='Copper IUD'
+              url='/'
+            />
+            <div className={excludeCondom ? 'hidden' : 'block'}>
+              <Tool img='/images/tools/condoms.png' name='Condoms' url='/' />
+            </div>
+            <div className={excludeRings ? 'hidden' : 'block'}>
+              <Tool img='/images/tools/rings.png' name='Rings' url='/' />
+            </div>
+            <div className={excludeCoc ? 'hidden' : 'block'}>
+              <Tool
+                img='/images/tools/oral.png'
+                name='Combined oral contraceptives'
+                url='/'
+              />
+            </div>
+            <div className={excludePop ? 'hidden' : 'block'}>
+              <Tool
+                img='/images/tools/only.png'
+                name='Progesterone only contraceptives'
+                url='/'
+              />
+            </div>
+            <div className={excludeImplantInjection ? 'hidden' : 'block'}>
+              <Tool img='/images/tools/implants.png' name='Implants' url='/' />
+            </div>
+            <div className={excludeImplantInjection ? 'hidden' : 'block'}>
+              <Tool
+                img='/images/tools/injection.png'
+                name='Injections'
+                url='/'
+              />
+            </div>
+          </div>
+
+          {myhealthtwo.includes('Current or recent breast cancer') && (
+            <div className='text-center border border-[#D6866B] bg-[#FFF8EF] p-5 rounded-2xl mt-20'>
+              <p className='font-semibold'>
+                You have indicated that you have breast cancer and therefore we
+                strongly recommend you to book a consultation with us before
+                proceeding
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </>
   )

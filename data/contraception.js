@@ -15,6 +15,10 @@ export const help = [
     id: 'help-four',
     value: 'Stop my periods',
   },
+  {
+    id: 'help-five',
+    value: 'Help reduce my acne',
+  },
 ]
 
 export const sexualHealth = [

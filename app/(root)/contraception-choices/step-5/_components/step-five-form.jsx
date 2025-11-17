@@ -1,5 +1,6 @@
 import ChoiceCheckBox from '@/components/global/choice-check'
 import OutlineBtn from '@/components/global/outline-btn'
+import PrimaryBtn from '@/components/global/primary-btn'
 import { contraceptive } from '@/data/contraception'
 import { ArrowRight } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
@@ -85,6 +86,7 @@ const StepFiveForm = ({ action }) => {
             </span>
           </button>
           <OutlineBtn url='/contraception-choices/step-1' label='Start Again' />
+          <PrimaryBtn label='Book a free call' url='/' />
         </div>
       </form>
     </>

@@ -32,14 +32,11 @@ const StepThree = () => {
       <div className='md:my-[130px] my-[60px]'>
         <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
           <StepsCount step={3} />
-          <div className='flex items-center justify-between lg:flex-row flex-col lg:gap-0 gap-3'>
-            <h3 className='font-semibold lg:text-[32px] text-[20px] leading-[1.2] lg:text-left text-center'>
-              Select all that apply to you
-            </h3>
-            <PrimaryBtn url='/' label='Book a Free Call' />
-          </div>
+          <h3 className='font-semibold lg:text-[32px] text-[20px] leading-[1.2] text-center'>
+            Select all that apply to you
+          </h3>
 
-          <div className='mt-[50px]'>
+          <div className='mt-[30px]'>
             {/* contraception options */}
             {loading ? (
               <SkeletonLoading items={4} />
