@@ -1,22 +1,22 @@
-'use client'
+"use client";
 
-import { useActionState } from 'react'
-import PageBanner from '@/components/global/page-banner'
-import PrimaryBtn from '@/components/global/primary-btn'
-import { contraceptionStepOne } from '@/actions/contraception.action'
-import StepOneForm from './_components/step-one-form'
-import SkeletonLoading from '../_components/loading-skeleton'
-import StepsCount from '../_components/steps'
+import { useActionState } from "react";
+import PageBanner from "@/components/global/page-banner";
+import PrimaryBtn from "@/components/global/primary-btn";
+import { contraceptionStepOne } from "@/actions/contraception.action";
+import StepOneForm from "./_components/step-one-form";
+import SkeletonLoading from "../_components/loading-skeleton";
+import StepsCount from "../_components/steps";
 
 const ContraceptaionPage = () => {
   const initialState = {
-    data: '',
-  }
+    data: "",
+  };
 
   const [state, action, loading] = useActionState(
     contraceptionStepOne,
     initialState
-  )
+  );
 
   return (
     <>
@@ -46,7 +46,7 @@ const ContraceptaionPage = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default ContraceptaionPage
+export default ContraceptaionPage;
