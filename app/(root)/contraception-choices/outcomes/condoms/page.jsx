@@ -1,8 +1,6 @@
-import Link from "next/link";
-import DecorativeBanner from "../_components/decorative-banner";
-import PrimaryBtn from "@/components/global/primary-btn";
-import { ArrowRight, MoveRight } from "lucide-react";
-import Image from "next/image";
+import DecorativeBanner from '../../_components/decorative-banner'
+import PrimaryBtn from '@/components/global/primary-btn'
+import Image from 'next/image'
 
 // Put your illustration image at /public/condom-illustration.png
 // Example usage: import CondomsSection from '@/components/CondomsSection';
@@ -11,10 +9,7 @@ export default function CondomsSection() {
   return (
     <section className=' p-6 sm:p-10'>
       <div className='container custom-container mx-auto'>
-        <DecorativeBanner
-          link='/contraception-choices'
-          image='/images/results/condoms.png'
-        />
+        <DecorativeBanner image='/images/results/condoms.png' />
         {/* Main content card */}
         <div className='bg-[#FFF8EF]   overflow-hidden'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6 p-6 md:p-10'>
@@ -207,5 +202,5 @@ export default function CondomsSection() {
         </div>
       </div>
     </section>
-  );
+  )
 }

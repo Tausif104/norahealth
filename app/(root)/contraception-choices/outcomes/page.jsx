@@ -1,4 +1,3 @@
-import PageBanner from '@/components/global/page-banner'
 import {
   coc,
   pop,
@@ -6,18 +5,15 @@ import {
   rings,
   implantInjection,
 } from '@/data/contraception-strings'
-import CoppurIud from './_components/coppur-iud'
-import Condoms from './_components/condoms'
-import Rings from './_components/rings'
 import Tool from './_components/tool'
 
 const OutComesPage = async ({ searchParams }) => {
   const { contraceptive, myhealthtwo, myhealth, sexhealth } = await searchParams
 
-  const sexhealthArray = sexhealth.split(',')
-  const myhealthArray = myhealth.split(',')
-  const myhealthtwoArray = myhealthtwo.split(',')
-  const contraceptiveArray = contraceptive.split(',')
+  const sexhealthArray = sexhealth?.split(',')
+  const myhealthArray = myhealth?.split(',')
+  const myhealthtwoArray = myhealthtwo?.split(',')
+  const contraceptiveArray = contraceptive?.split(',')
 
   const combinedArray = [
     ...sexhealthArray,
@@ -47,7 +43,11 @@ const OutComesPage = async ({ searchParams }) => {
               url='/'
             />
             <div className={excludeCondom ? 'hidden' : 'block'}>
-              <Tool img='/images/tools/condoms.png' name='Condoms' url='/' />
+              <Tool
+                img='/images/tools/condoms.png'
+                name='Condoms'
+                url='/contraception-choices/outcomes/condoms'
+              />
             </div>
             <div className={excludeRings ? 'hidden' : 'block'}>
               <Tool img='/images/tools/rings.png' name='Rings' url='/' />
