@@ -34,28 +34,17 @@ const OutComesPage = async ({ searchParams }) => {
     <>
       {/* <PageBanner title='Contraception Choices' /> */}
 
+      {/* Combined oral contraceptive pill
+      Progesterone only contraceptive pill
+      Condoms
+      Copper IUD
+      Implants
+      Injections
+      Rings */}
+
       <div className='bg-[#FFF2EE] md:py-[130px] py-[80px]'>
         <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
           <div className='grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-8 gap-4 justify-center'>
-            <Tool
-              img='/images/tools/copper-iud.png'
-              name='Copper IUD'
-              url='/contraception-choices/outcomes/copper-iud'
-            />
-            <div className={excludeCondom ? 'hidden' : 'block'}>
-              <Tool
-                img='/images/tools/condoms.png'
-                name='Condoms'
-                url='/contraception-choices/outcomes/condoms'
-              />
-            </div>
-            <div className={excludeRings ? 'hidden' : 'block'}>
-              <Tool
-                img='/images/tools/rings.png'
-                name='Rings'
-                url='/contraception-choices/outcomes/rings'
-              />
-            </div>
             <div className={excludeCoc ? 'hidden' : 'block'}>
               <Tool
                 img='/images/tools/oral.png'
@@ -70,6 +59,18 @@ const OutComesPage = async ({ searchParams }) => {
                 url='/'
               />
             </div>
+            <div className={excludeCondom ? 'hidden' : 'block'}>
+              <Tool
+                img='/images/tools/condoms.png'
+                name='Condoms'
+                url='/contraception-choices/outcomes/condoms'
+              />
+            </div>
+            <Tool
+              img='/images/tools/copper-iud.png'
+              name='Copper IUD'
+              url='/contraception-choices/outcomes/copper-iud'
+            />
             <div className={excludeImplantInjection ? 'hidden' : 'block'}>
               <Tool
                 img='/images/tools/implants.png'
@@ -82,6 +83,13 @@ const OutComesPage = async ({ searchParams }) => {
                 img='/images/tools/injection.png'
                 name='Injections'
                 url='/contraception-choices/outcomes/injection'
+              />
+            </div>
+            <div className={excludeRings ? 'hidden' : 'block'}>
+              <Tool
+                img='/images/tools/rings.png'
+                name='Rings'
+                url='/contraception-choices/outcomes/rings'
               />
             </div>
           </div>
