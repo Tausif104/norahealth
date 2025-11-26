@@ -40,7 +40,7 @@ const OutComesPage = async ({ searchParams }) => {
             <Tool
               img='/images/tools/copper-iud.png'
               name='Copper IUD'
-              url='/'
+              url='/contraception-choices/outcomes/copper-iud'
             />
             <div className={excludeCondom ? 'hidden' : 'block'}>
               <Tool
@@ -50,7 +50,11 @@ const OutComesPage = async ({ searchParams }) => {
               />
             </div>
             <div className={excludeRings ? 'hidden' : 'block'}>
-              <Tool img='/images/tools/rings.png' name='Rings' url='/' />
+              <Tool
+                img='/images/tools/rings.png'
+                name='Rings'
+                url='/contraception-choices/outcomes/rings'
+              />
             </div>
             <div className={excludeCoc ? 'hidden' : 'block'}>
               <Tool
@@ -77,7 +81,7 @@ const OutComesPage = async ({ searchParams }) => {
               <Tool
                 img='/images/tools/injection.png'
                 name='Injections'
-                url='/'
+                url='/contraception-choices/outcomes/injection'
               />
             </div>
           </div>

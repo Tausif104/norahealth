@@ -3,14 +3,13 @@
 import { useRouter } from 'next/navigation'
 import React from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 
 const DecorativeBanner = ({ image }) => {
   const router = useRouter()
 
   return (
-    <div className='relative bg-[#FFF8EF] rounded-xl border border-[#D6866B] px-[60px] py-28 lg:p-6 lg:py-16 mb-8'>
+    <div className='relative bg-[#FFF8EF] rounded-xl border border-[#D6866B] px-[60px] xl:py-28 lg:p-6 lg:py-16  py-20 pb-10 mb-8'>
       <button
         className='absolute left-4 top-4 inline-flex items-center gap-2 bg-[#CE8936] text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-sm cursor-pointer'
         onClick={() => router.back()}
