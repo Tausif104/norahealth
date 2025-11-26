@@ -2,9 +2,6 @@ import DecorativeBanner from '../../_components/decorative-banner'
 import PrimaryBtn from '@/components/global/primary-btn'
 import Image from 'next/image'
 
-// Put your illustration image at /public/condom-illustration.png
-// Example usage: import CondomsSection from '@/components/CondomsSection';
-
 export default function CondomsSection() {
   return (
     <section className=' p-6 sm:p-10'>

@@ -21,11 +21,11 @@ const DecorativeBanner = ({ image }) => {
       <div className='flex justify-center items-center'>
         <div className=''>
           <Image
+            className='object-contain max-h-[200px]'
             src={image}
             alt='illustration'
             width={368}
             height={250}
-            style={{ objectFit: 'contain' }}
           />
         </div>
       </div>

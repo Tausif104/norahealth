@@ -29,9 +29,11 @@ const StepFour = () => {
   return (
     <>
       {/* <PageBanner title='My Contraceptive' /> */}
-      <div className='md:my-[130px] my-[60px]'>
-        <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
-          <StepsCount step={5} />
+      <div className='md:my-[130px] my-[30px]'>
+        <div className='container custom-container mx-auto  md:mb-[30px] mb-[20px] sm:px-0 px-[24px]'>
+          <div className='mb-5 md:mb-10'>
+            <StepsCount step={5} />
+          </div>
           <h3 className='font-semibold lg:text-[32px] text-[20px] leading-[1.2] text-center'>
             Are any of these an absolute no for you? Ticking all of these may
             mean your results are not very helpful

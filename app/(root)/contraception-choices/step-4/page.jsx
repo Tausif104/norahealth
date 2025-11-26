@@ -29,9 +29,11 @@ const StepFour = () => {
   return (
     <>
       {/* <PageBanner title='My Health' /> */}
-      <div className='md:my-[130px] my-[60px]'>
-        <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
-          <StepsCount step={4} />
+      <div className='md:my-[130px] my-[30px]'>
+        <div className='container custom-container mx-auto  md:mb-[30px] mb-[20px] sm:px-0 px-[24px]'>
+          <div className='mb-5 md:mb-10'>
+            <StepsCount step={4} />
+          </div>
           <h3 className='font-semibold lg:text-[32px] text-[20px] leading-[1.2] text-center'>
             Do you suffer from any of the following?
           </h3>

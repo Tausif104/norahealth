@@ -67,7 +67,11 @@ const OutComesPage = async ({ searchParams }) => {
               />
             </div>
             <div className={excludeImplantInjection ? 'hidden' : 'block'}>
-              <Tool img='/images/tools/implants.png' name='Implants' url='/' />
+              <Tool
+                img='/images/tools/implants.png'
+                name='Implants'
+                url='/contraception-choices/outcomes/implants'
+              />
             </div>
             <div className={excludeImplantInjection ? 'hidden' : 'block'}>
               <Tool
