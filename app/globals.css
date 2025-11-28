@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -192,7 +192,7 @@ h6 {
   color: #cd8936;
 }
 
-.accordion-trigger[data-state='open'] svg {
+.accordion-trigger[data-state="open"] svg {
   color: #fff;
 }
 
@@ -222,4 +222,7 @@ ul.slick-dots .slick-active button {
   border-radius: 16px;
   padding: 50px 30px;
   border: 1px solid #ce8a3696;
+}
+.react-datepicker-wrapper {
+  width: 100%;
 }
