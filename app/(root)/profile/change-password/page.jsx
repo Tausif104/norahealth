@@ -1,10 +1,10 @@
 import React from "react";
-import HealthProfile from "../_components/health-profile";
+import ChangePassword from "../_components/change-password";
 
 const page = () => {
   return (
     <>
-      <HealthProfile />
+      <ChangePassword />
     </>
   );
 };

@@ -39,7 +39,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='firstName'
                   placeholder='First name'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -55,7 +55,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='lastName'
                   placeholder='Last name'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -71,7 +71,7 @@ const GuestRagistration = () => {
                   type='tel'
                   id='phone'
                   placeholder='Phone Number'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -87,7 +87,7 @@ const GuestRagistration = () => {
                   type='email'
                   id='email'
                   placeholder='Email address'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -103,7 +103,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='dob'
                   placeholder='27 October 2025'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] pl-[16px] pr-[40px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] pl-[16px] pr-[40px] rounded-[6px]'
                 />
                 <CalendarDays className='absolute right-3 bottom-3.5 w-5 h-5 text-[#3A3D42]' /> */}
               <DateField
@@ -128,7 +128,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='nhs'
                   placeholder='10 Digits NHS Number'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -144,7 +144,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='address'
                   placeholder='Address'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -160,7 +160,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='zip'
                   placeholder='Zip code'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
             </div>
@@ -187,7 +187,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='weight'
                   placeholder='Kg/stones/pounds'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -203,7 +203,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='height'
                   placeholder='Cm/feet/inches'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -219,7 +219,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='whDate'
                   placeholder='27 October 2025'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] pl-[16px] pr-[40px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] pl-[16px] pr-[40px] rounded-[6px]'
                 />
                 <CalendarDays className='absolute right-3 bottom-3.5 text-[#3A3D42] w-5 h-5' />
               </div> */}
@@ -245,7 +245,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='bpTop'
                   placeholder='Sys'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -261,7 +261,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='bpBottom'
                   placeholder='Dis'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -277,7 +277,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='bpDate'
                   placeholder='Date checked'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] pl-[16px] pr-[40px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] pl-[16px] pr-[40px] rounded-[6px]'
                 />
                 <CalendarDays className='absolute right-3 bottom-3.5 text-[#3A3D42] w-5 h-5' />
               </div> */}
@@ -303,7 +303,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='medicalConditions'
                   placeholder='Medical Conditions'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 
@@ -319,7 +319,7 @@ const GuestRagistration = () => {
                   type='text'
                   id='currentMedicines'
                   placeholder='Medicines name'
-                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
+                  className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
                 />
               </div>
 

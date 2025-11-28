@@ -8,6 +8,8 @@ import {
   Lock,
   ArrowRight,
   PanelLeft,
+  Camera,
+  SquarePen,
 } from "lucide-react";
 import DateField from "@/components/global/DateField";
 import Link from "next/link";
@@ -16,6 +18,14 @@ import { useProfile } from "@/lib/profileContext";
 const Profile = () => {
   const [dob, setDob] = React.useState(null);
   const { setMenuOpen } = useProfile();
+  const [uploadedImage, setUploadedImage] = React.useState(null);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUploadedImage(URL.createObjectURL(file));
+    }
+  };
 
   return (
     <div className='flex-1 space-y-6 p-[24px] md:p-[50px]'>
@@ -34,13 +44,23 @@ const Profile = () => {
 
       <div className='flex items-center justify-between gap-4'>
         <div className='flex items-center gap-4'>
-          <div className='relative w-[64px] lg:w-[100px] h-[64px] lg:h-[100px] rounded-full overflow-hidden bg-[#F6F5F4]'>
+          <div className='relative w-[64px] lg:w-[100px] h-[64px] lg:h-[100px] rounded-full  bg-[#F6F5F4]'>
             <Image
-              src='/images/profile-placeholder.png' // replace with real image
+              src={uploadedImage || "/images/profile-placeholder.png"}
               alt='Profile'
               fill
-              className='object-cover'
+              className='object-cover  w-[64px] lg:w-[100px] h-[64px] lg:h-[100px] rounded-full border-2 border-[#CE8936]'
             />
+            {/* Upload Button on Image */}
+            <label className='absolute bottom-0 right-0 bg-white shadow-lg p-2 rounded-full cursor-pointer'>
+              <SquarePen className='w-4 h-4 text-[#d67b0e]' />
+              <input
+                type='file'
+                accept='image/*'
+                onChange={handleImageUpload}
+                className='hidden'
+              />
+            </label>
           </div>
           <div>
             <h3 className='text-[#1F2122] text-[20px] md:text-[22px] font-semibold'>

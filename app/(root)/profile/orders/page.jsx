@@ -1,10 +1,10 @@
 import React from "react";
-import HealthProfile from "../_components/health-profile";
+import Orders from "../_components/orders";
 
 const page = () => {
   return (
     <>
-      <HealthProfile />
+      <Orders />
     </>
   );
 };

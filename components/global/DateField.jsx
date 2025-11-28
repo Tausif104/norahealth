@@ -1,36 +1,65 @@
 "use client";
-import React from "react";
-import DatePicker from "react-datepicker";
-import { CalendarDays } from "lucide-react";
-import "react-datepicker/dist/react-datepicker.css";
+import * as React from "react";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export default function DateField({
   label,
-  placeholder,
+  placeholder = "Select date",
   selected,
   onChange,
   className = "",
   id,
   bg,
 }) {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <div className={`relative ${className}`}>
-      <label className='block text-base mb-2 text-[#0D060C]' htmlFor={id}>
-        {label}
-      </label>
+    <div className={cn("relative", className)}>
+      {label && (
+        <label htmlFor={id} className='block text-base mb-2 text-[#0D060C]'>
+          {label}
+        </label>
+      )}
 
-      <DatePicker
-        id={id}
-        selected={selected}
-        onChange={onChange}
-        placeholderText={placeholder}
-        dateFormat='dd MMMM yyyy'
-        className={`${bg}  placeholder:text-[#3A3D42]
-        !w-full py-[15px] md:py-[18px] pl-[16px] pr-[40px] rounded-[6px]
-        focus:outline-none`}
-      />
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            id={id}
+            className={cn(
+              `${bg} placeholder:text-[#3A3D42] !w-full 
+              py-[15px] md:py-[17px] pl-[16px] pr-[40px] rounded-[6px]
+              text-left  focus:outline-none focus:ring-2 
+              focus:ring-[#3A3D42]/50`,
+              !selected && "text-[#3A3D42]"
+            )}
+          >
+            {selected ? format(selected, "dd MMMM yyyy") : placeholder}
+            <CalendarIcon className='absolute right-3 bottom-3.5 md:bottom-4.5 w-5 h-5 text-[#3A3D42] pointer-events-none' />
+          </button>
+        </PopoverTrigger>
 
-      <CalendarDays className='absolute right-3 bottom-3.5 md:bottom-4.5 text-[#3A3D42] w-5 h-5 pointer-events-none' />
+        <PopoverContent className='p-0' align='start'>
+          <Calendar
+            mode='single'
+            selected={selected}
+            captionLayout='dropdown'
+            onSelect={(date) => {
+              onChange(date);
+              setOpen(false);
+            }}
+            initialFocus
+            className='w-full'
+          />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
