@@ -113,6 +113,7 @@ const GuestRagistration = () => {
                 onChange={setDob}
                 placeholder='27 October 2025'
                 className='md:col-span-2'
+                bg='bg-[#F6F5F4] border-0'
               />
 
               {/* NHS Number */}
@@ -229,6 +230,7 @@ const GuestRagistration = () => {
                 onChange={setWeightDate}
                 placeholder='27 October 2025'
                 className='md:col-span-2'
+                bg='bg-[#F6F5F4] border-0'
               />
 
               {/* BP Top (25%) */}
@@ -286,6 +288,7 @@ const GuestRagistration = () => {
                 onChange={setBpDate}
                 placeholder='Date checked'
                 className='md:col-span-2'
+                bg='bg-[#F6F5F4] border-0'
               />
 
               {/* Medical Conditions (50%) */}
