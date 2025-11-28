@@ -1,21 +1,23 @@
-import { DM_Sans, Inter } from 'next/font/google'
-import { Toaster } from '@/components/ui/sonner'
-import './globals.css'
+import { DM_Sans, Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import "react-datepicker/dist/react-datepicker.css";
+
+import "./globals.css";
 
 const dmSams = DM_Sans({
-  subsets: ['latin'],
-  variable: '--font-dm-sans',
-})
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+});
 
 const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-})
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
 export const metadata = {
-  title: 'Nora Health',
-  description: 'Free Oral Contraception, Delivered to Your Door',
-}
+  title: "Nora Health",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
 
 export default function RootLayout({ children }) {
   return (
@@ -28,5 +30,5 @@ export default function RootLayout({ children }) {
         <Toaster position='top-center' />
       </body>
     </html>
-  )
+  );
 }
