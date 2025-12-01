@@ -34,14 +34,6 @@ const OutComesPage = async ({ searchParams }) => {
     <>
       {/* <PageBanner title='Contraception Choices' /> */}
 
-      {/* Combined oral contraceptive pill
-      Progesterone only contraceptive pill
-      Condoms
-      Copper IUD
-      Implants
-      Injections
-      Rings */}
-
       <div className='bg-[#FFF2EE] md:py-[130px] py-[80px]'>
         <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
           <div className='grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-8 gap-4 justify-center'>
@@ -49,14 +41,14 @@ const OutComesPage = async ({ searchParams }) => {
               <Tool
                 img='/images/tools/oral.png'
                 name='Combined oral contraceptives'
-                url='/'
+                url='/contraception-choices/outcomes/oral'
               />
             </div>
             <div className={excludePop ? 'hidden' : 'block'}>
               <Tool
                 img='/images/tools/only.png'
                 name='Progesterone only contraceptives'
-                url='/'
+                url='/contraception-choices/outcomes/only'
               />
             </div>
             <div className={excludeCondom ? 'hidden' : 'block'}>
