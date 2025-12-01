@@ -34,9 +34,17 @@ const OutComesPage = async ({ searchParams }) => {
     <>
       {/* <PageBanner title='Contraception Choices' /> */}
 
-      <div className='bg-[#FFF2EE] md:py-[130px] py-[80px]'>
+      <div className='bg-[#FFF2EE] md:py-[130px] sm:py-[80px] py-[50px]'>
         <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
-          <div className='grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-8 gap-4 justify-center'>
+          <h3 className='text-center font-semibold text-[20px] md:text-3xl lg:text-4xl mb-3'>
+            These contraceptive methods may be suitable for you.
+          </h3>
+          <p className='text-center mb-10 md:mb-15'>
+            Click here to book an appointment or select any method for more
+            information
+          </p>
+
+          <div className='grid xl:grid-cols-3 md:grid-cols-2 grid-cols-2 md:gap-8 gap-4 justify-center'>
             <div className={excludeCoc ? 'hidden' : 'block'}>
               <Tool
                 img='/images/tools/oral.png'
