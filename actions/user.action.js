@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt'
 import { prisma } from '@/lib/client/prisma'
 import { signToken, verifyToken } from '@/lib/jwt/jwt'
 import { cookies } from 'next/headers'
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 // register action
 export const registerAction = async (prevState, formData) => {

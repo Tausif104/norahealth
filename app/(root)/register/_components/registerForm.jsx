@@ -2,31 +2,30 @@
 
 import { useState, useEffect } from 'react'
 import { useActionState } from 'react'
-import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  LoaderIcon,
-  LockKeyhole,
-  Mail,
-} from 'lucide-react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Eye, EyeOff, LoaderIcon, LockKeyhole, Mail } from 'lucide-react'
 import { registerAction } from '@/actions/user.action'
-import LoadingIcon from '@/components/global/loading'
 import { toast } from 'sonner'
 
 const RegisterForm = () => {
+  // router
+  const router = useRouter()
+
+  // initial State
   const initialState = {
     msg: '',
     success: false,
   }
 
+  // action state
   const [state, action, loading] = useActionState(registerAction, initialState)
 
+  // to show alerts
   useEffect(() => {
     if (state.msg) {
       if (state.success) {
         toast.success(state.msg)
+        router.push('/login')
       } else {
         toast.warning(state.msg)
       }
@@ -34,9 +33,11 @@ const RegisterForm = () => {
     state.msg = ''
   }, [state.msg])
 
+  // password show hide
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   return (
+    // login form
     <form action={action}>
       <div className='space-y-5'>
         <div className='relative'>

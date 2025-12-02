@@ -1,7 +1,14 @@
+import { loggedInUserAction } from '@/actions/user.action'
 import RegisterForm from './_components/registerForm'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
-const RegisterPage = () => {
+const RegisterPage = async () => {
+  const payload = await loggedInUserAction()
+
+  if (payload?.payload?.email) {
+    redirect('/profile')
+  }
   return (
     <>
       <section className='section-padding'>

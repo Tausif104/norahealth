@@ -1,8 +1,16 @@
 import React from 'react'
 import LoginForm from './_components/loginForm'
 import Link from 'next/link'
+import { loggedInUserAction } from '@/actions/user.action'
+import { redirect } from 'next/navigation'
 
-const page = () => {
+const page = async () => {
+  const payload = await loggedInUserAction()
+
+  if (payload?.payload?.email) {
+    redirect('/profile')
+  }
+
   return (
     <>
       <section className='section-padding'>
