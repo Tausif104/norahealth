@@ -25,7 +25,7 @@ const DecorativeBanner = ({ image }) => {
             alt='illustration'
             width={368}
             height={250}
-            placeholder='blur'
+            loading='lazy'
           />
         </div>
       </div>
