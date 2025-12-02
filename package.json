@@ -8,10 +8,13 @@
     "start": "next start"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.0.1",
+    "@prisma/client": "^7.0.1",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",
+    "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -19,6 +22,7 @@
     "motion": "^12.23.24",
     "next": "15.5.4",
     "next-themes": "^0.4.6",
+    "prisma": "^7.0.1",
     "react": "19.1.0",
     "react-datepicker": "^8.9.0",
     "react-day-picker": "^9.11.2",

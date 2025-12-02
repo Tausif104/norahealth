@@ -1,0 +1,140 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useActionState } from 'react'
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  LoaderIcon,
+  LockKeyhole,
+  Mail,
+} from 'lucide-react'
+import Link from 'next/link'
+import { registerAction } from '@/actions/user.action'
+import LoadingIcon from '@/components/global/loading'
+import { toast } from 'sonner'
+
+const RegisterForm = () => {
+  const initialState = {
+    msg: '',
+    success: false,
+  }
+
+  const [state, action, loading] = useActionState(registerAction, initialState)
+
+  useEffect(() => {
+    if (state.msg) {
+      if (state.success) {
+        toast.success(state.msg)
+      } else {
+        toast.warning(state.msg)
+      }
+    }
+    state.msg = ''
+  }, [state.msg])
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  return (
+    <form action={action}>
+      <div className='space-y-5'>
+        <div className='relative'>
+          <label
+            className='block text-base  mb-2 text-[#0D060C]'
+            htmlFor='email'
+          >
+            Email address
+          </label>
+          <input
+            type='email'
+            id='email'
+            name='email'
+            placeholder='Email address'
+            className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] md:py-[18px]  pl-[48px] pr-[24px]   rounded-[6px]'
+          />
+          <Mail className='absolute left-4 bottom-3.5 md:bottom-4.5 text-[#3A3D42]' />
+        </div>
+        <div className='relative'>
+          <label
+            className='block text-base  mb-2 text-[#0D060C]'
+            htmlFor='password'
+          >
+            Password
+          </label>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            id='password'
+            name='password'
+            placeholder='Password'
+            className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] md:py-[18px]  pl-[48px] pr-[24px]   rounded-[6px]'
+          />
+          <LockKeyhole className='absolute left-4 bottom-3.5  md:bottom-4.5 text-[#3A3D42]' />
+          <span>
+            {showPassword ? (
+              <Eye
+                className='absolute right-4 bottom-4.5 text-[#3A3D42] cursor-pointer'
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            ) : (
+              <EyeOff
+                className='absolute right-4 bottom-4.5 text-[#3A3D42] cursor-pointer'
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            )}
+          </span>
+        </div>
+        <div className='relative'>
+          <label
+            className='block text-base  mb-2 text-[#0D060C]'
+            htmlFor='Cpassword'
+          >
+            Confirm Password
+          </label>
+          <input
+            type={showConfirmPassword ? 'text' : 'password'}
+            id='Cpassword'
+            name='confirm-password'
+            placeholder='Confirm Password'
+            className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[15px] md:py-[18px]  pl-[48px] pr-[24px]   rounded-[6px]'
+          />
+          <LockKeyhole className='absolute left-4 bottom-3.5  md:bottom-4.5 text-[#3A3D42]' />
+          <span>
+            {showConfirmPassword ? (
+              <Eye
+                className='absolute right-4 bottom-4.5 text-[#3A3D42] cursor-pointer'
+                onClick={() => setShowPassword(!showConfirmPassword)}
+              />
+            ) : (
+              <EyeOff
+                className='absolute right-4 bottom-4.5 text-[#3A3D42] cursor-pointer'
+                onClick={() => setShowPassword(!showConfirmPassword)}
+              />
+            )}
+          </span>
+        </div>
+
+        <button
+          type='submit'
+          className=' text-white inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 w-full cursor-pointer'
+        >
+          <span className='flex items-center justify-center'>
+            {loading ? (
+              <span className='ml-2 -rotate-45 group-hover:rotate-0 transition duration-300'>
+                <LoaderIcon
+                  role='status'
+                  aria-label='Loading'
+                  className='size-6 animate-spin mx-auto'
+                />
+              </span>
+            ) : (
+              <span>Register</span>
+            )}
+          </span>
+        </button>
+      </div>
+    </form>
+  )
+}
+
+export default RegisterForm

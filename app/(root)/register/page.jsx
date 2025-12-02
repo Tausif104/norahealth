@@ -1,12 +1,27 @@
-import React from "react";
-import Register from "./_components/register";
+import RegisterForm from './_components/registerForm'
+import Link from 'next/link'
 
-const page = () => {
+const RegisterPage = () => {
   return (
     <>
-      <Register />
+      <section className='section-padding'>
+        <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
+          <div className='p-4 md:p-[40px] shadow-[0_10px_80px_0_rgba(30,96,221,0.1)] rounded-[12px] max-w-[670px] mx-auto space-y-[30px]'>
+            <h2 className='text-center text-[#1F2122] text-[24px] md:text-[32px] font-semibold'>
+              Registration
+            </h2>
+            <RegisterForm />
+            <p className='text-center text-[#1D2D44] text-base'>
+              Already have an account?
+              <Link href='/login' className='text-[#d67b0e] underline ml-2'>
+                Sign In
+              </Link>
+            </p>
+          </div>
+        </div>
+      </section>
     </>
-  );
-};
+  )
+}
 
-export default page;
+export default RegisterPage
