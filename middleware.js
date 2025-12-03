@@ -5,13 +5,10 @@ export function middleware(req) {
   const token = req.cookies.get('auth_token')?.value
   const pathname = req.nextUrl.pathname
 
-  // Guest-only (hide from logged-in users)
   const guestOnly = ['/login', '/register']
 
-  // Protected routes (block if not logged in)
   const protectedPrefixes = ['/profile', '/account']
 
-  // --------- Guest-only Redirect (if logged in) ---------
   if (guestOnly.includes(pathname)) {
     if (token) {
       try {
@@ -22,7 +19,6 @@ export function middleware(req) {
     return NextResponse.next()
   }
 
-  // --------- Protected Routes (if NOT logged in) ---------
   const isProtected = protectedPrefixes.some((prefix) =>
     pathname.startsWith(prefix)
   )
@@ -44,10 +40,5 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: [
-    '/login',
-    '/register',
-    '/profile/:path*', // protect /profile and all subroutes
-    '/account/:path*', // protect /account and all subroutes
-  ],
+  matcher: ['/login', '/register', '/profile/:path*', '/account/:path*'],
 }

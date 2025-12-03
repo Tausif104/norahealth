@@ -54,6 +54,7 @@ export const registerAction = async (prevState, formData) => {
     const safeUser = {
       id: user.id,
       email: user.email,
+      isAdmin: user.isAdmin,
       createdAt: user.createdAt,
     }
 
@@ -119,6 +120,7 @@ export const loginAction = async (prevState, formData) => {
   const safeUser = {
     id: user.id,
     email: user.email,
+    isAdmin: user.isAdmin,
     createdAt: user.createdAt,
   }
 
