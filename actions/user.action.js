@@ -119,6 +119,8 @@ export const logoutAction = async () => {
     sameSite: 'strict',
     maxAge: 0,
   })
+
+  redirect('/login')
 }
 
 // Get Logged In User

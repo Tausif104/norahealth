@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { User, ShoppingCart } from 'lucide-react'
+import { User, LogInIcon } from 'lucide-react'
 import { menuItems } from '@/data/menu'
 import {
   DropdownMenu,
@@ -9,8 +9,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { loggedInUserAction, logoutAction } from '@/actions/user.action'
 
-const Navigation = () => {
+const Navigation = async () => {
+  const payload = await loggedInUserAction()
+
   return (
     <nav className='flex items-center gap-6'>
       <ul className='flex items-center gap-6'>
@@ -27,35 +30,41 @@ const Navigation = () => {
       </ul>
 
       <div className='flex items-center gap-2'>
-        <DropdownMenu>
-          <DropdownMenuTrigger className='focus:outline-0 cursor-pointer'>
-            <span className='text-[#D6866B] w-[40px] h-[40px] border border-[#D6866B] flex items-center justify-center rounded-full hover:bg-[#D6866B] hover:text-white transition'>
-              <User width={22} />
-            </span>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuLabel className='font-bold'>
-              My Account
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href='/profile'>Profile</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href='/Settings'>Settings</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href='/log-out'>Log Out</Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <Link
-          href='/order'
-          className='bg-transparent text-[#D6866B] border border-[#D6866B] rounded-full hover:bg-[#D6866B] hover:text-white py-3 text-[16px] flex px-4 gap-2 font-medium transition'
-        >
-          <ShoppingCart width={22} /> <span>Order</span>
-        </Link>
+        {payload?.payload ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger className='focus:outline-0 cursor-pointer'>
+              <span className='text-[#D6866B] w-[40px] h-[40px] border border-[#D6866B] flex items-center justify-center rounded-full hover:bg-[#D6866B] hover:text-white transition'>
+                <User width={22} />
+              </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuLabel className='font-bold'>
+                {payload?.payload?.email}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link href='/profile'>Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <form action={logoutAction}>
+                  <button
+                    type='submit'
+                    className='w-full text-left cursor-pointer'
+                  >
+                    Log Out
+                  </button>
+                </form>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Link
+            href='/login'
+            className='bg-transparent text-[#D6866B] border border-[#D6866B] rounded-full hover:bg-[#D6866B] hover:text-white py-2 text-[16px] flex px-4 gap-2 font-medium transition'
+          >
+            <LogInIcon width={15} /> <span>Log In</span>
+          </Link>
+        )}
       </div>
     </nav>
   )

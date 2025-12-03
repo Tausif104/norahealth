@@ -1,4 +1,4 @@
-import { Mail, Phone, User } from 'lucide-react'
+import { Mail, Phone, User, LogInIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { menuItems } from '@/data/menu'
@@ -10,8 +10,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { loggedInUserAction, logoutAction } from '@/actions/user.action'
 
-const MobileHeader = () => {
+const MobileHeader = async () => {
+  const payload = await loggedInUserAction()
   return (
     <header className='block lg:hidden'>
       {/* announcement bar */}
@@ -66,30 +68,42 @@ const MobileHeader = () => {
               className='w-[40px] max-w-[40px]'
             />
 
-            <div>
-              <DropdownMenu>
-                <DropdownMenuTrigger className='focus:outline-0'>
-                  <span className='text-[#D6866B] w-[40px] h-[40px] border border-[#D6866B] flex items-center justify-center rounded-full hover:bg-[#D6866B] hover:text-white transition'>
-                    <User width={22} />
-                  </span>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
-                  <DropdownMenuLabel className='font-bold'>
-                    My Account
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Link href='/profile'>Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href='/Settings'>Settings</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href='/log-out'>Log Out</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            {payload?.payload?.email ? (
+              <div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className='focus:outline-0'>
+                    <span className='text-[#D6866B] w-[40px] h-[40px] border border-[#D6866B] flex items-center justify-center rounded-full hover:bg-[#D6866B] hover:text-white transition'>
+                      <User width={22} />
+                    </span>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align='end'>
+                    <DropdownMenuLabel className='font-bold'>
+                      My Account
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <Link href='/profile'>Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <form action={logoutAction}>
+                        <button
+                          type='submit'
+                          className='w-full text-left cursor-pointer'
+                        >
+                          Log Out
+                        </button>
+                      </form>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <>
+                <span className='text-[#D6866B] w-[40px] h-[40px] border border-[#D6866B] flex items-center justify-center rounded-full hover:bg-[#D6866B] hover:text-white transition'>
+                  <LogInIcon width={22} />
+                </span>
+              </>
+            )}
 
             <DropdownMenu>
               <DropdownMenuTrigger className='focus:outline-0'>

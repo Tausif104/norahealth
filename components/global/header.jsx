@@ -3,13 +3,8 @@ import Link from 'next/link'
 import Navigation from './navigation'
 import { Mail, Phone } from 'lucide-react'
 import MobileHeader from './mobile-header'
-import { loggedInUserAction } from '@/actions/user.action'
 
 const Header = async () => {
-  // console.log(await loggedInUserAction())
-
-  const payload = await loggedInUserAction()
-
   return (
     <>
       <MobileHeader />
