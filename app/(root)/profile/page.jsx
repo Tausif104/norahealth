@@ -1,14 +1,18 @@
 import React from 'react'
 import Profile from './_components/profile'
-import { loggedInUserAction } from '@/actions/user.action'
+import { getUserAccount } from '@/actions/account.action'
 import { redirect } from 'next/navigation'
 
 const page = async () => {
-  const payload = await loggedInUserAction()
+  const account = await getUserAccount()
+
+  if (!account?.account) {
+    redirect('/account')
+  }
 
   return (
     <>
-      <Profile />
+      <Profile account={account?.account} />
     </>
   )
 }

@@ -1,31 +1,68 @@
-"use client";
-import React from "react";
-import Image from "next/image";
-import {
-  User,
-  HeartPulse,
-  ShoppingBag,
-  Lock,
-  ArrowRight,
-  PanelLeft,
-  Camera,
-  SquarePen,
-} from "lucide-react";
-import DateField from "@/components/global/DateField";
-import Link from "next/link";
-import { useProfile } from "@/lib/profileContext";
+'use client'
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import { ArrowRight, PanelLeft, SquarePen } from 'lucide-react'
+import DateField from '@/components/global/DateField'
+import { useProfile } from '@/lib/profileContext'
+import { formatDate } from '@/lib/utils'
+import { useActionState } from 'react'
+import { updateAccountAction } from '@/actions/account.action'
+import { toast } from 'sonner'
 
-const Profile = () => {
-  const [dob, setDob] = React.useState(null);
-  const { setMenuOpen } = useProfile();
-  const [uploadedImage, setUploadedImage] = React.useState(null);
+const Profile = ({ account }) => {
+  const [dob, setDob] = useState(null)
+  const { setMenuOpen } = useProfile()
+  const [uploadedImage, setUploadedImage] = useState(null)
 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]
     if (file) {
-      setUploadedImage(URL.createObjectURL(file));
+      setUploadedImage(URL.createObjectURL(file))
     }
-  };
+  }
+
+  const initialState = {
+    msg: '',
+    success: false,
+  }
+
+  const [state, action, loading] = useActionState(
+    updateAccountAction,
+    initialState
+  )
+
+  const {
+    userId,
+    firstName,
+    lastName,
+    dob: dateOfBirth,
+    secondEmail,
+    phoneNumber,
+    nhsNumber,
+    address,
+    zipCode,
+    weight,
+    height,
+    weightHeightCheckDate,
+    bpTop,
+    bpBottom,
+    bpCheckDate,
+    medicalConditions,
+    currentMedicines,
+  } = account
+
+  console.log(account)
+
+  useEffect(() => {
+    if (state.msg) {
+      if (state.success) {
+        toast.success(state.msg)
+      } else {
+        toast.warning(state.msg)
+      }
+    }
+    state.msg = ''
+  }, [state.msg])
 
   return (
     <div className='flex-1 space-y-6 p-[24px] md:p-[50px]'>
@@ -46,7 +83,7 @@ const Profile = () => {
         <div className='flex items-center gap-4'>
           <div className='relative w-[64px] lg:w-[100px] h-[64px] lg:h-[100px] rounded-full  bg-[#F6F5F4]'>
             <Image
-              src={uploadedImage || "/images/profile-placeholder.png"}
+              src={uploadedImage || '/images/profile-placeholder.png'}
               alt='Profile'
               fill
               className='object-cover  w-[64px] lg:w-[100px] h-[64px] lg:h-[100px] rounded-full border-2 border-[#CE8936]'
@@ -64,24 +101,18 @@ const Profile = () => {
           </div>
           <div>
             <h3 className='text-[#1F2122] text-[20px] md:text-[22px] font-semibold'>
-              Sarah M.
+              {firstName} {lastName}
             </h3>
-            <p className='text-sm text-[#3A3D42]'> Age: 28</p>
+            <p className='text-sm text-[#3A3D42]'>
+              DOB: {formatDate(dateOfBirth)}
+            </p>
           </div>
         </div>
-
-        <button className='hidden md:inline-flex items-center text-sm font-medium bg-[#d67b0e] text-white py-2.5 px-5 rounded-full hover:bg-[#b8680b] transition'>
-          Edit Profile
-        </button>
       </div>
 
-      {/* MOBILE edit button */}
-      <button className='md:hidden inline-flex items-center text-sm font-medium bg-[#d67b0e] text-white py-2.5 px-5 rounded-full hover:bg-[#b8680b] transition'>
-        Edit Profile
-      </button>
-
       {/* FORM */}
-      <form className='space-y-6'>
+      <form className='space-y-6' action={action}>
+        <input type='hidden' name='userId' value={userId} />
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
           {/* First / Last name */}
           <div className='md:col-span-2'>
@@ -94,7 +125,8 @@ const Profile = () => {
             <input
               id='firstName'
               type='text'
-              defaultValue='Sarah M.'
+              name='firstname'
+              defaultValue={firstName}
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
@@ -108,11 +140,11 @@ const Profile = () => {
             <input
               id='lastName'
               type='text'
-              defaultValue='Sarah M.'
+              name='lastName'
+              defaultValue={lastName}
               className='bg-white border border-[#F0E3D6] text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-
           {/* Email / Phone */}
           <div className='md:col-span-2'>
             <label
@@ -123,8 +155,9 @@ const Profile = () => {
             </label>
             <input
               id='email'
+              defaultValue={secondEmail}
+              name='email'
               type='email'
-              defaultValue='sarah@example.com'
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
@@ -137,20 +170,21 @@ const Profile = () => {
             </label>
             <input
               id='phone'
+              name='phone'
               type='tel'
-              defaultValue='+447386235014'
+              defaultValue={phoneNumber}
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-
           {/* DOB / NHS */}
           <DateField
             id='dob'
             label='Date of Birth'
             selected={dob}
             onChange={setDob}
-            placeholder='13 January 2002'
+            placeholder={formatDate(dateOfBirth)}
             className='md:col-span-2 '
+            name='dob'
             bg='bg-white border border-[#EEE0CF] text-black'
           />
           <div className='md:col-span-2'>
@@ -163,11 +197,11 @@ const Profile = () => {
             <input
               id='nhs'
               type='text'
-              defaultValue='485 777 3456'
+              defaultValue={nhsNumber}
+              name='nhs'
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-
           {/* Home address / Zip */}
           <div className='md:col-span-3'>
             <label
@@ -179,6 +213,8 @@ const Profile = () => {
             <input
               id='homeAddress'
               type='text'
+              defaultValue={address}
+              name='address'
               placeholder='Wellin Lane, Edwalton, United Kingdom'
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
@@ -193,90 +229,46 @@ const Profile = () => {
             <input
               id='homeZip'
               type='text'
+              defaultValue={zipCode}
+              name='zip'
               placeholder='NG12 4AS'
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-
-          {/* Delivery address / Zip */}
-          <div className='md:col-span-3'>
-            <label
-              htmlFor='deliveryAddress'
-              className='block text-base mb-2 text-[#0D060C]'
-            >
-              Delivery Address
-            </label>
-            <input
-              id='deliveryAddress'
-              type='text'
-              placeholder='Wellin Lane, Edwalton, United Kingdom'
-              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
-            />
-          </div>
-          <div className='md:col-span-1'>
-            <label
-              htmlFor='deliveryZip'
-              className='block text-base mb-2 text-[#0D060C]'
-            >
-              Zip code
-            </label>
-            <input
-              id='deliveryZip'
-              type='text'
-              placeholder='NG12 4AS'
-              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
-            />
-          </div>
-
-          {/* Country / Language */}
-          <div className='md:col-span-2'>
-            <label
-              htmlFor='country'
-              className='block text-base mb-2 text-[#0D060C]'
-            >
-              Country
-            </label>
-            <select
-              id='country'
-              placeholder='England'
-              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px] appearance-none'
-            >
-              <option>England</option>
-              <option>Scotland</option>
-              <option>Wales</option>
-              <option>Northern Ireland</option>
-            </select>
-          </div>
-          <div className='md:col-span-2'>
-            <label
-              htmlFor='language'
-              className='block text-base mb-2 text-[#0D060C]'
-            >
-              Language
-            </label>
-            <select
-              id='language'
-              defaultValue='English'
-              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px] appearance-none'
-            >
-              <option>English</option>
-            </select>
-          </div>
-
+          <input type='hidden' name='weight' defaultValue={weight} />
+          <input type='hidden' name='height' defaultValue={weight} />
+          <input
+            type='hidden'
+            name='whdate'
+            defaultValue={weightHeightCheckDate}
+          />
+          <input type='hidden' name='bptop' defaultValue={bpTop} />
+          <input type='hidden' name='bpbottom' defaultValue={bpBottom} />
+          <input type='hidden' name='bpdate' defaultValue={bpCheckDate} />
+          <input
+            type='hidden'
+            name='medicalconditions'
+            defaultValue={medicalConditions}
+          />
+          <input
+            type='hidden'
+            name='currentmedicines'
+            defaultValue={currentMedicines}
+          />
           {/* Save button */}
           <div className='md:col-span-4'>
             <button
               type='submit'
               className='w-full md:w-auto flex items-center justify-center gap-2 bg-[#d67b0e] text-white text-[16px] font-medium py-3 px-8 rounded-full hover:bg-[#b8680b] transition'
             >
-              <span>Save now</span>
+              <span>{loading ? 'loading' : 'Save Now'}</span>
               <ArrowRight className='w-4 h-4 -rotate-45' />
             </button>
           </div>
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile
