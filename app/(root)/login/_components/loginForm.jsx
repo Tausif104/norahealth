@@ -5,9 +5,12 @@ import { useActionState } from 'react'
 import { Eye, EyeOff, LoaderIcon, LockKeyhole, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { loginAction } from '@/actions/user.action'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 const LoginForm = () => {
+  const router = useRouter()
+
   const [showPassword, setShowPassword] = useState(false)
 
   const initialState = {
@@ -21,6 +24,7 @@ const LoginForm = () => {
     if (state.msg) {
       if (state.success) {
         toast.success(state.msg)
+        router.push('/profile')
       } else {
         toast.warning(state.msg)
       }

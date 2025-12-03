@@ -6,9 +6,9 @@ import { redirect } from 'next/navigation'
 const RegisterPage = async () => {
   const payload = await loggedInUserAction()
 
-  if (payload?.payload?.email) {
-    redirect('/profile')
-  }
+  // if (payload?.payload?.email) {
+  //   redirect('/account')
+  // }
   return (
     <>
       <section className='section-padding'>

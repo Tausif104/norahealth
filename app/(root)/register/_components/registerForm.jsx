@@ -25,7 +25,7 @@ const RegisterForm = () => {
     if (state.msg) {
       if (state.success) {
         toast.success(state.msg)
-        router.push('/login')
+        router.push('/account')
       } else {
         toast.warning(state.msg)
       }

@@ -1,16 +1,8 @@
 import React from 'react'
 import LoginForm from './_components/loginForm'
 import Link from 'next/link'
-import { loggedInUserAction } from '@/actions/user.action'
-import { redirect } from 'next/navigation'
 
 const page = async () => {
-  const payload = await loggedInUserAction()
-
-  if (payload?.payload?.email) {
-    redirect('/profile')
-  }
-
   return (
     <>
       <section className='section-padding'>
@@ -21,10 +13,10 @@ const page = async () => {
             </h2>
             <LoginForm />
             <p className='text-center text-[#1D2D44] text-base leading-[1.8]'>
-              By logging in, you agree to the personal data processing policy{' '}
+              By logging in, you agree to the personal data processing policy
               <br />
-              Don’t have an account yet?{' '}
-              <Link href='/register' className='text-[#d67b0e] underline'>
+              Don’t have an account yet?
+              <Link href='/register' className='text-[#d67b0e] underline ml-2'>
                 Sign Up
               </Link>
             </p>
