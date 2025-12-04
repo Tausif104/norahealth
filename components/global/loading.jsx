@@ -2,7 +2,7 @@ import { LoaderIcon } from 'lucide-react'
 
 const LoadingIcon = () => {
   return (
-    <div className='w-full justify-center items-center h-[100vh] flex'>
+    <div className='w-full justify-center items-center h-[60vh] flex'>
       <span>
         <LoaderIcon
           role='status'
