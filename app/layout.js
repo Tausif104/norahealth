@@ -1,7 +1,7 @@
 import { DM_Sans, Inter } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
 import 'react-datepicker/dist/react-datepicker.css'
-
+import 'react-calendar/dist/Calendar.css'
 import './globals.css'
 
 const dmSams = DM_Sans({

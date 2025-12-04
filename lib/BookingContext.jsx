@@ -1,9 +1,9 @@
 "use client";
 import React, { createContext, useContext, useState } from "react";
 
-const ProfileContext = createContext();
+const BookingContext = createContext();
 
-export const ProfileProvider = ({ children }) => {
+export const BookingProvider = ({ children }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [bookingData, setBookingData] = useState(null);
   const value = {
@@ -13,8 +13,8 @@ export const ProfileProvider = ({ children }) => {
     setBookingData,
   };
   return (
-    <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>
+    <BookingContext.Provider value={value}>{children}</BookingContext.Provider>
   );
 };
 
-export const useProfile = () => useContext(ProfileContext);
+export const useBooking = () => useContext(BookingContext);
