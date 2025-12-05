@@ -1,4 +1,3 @@
-import React from 'react'
 import { RecordTable } from './_components/record-table'
 import { getAllRecordsAction } from '@/actions/record.action'
 

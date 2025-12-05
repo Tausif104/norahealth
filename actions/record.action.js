@@ -73,3 +73,28 @@ export const getAllRecordsAction = async () => {
     records,
   }
 }
+
+// delete record
+export const deleteRecord = async (formData) => {
+  const recordId = formData.get('recordId')
+
+  const payload = await loggedInUserAction()
+
+  if (!payload?.payload?.id) {
+    return {
+      msg: 'User not logged In',
+      success: false,
+    }
+  }
+
+  const userId = payload?.payload?.id
+
+  await prisma.record.delete({
+    where: {
+      id: Number(recordId),
+      userId: Number(userId),
+    },
+  })
+
+  revalidatePath('/profile/health-records')
+}

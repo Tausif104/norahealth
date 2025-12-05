@@ -35,7 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { CreateRecordForm } from './create-record-form'
+import { CreateHistoryForm } from './create-history-form'
 import { formatDate } from '@/lib/utils'
 import { deleteRecord } from '@/actions/record.action'
 
@@ -139,7 +139,7 @@ export const columns = [
   },
 ]
 
-export function RecordTable({ record }) {
+export function HistoryTable({ record }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
   const [columnVisibility, setColumnVisibility] = React.useState({})
@@ -174,10 +174,10 @@ export function RecordTable({ record }) {
   return (
     <div className='w-full p-10'>
       <div className='flex justify-between items-center'>
-        <h1>Health Records</h1>
+        <h1>Medical History</h1>
       </div>
       <div className='flex items-center py-4'>
-        <CreateRecordForm />
+        <CreateHistoryForm />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='ml-auto'>

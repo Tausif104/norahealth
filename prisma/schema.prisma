@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
   password  String
-  isAdmin   Boolean  @default(false)
-  createdAt DateTime @default(now())
+  isAdmin   Boolean   @default(false)
+  createdAt DateTime  @default(now())
   account   Account?
   records   Record[]
+  history   History[]
 }
 
 model Record {
@@ -26,6 +27,13 @@ model Record {
   lastBpCheckDate DateTime
   userId          Int
   user            User     @relation(fields: [userId], references: [id])
+}
+
+model History {
+  id      Int    @id @default(autoincrement())
+  history String
+  user    User   @relation(fields: [userId], references: [id])
+  userId  Int
 }
 
 model Account {

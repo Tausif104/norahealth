@@ -48,7 +48,7 @@ const Sidebar = () => {
           <span>Profile</span>
         </Link>
 
-        {/* Health Profile */}
+        {/* Health Records */}
         <Link
           href='/profile/health-records'
           className={`${baseClasses} ${
@@ -59,6 +59,19 @@ const Sidebar = () => {
         >
           <Cross className='w-4 h-4' />
           <span>Health Records</span>
+        </Link>
+
+        {/* Medical History */}
+        <Link
+          href='/profile/medical-history'
+          className={`${baseClasses} ${
+            pathname === '/profile/medical-history'
+              ? activeClasses
+              : inactiveClasses
+          }`}
+        >
+          <HeartPulse className='w-4 h-4' />
+          <span>Medical History</span>
         </Link>
 
         {/* Orders */}
