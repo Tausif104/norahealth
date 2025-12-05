@@ -4,10 +4,18 @@ import { prisma } from "@/lib/client/prisma";
 
 /* ------------------ helpers ------------------ */
 
+// For reading (client sends "YYYY-MM-DD")
+function parseYMDtoDate(ymd) {
+  // "2025-12-06" -> Date(2025-12-06T00:00:00.000Z)
+  const [y, m, d] = ymd.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+}
+
+// For creating (admin form sends "DD-MM-YYYY")
 function parseDMYtoDate(dmy) {
-  // "12-12-2025" -> Date(2025-12-12)
+  // "12-12-2025" -> Date(2025-12-12T00:00:00.000Z)
   const [d, m, y] = dmy.split("-").map(Number);
-  return new Date(y, m - 1, d);
+  return new Date(Date.UTC(y, m - 1, d));
 }
 
 function timeToMinutes(time) {
@@ -25,10 +33,10 @@ function roundUpToNext10(mins) {
   return Math.ceil(mins / 10) * 10;
 }
 
-/* ------------------ MAIN ACTION ------------------ */
+/* ------------------ CREATE SLOTS (admin form) ------------------ */
 /**
  * FormData keys expected:
- *  - date  -> "12-12-2025"
+ *  - date  -> "12-12-2025"  (DD-MM-YYYY)
  *  - times -> JSON string:
  *      [
  *        { "fromTime": "09:00", "toTime": "00:00" },
@@ -84,14 +92,14 @@ export async function createBookingSlotsFromClient(formData) {
       let startMin = timeToMinutes(range.fromTime);
       let endMin = timeToMinutes(range.toTime);
 
-      // ✅ "00:00" means end of same day
+      // "00:00" means end of same day
       if (range.toTime === "00:00" && range.fromTime !== "00:00") {
         endMin = 24 * 60;
       }
 
       if (endMin <= startMin) continue;
 
-      // ✅ Snap to 10-min boundary (02:59 -> 03:00)
+      // snap to 10-min boundary (02:59 -> 03:00)
       let current = roundUpToNext10(startMin);
 
       while (current + 10 <= endMin) {
@@ -99,9 +107,10 @@ export async function createBookingSlotsFromClient(formData) {
         const slotEnd = minutesToTime(current + 10);
 
         slotsToInsert.push({
-          slotDate: baseDate, // ✅ ALWAYS same day
+          slotDate: baseDate, // always same calendar day
           startTime: slotStart,
           endTime: slotEnd,
+          isBooked: false,
         });
 
         current += 10;
@@ -140,11 +149,17 @@ export async function createBookingSlotsFromClient(formData) {
   }
 }
 
+/* ------------------ GET SLOTS FOR ONE DATE ------------------ */
+/**
+ * Accepts:
+ *  - "2025-12-06" (string, YYYY-MM-DD)
+ *  OR
+ *  - FormData with "date" = "2025-12-06"
+ */
 export async function getBookingSlots(formDataOrDate) {
   try {
     let dateStr;
 
-    // ✅ Allow both direct string and FormData
     if (formDataOrDate instanceof FormData) {
       dateStr = formDataOrDate.get("date");
     } else {
@@ -159,12 +174,12 @@ export async function getBookingSlots(formDataOrDate) {
       };
     }
 
-    const slotDate = parseDMYtoDate(dateStr);
+    const slotDate = parseYMDtoDate(dateStr);
 
     const rows = await prisma.bookingSlot.findMany({
       where: {
         slotDate,
-        isBooked: false, // ✅ only available slots
+        isBooked: false,
       },
       orderBy: {
         startTime: "asc",
@@ -192,6 +207,48 @@ export async function getBookingSlots(formDataOrDate) {
     return {
       success: false,
       msg: "Failed to fetch booking slots.",
+      data: error.message,
+    };
+  }
+}
+
+/* ------------------ GET ALL BOOKABLE DATES ------------------ */
+
+export async function getBookableDates() {
+  try {
+    const rows = await prisma.bookingSlot.findMany({
+      where: {
+        isBooked: false,
+      },
+      select: {
+        slotDate: true,
+      },
+      distinct: ["slotDate"],
+      orderBy: {
+        slotDate: "asc",
+      },
+    });
+
+    // Convert JS Date -> "YYYY-MM-DD" using UTC parts
+    const dateStrings = rows.map((row) => {
+      const d = row.slotDate;
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(d.getUTCDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    });
+
+    return {
+      success: true,
+      msg: "Bookable dates fetched successfully.",
+      data: dateStrings,
+    };
+  } catch (error) {
+    console.error("getBookableDates:", error);
+
+    return {
+      success: false,
+      msg: "Failed to fetch bookable dates.",
       data: error.message,
     };
   }

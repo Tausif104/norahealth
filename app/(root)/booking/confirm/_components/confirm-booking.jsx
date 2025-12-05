@@ -1,26 +1,29 @@
 "use client";
+
 import { useBooking } from "@/lib/BookingContext";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createBooking } from "@/actions/booking.action";
+import { toast } from "sonner";
+
 const ConfirmBooking = () => {
   const { bookingData, setBookingData } = useBooking();
   const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!bookingData?.bookingdate) {
+    if (!bookingData?.bookingdate || !bookingData?.bookingtime) {
       router.replace("/booking");
     }
   }, [bookingData, router]);
-  console.log(bookingData);
+
   function formatBookingDate(dateStr, timeStr) {
     if (!dateStr || !timeStr) return "";
 
     const [year, month, day] = dateStr.split("-").map(Number);
-
     const date = new Date(year, month - 1, day);
 
     const formatted = date.toLocaleDateString("en-GB", {
@@ -32,6 +35,49 @@ const ConfirmBooking = () => {
     return `${formatted}, ${timeStr}`;
   }
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!bookingData?.bookingdate || !bookingData?.bookingtime) {
+      toast.error("No booking slot selected.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const formData = new FormData(e.currentTarget);
+
+      // ensure date & time go with the form
+      formData.set("bookingdate", bookingData.bookingdate); // "YYYY-MM-DD"
+      formData.set("bookingtime", bookingData.bookingtime); // "HH:MM"
+
+      // default values for these (match what you show on right card)
+      if (!formData.get("serviceName")) {
+        formData.set("serviceName", "Oral Contraception");
+      }
+      if (!formData.get("providerName")) {
+        formData.set("providerName", "Manor Chemist");
+      }
+      if (!formData.get("nhsService")) {
+        formData.set("nhsService", "NHS Service");
+      }
+
+      const res = await createBooking(formData);
+
+      if (!res.success) {
+        toast.error(res.msg || "Booking failed.");
+        return;
+      }
+
+      toast.success("Your appointment has been booked.");
+      router.push("/"); // or wherever you want
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong while booking.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <section className='section-padding'>
       <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
@@ -41,7 +87,8 @@ const ConfirmBooking = () => {
         >
           <ArrowLeft /> Back
         </Link>
-        <form action=''>
+
+        <form onSubmit={handleSubmit}>
           <div className='grid grid-cols-1 lg:grid-cols-3 bg-[#FAF9F8] rounded-2xl p-6 md:p-[30px] xl:p-[50px] gap-[30px]'>
             <div className='lg:col-span-2 space-y-5'>
               <div>
@@ -53,9 +100,11 @@ const ConfirmBooking = () => {
                 </label>
                 <input
                   id='name'
+                  name='fullName'
                   type='text'
                   placeholder='Enter your full name'
                   className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
+                  required
                 />
               </div>
               <div>
@@ -67,9 +116,11 @@ const ConfirmBooking = () => {
                 </label>
                 <input
                   id='email'
+                  name='email'
                   type='email'
                   placeholder='Enter your email'
                   className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
+                  required
                 />
               </div>
               <div>
@@ -81,9 +132,11 @@ const ConfirmBooking = () => {
                 </label>
                 <input
                   id='phone'
-                  type='number'
+                  name='phoneNumber'
+                  type='tel'
                   placeholder='Phone number'
                   className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
+                  required
                 />
               </div>
               <div>
@@ -95,11 +148,13 @@ const ConfirmBooking = () => {
                 </label>
                 <textarea
                   id='notes'
+                  name='notes'
                   rows={6}
                   placeholder='If you have any specific questions or concerns you may write them here'
                   className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
                 />
               </div>
+
               <div className='space-y-4'>
                 <label className='block text-base text-[#3A3D42]'>
                   Oral Contraceptive (OC) Request
@@ -110,8 +165,8 @@ const ConfirmBooking = () => {
                   <label className='flex items-center gap-2 cursor-pointer'>
                     <input
                       type='radio'
-                      name='oc_request'
-                      value='same'
+                      name='ocRequest'
+                      value='SAME_OC'
                       className='hidden peer'
                       onChange={(e) =>
                         setBookingData({
@@ -119,6 +174,7 @@ const ConfirmBooking = () => {
                           ocRequest: e.target.value,
                         })
                       }
+                      required
                     />
                     <span className="w-6 h-6 rounded-full border border-[#0D060C] peer-checked:border-[#0D060C] relative after:content-[''] after:w-4 after:h-4 after:bg-[#0D060C] after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 peer-checked:after:block after:hidden"></span>
                     <span className='text-[#0D060C]'>Same OC</span>
@@ -128,8 +184,8 @@ const ConfirmBooking = () => {
                   <label className='flex items-center gap-2 cursor-pointer'>
                     <input
                       type='radio'
-                      name='oc_request'
-                      value='different'
+                      name='ocRequest'
+                      value='DIFFERENT_OC'
                       className='hidden peer'
                       onChange={(e) =>
                         setBookingData({
@@ -144,6 +200,7 @@ const ConfirmBooking = () => {
                 </div>
               </div>
             </div>
+
             <div className='flex flex-col gap-5 lg:col-span-1'>
               <Image
                 src='/images/booking.png'
@@ -179,12 +236,30 @@ const ConfirmBooking = () => {
                     </span>
                   </div>
                 </div>
+
+                {/* Hidden fields for service/provider/nhs if you want to store them */}
+                <input
+                  type='hidden'
+                  name='serviceName'
+                  value='Oral Contraception'
+                />
+                <input
+                  type='hidden'
+                  name='providerName'
+                  value='Manor Chemist'
+                />
+                <input type='hidden' name='nhsService' value='NHS Service' />
+                {/* bookingdate / bookingtime get set in handleSubmit from context */}
+
                 <button
                   type='submit'
-                  className=' text-white cursor-pointer inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 w-full'
+                  disabled={submitting}
+                  className=' text-white cursor-pointer inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 w-full disabled:opacity-60 disabled:cursor-not-allowed'
                 >
                   <span className='flex items-center justify-center'>
-                    <span>Confirm Booking</span>
+                    <span>
+                      {submitting ? "Confirming..." : "Confirm Booking"}
+                    </span>
                     <span className='ml-2 -rotate-45 group-hover:rotate-0 transition duration-300'>
                       <ArrowRight />
                     </span>
