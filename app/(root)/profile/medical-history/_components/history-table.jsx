@@ -35,9 +35,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { CreateHistoryForm } from './create-history-form'
+import { CreateHistoryForm, CreateRecordForm } from './create-history-form'
 import { formatDate } from '@/lib/utils'
-import { deleteRecord } from '@/actions/record.action'
+import { deleteHistory } from '@/actions/history.action'
 
 export const columns = [
   {
@@ -64,42 +64,18 @@ export const columns = [
   },
 
   {
-    accessorKey: 'weight',
-    header: 'Weight',
+    accessorKey: 'history',
+    header: 'History',
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('weight')}</div>
+      <div className='capitalize'>{row.getValue('history')}</div>
     ),
   },
+
   {
-    accessorKey: 'height',
-    header: 'Height',
+    accessorKey: 'createdAt',
+    header: 'Created At',
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('height')}</div>
-    ),
-  },
-  {
-    accessorKey: 'lastwhCheck',
-    header: 'Last (W/H) Check',
-    cell: ({ row }) => (
-      <div className='capitalize'>
-        {formatDate(row.getValue('lastwhCheck'))}
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'bloodPressure',
-    header: 'Blood Pressure',
-    cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('bloodPressure')}</div>
-    ),
-  },
-  {
-    accessorKey: 'lastBpCheckDate',
-    header: 'Last BP Check',
-    cell: ({ row }) => (
-      <div className='capitalize'>
-        {formatDate(row.getValue('lastBpCheckDate'))}
-      </div>
+      <div className='capitalize'>{formatDate(row.getValue('createdAt'))}</div>
     ),
   },
 
@@ -107,7 +83,7 @@ export const columns = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const recordItem = row.original
+      const historyItem = row.original
 
       return (
         <DropdownMenu>
@@ -120,13 +96,13 @@ export const columns = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem asChild className='p-0'>
-              <form action={deleteRecord}>
-                <input type='hidden' name='recordId' value={recordItem.id} />
+              <form action={deleteHistory}>
+                <input type='hidden' name='historyId' value={historyItem.id} />
                 <Button
                   type='submit'
                   className='cursor-pointer block w-full'
                   variant='destructive'
-                  onClick={() => navigator.clipboard.writeText(recordItem.id)}
+                  onClick={() => navigator.clipboard.writeText(historyItem.id)}
                 >
                   Delete
                 </Button>
@@ -139,14 +115,14 @@ export const columns = [
   },
 ]
 
-export function HistoryTable({ record }) {
+export function HistoryTable({ history }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
   const [columnVisibility, setColumnVisibility] = React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data: record,
+    data: history,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

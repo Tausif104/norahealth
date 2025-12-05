@@ -12,8 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { DatePicker } from './date-picker'
-import { createRecordAction } from '@/actions/record.action'
+import { createHistoryAction } from '@/actions/history.action'
 import { useState, useEffect, useActionState } from 'react'
 import { loggedInUserAction } from '@/actions/user.action'
 import { LoaderIcon } from 'lucide-react'
@@ -28,7 +27,7 @@ export const CreateHistoryForm = () => {
   }
 
   const [state, action, loading] = useActionState(
-    createRecordAction,
+    createHistoryAction,
     initialState
   )
 
@@ -79,10 +78,7 @@ export const CreateHistoryForm = () => {
             <DialogClose asChild>
               <Button variant='outline'>Cancel</Button>
             </DialogClose>
-            <Button
-              className='bg-theme cursor-pointer hover:bg-purple-800'
-              type='submit'
-            >
+            <Button className='bg-theme cursor-pointer' type='submit'>
               {loading ? (
                 <LoaderIcon
                   role='status'

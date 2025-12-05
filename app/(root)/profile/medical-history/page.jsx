@@ -1,11 +1,12 @@
 import { HistoryTable } from './_components/history-table'
-import { getAllRecordsAction } from '@/actions/record.action'
+import { getAllHistoryAction } from '@/actions/history.action'
 
 const MedicalHistory = async () => {
-  const records = await getAllRecordsAction()
+  const history = await getAllHistoryAction()
+
   return (
     <>
-      <HistoryTable record={records?.records} />
+      <HistoryTable history={history?.history} />
     </>
   )
 }

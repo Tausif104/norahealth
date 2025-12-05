@@ -111,10 +111,7 @@ export const CreateRecordForm = () => {
             <DialogClose asChild>
               <Button variant='outline'>Cancel</Button>
             </DialogClose>
-            <Button
-              className='bg-theme cursor-pointer hover:bg-purple-800'
-              type='submit'
-            >
+            <Button className='bg-theme cursor-pointer ' type='submit'>
               {loading ? (
                 <LoaderIcon
                   role='status'
