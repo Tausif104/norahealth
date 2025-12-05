@@ -8,7 +8,7 @@ const Loading = () => {
           <LoaderIcon
             role='status'
             aria-label='Loading'
-            className='size-10 animate-spin mx-auto'
+            className='size-5 animate-spin mx-auto'
           />
         </span>
       </div>

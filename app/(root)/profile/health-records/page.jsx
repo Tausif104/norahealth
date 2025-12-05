@@ -5,8 +5,6 @@ import { getAllRecordsAction } from '@/actions/record.action'
 const page = async () => {
   const records = await getAllRecordsAction()
 
-  console.log(records)
-
   return (
     <>
       <RecordTable record={records?.records} />
