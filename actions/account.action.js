@@ -185,6 +185,8 @@ export const updateAccountAction = async (prevState, formData) => {
     return null
   }
 
+  console.log(dob)
+
   const updatedAcount = await prisma.account.upsert({
     where: {
       userId: loggedInUserId,

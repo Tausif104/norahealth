@@ -1,60 +1,60 @@
-"use client";
+'use client'
 
-import React from "react";
-import { ArrowRight, PanelLeft, Pill, Plus, X } from "lucide-react";
-import DateField from "@/components/global/DateField";
-import { useProfile } from "@/lib/profileContext";
+import React from 'react'
+import { ArrowRight, PanelLeft, Pill, Plus, X } from 'lucide-react'
+import DateField from '@/components/global/DateField'
+import { useProfile } from '@/lib/profileContext'
 
-export default function HealthProfile() {
-  const { setMenuOpen } = useProfile();
-  const [lastCheckDate, setLastCheckDate] = React.useState(null);
-  const [lastBpDate, setLastBpDate] = React.useState(null);
+export default function HealthRecords() {
+  const { setMenuOpen } = useProfile()
+  const [lastCheckDate, setLastCheckDate] = React.useState(null)
+  const [lastBpDate, setLastBpDate] = React.useState(null)
 
-  const [weight, setWeight] = React.useState("");
-  const [height, setHeight] = React.useState("");
-  const [bloodPressure, setBloodPressure] = React.useState("");
+  const [weight, setWeight] = React.useState('')
+  const [height, setHeight] = React.useState('')
+  const [bloodPressure, setBloodPressure] = React.useState('')
 
   const [medications] = React.useState([
-    "Lisinopril 10mg daily",
-    "Ibuprofen 200mg when needed",
-  ]);
+    'Lisinopril 10mg daily',
+    'Ibuprofen 200mg when needed',
+  ])
 
   // medical history as tags
   const [medicalHistory, setMedicalHistory] = React.useState([
-    "Asthma",
-    "Diabetes Type 2",
-    "Allergic Rhinitis",
-  ]);
-  const [showHistoryInput, setShowHistoryInput] = React.useState(false);
-  const [newHistoryValue, setNewHistoryValue] = React.useState("");
+    'Asthma',
+    'Diabetes Type 2',
+    'Allergic Rhinitis',
+  ])
+  const [showHistoryInput, setShowHistoryInput] = React.useState(false)
+  const [newHistoryValue, setNewHistoryValue] = React.useState('')
 
-  const historyLimit = 10;
+  const historyLimit = 10
 
   const handleHistoryKeyDown = (e) => {
     // comma or Enter
     if (e.keyCode === 188 || e.keyCode === 13) {
-      e.preventDefault();
-      let tag = e.target.value?.trim();
+      e.preventDefault()
+      let tag = e.target.value?.trim()
 
       if (tag) {
         if (medicalHistory.length < historyLimit) {
           if (!medicalHistory.includes(tag)) {
-            setMedicalHistory((prev) => [...prev, tag]);
+            setMedicalHistory((prev) => [...prev, tag])
           }
         } else {
           // use your existing toast system if you have one
           // toast.warning("Tag limit reached.");
-          console.warn("Tag limit reached");
+          console.warn('Tag limit reached')
         }
       }
 
-      e.target.value = "";
+      e.target.value = ''
     }
-  };
+  }
 
   const removeHistoryItem = (index) => {
-    setMedicalHistory((prev) => prev.filter((_, i) => i !== index));
-  };
+    setMedicalHistory((prev) => prev.filter((_, i) => i !== index))
+  }
 
   return (
     <div className='flex-1 space-y-6 p-[24px] md:p-[50px]'>
@@ -217,16 +217,16 @@ export default function HealthProfile() {
                     onChange={(e) => setNewHistoryValue(e.target.value)}
                     onBlur={() => setShowHistoryInput(false)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        const value = newHistoryValue.trim();
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        const value = newHistoryValue.trim()
 
                         if (value && !medicalHistory.includes(value)) {
-                          setMedicalHistory([...medicalHistory, value]);
+                          setMedicalHistory([...medicalHistory, value])
                         }
 
-                        setNewHistoryValue("");
-                        setShowHistoryInput(false);
+                        setNewHistoryValue('')
+                        setShowHistoryInput(false)
                       }
                     }}
                   />
@@ -289,5 +289,5 @@ export default function HealthProfile() {
         </div>
       </form>
     </div>
-  );
+  )
 }

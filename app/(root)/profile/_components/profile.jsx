@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { ArrowRight, PanelLeft, SquarePen } from 'lucide-react'
+import { ArrowRight, LoaderIcon, PanelLeft, SquarePen } from 'lucide-react'
 import DateField from '@/components/global/DateField'
 import { useProfile } from '@/lib/profileContext'
 import { formatDate } from '@/lib/utils'
@@ -11,6 +11,8 @@ import { toast } from 'sonner'
 
 const Profile = ({ account }) => {
   const [dob, setDob] = useState(null)
+  const [whDate, setWHDate] = useState(null)
+  const [bpDate, setBPDate] = useState(null)
   const { setMenuOpen } = useProfile()
   const [uploadedImage, setUploadedImage] = useState(null)
 
@@ -50,8 +52,6 @@ const Profile = ({ account }) => {
     medicalConditions,
     currentMedicines,
   } = account
-
-  console.log(account)
 
   useEffect(() => {
     if (state.msg) {
@@ -109,12 +109,16 @@ const Profile = ({ account }) => {
           </div>
         </div>
       </div>
-
       {/* FORM */}
       <form className='space-y-6' action={action}>
         <input type='hidden' name='userId' value={userId} />
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
           {/* First / Last name */}
+          <div className='col-span-4 mt-3'>
+            <h2 className='text-theme text-2xl font-semibold'>
+              Personal Profile
+            </h2>
+          </div>
           <div className='md:col-span-2'>
             <label
               htmlFor='firstName'
@@ -177,6 +181,7 @@ const Profile = ({ account }) => {
             />
           </div>
           {/* DOB / NHS */}
+          <input type='hidden' name='dob' value={dob ? dob : dateOfBirth} />
           <DateField
             id='dob'
             label='Date of Birth'
@@ -235,34 +240,164 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-          <input type='hidden' name='weight' defaultValue={weight} />
-          <input type='hidden' name='height' defaultValue={weight} />
+
+          <div className='col-span-4 mt-3'>
+            <h2 className='text-theme text-2xl font-semibold'>
+              Health Profile
+            </h2>
+          </div>
+          <div className='md:col-span-1'>
+            <label
+              htmlFor='weight'
+              className='block text-base mb-2 text-[#0D060C]'
+            >
+              Weight
+            </label>
+            <input
+              id='weight'
+              type='text'
+              defaultValue={weight}
+              name='weight'
+              placeholder='Kg/stones/pounds'
+              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
+            />
+          </div>
+          <div className='md:col-span-1'>
+            <label
+              htmlFor='height'
+              className='block text-base mb-2 text-[#0D060C]'
+            >
+              Height
+            </label>
+            <input
+              id='height'
+              type='text'
+              defaultValue={height}
+              name='height'
+              placeholder='Cm/feet/inches'
+              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
+            />
+          </div>
+
           <input
             type='hidden'
             name='whdate'
-            defaultValue={weightHeightCheckDate}
+            value={whDate ? whDate : weightHeightCheckDate}
           />
-          <input type='hidden' name='bptop' defaultValue={bpTop} />
-          <input type='hidden' name='bpbottom' defaultValue={bpBottom} />
-          <input type='hidden' name='bpdate' defaultValue={bpCheckDate} />
+          <DateField
+            id='wh-date'
+            label='Weight Height Check Date'
+            selected={whDate}
+            onChange={setWHDate}
+            placeholder={formatDate(weightHeightCheckDate)}
+            className='md:col-span-2 '
+            name='whdate'
+            bg='bg-white border border-[#EEE0CF] text-black'
+          />
+
+          <div className='md:col-span-1'>
+            <label
+              htmlFor='bp-top'
+              className='block text-base mb-2 text-[#0D060C]'
+            >
+              Blood Preasure Top
+            </label>
+            <input
+              id='bp-top'
+              type='text'
+              defaultValue={bpTop}
+              name='bptop'
+              placeholder='BP Top'
+              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
+            />
+          </div>
+
+          <div className='md:col-span-1'>
+            <label
+              htmlFor='homeZip'
+              className='block text-base mb-2 text-[#0D060C]'
+            >
+              Blood Preasure Bottom
+            </label>
+            <input
+              id='bp-top'
+              type='text'
+              defaultValue={bpBottom}
+              name='bpbottom'
+              placeholder='BP Bottom'
+              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
+            />
+          </div>
+
           <input
             type='hidden'
-            name='medicalconditions'
-            defaultValue={medicalConditions}
+            name='bpdate'
+            value={bpDate ? bpDate : bpCheckDate}
           />
-          <input
-            type='hidden'
-            name='currentmedicines'
-            defaultValue={currentMedicines}
+          <DateField
+            id='bp-check-date'
+            label='BP Check Date'
+            selected={bpDate}
+            onChange={setBPDate}
+            placeholder={formatDate(bpCheckDate)}
+            className='md:col-span-2 '
+            name='bpdate'
+            bg='bg-white border border-[#EEE0CF] text-black'
           />
+
+          <div className='md:col-span-2'>
+            <label
+              htmlFor='med-con'
+              className='block text-base mb-2 text-[#0D060C]'
+            >
+              Medical Conditions
+            </label>
+            <input
+              id='med-con'
+              type='text'
+              defaultValue={medicalConditions}
+              name='medicalconditions'
+              placeholder='Medical Conditions'
+              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
+            />
+          </div>
+
+          <div className='md:col-span-2'>
+            <label
+              htmlFor='current-med'
+              className='block text-base mb-2 text-[#0D060C]'
+            >
+              Current Medicines
+            </label>
+            <input
+              id='current-med'
+              type='text'
+              defaultValue={currentMedicines}
+              name='currentmedicines'
+              placeholder='Current Medicines'
+              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
+            />
+          </div>
+
           {/* Save button */}
           <div className='md:col-span-4'>
             <button
               type='submit'
-              className='w-full md:w-auto flex items-center justify-center gap-2 bg-[#d67b0e] text-white text-[16px] font-medium py-3 px-8 rounded-full hover:bg-[#b8680b] transition'
+              className=' text-white inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 sm:min-w-[200px] min-w-full cursor-pointer '
             >
-              <span>{loading ? 'loading' : 'Save Now'}</span>
-              <ArrowRight className='w-4 h-4 -rotate-45' />
+              <span className='flex items-center justify-center'>
+                {loading ? (
+                  <span className='ml-2 -rotate-45 group-hover:rotate-0 transition duration-300'>
+                    <LoaderIcon
+                      role='status'
+                      aria-label='Loading'
+                      className='size-6 animate-spin mx-auto'
+                    />
+                  </span>
+                ) : (
+                  <span>Update Profile</span>
+                )}
+              </span>
             </button>
           </div>
         </div>

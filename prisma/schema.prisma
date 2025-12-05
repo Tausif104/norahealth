@@ -14,6 +14,18 @@ model User {
   isAdmin   Boolean  @default(false)
   createdAt DateTime @default(now())
   account   Account?
+  records   Record[]
+}
+
+model Record {
+  id              Int      @id @default(autoincrement())
+  weight          String
+  height          String
+  lastwhCheck     DateTime
+  bloodPressure   String
+  lastBpCheckDate DateTime
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id])
 }
 
 model Account {
