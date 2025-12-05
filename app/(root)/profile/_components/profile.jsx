@@ -1,37 +1,26 @@
-'use client'
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
-import { ArrowRight, LoaderIcon, PanelLeft, SquarePen } from 'lucide-react'
-import DateField from '@/components/global/DateField'
-import { useProfile } from '@/lib/profileContext'
-import { formatDate } from '@/lib/utils'
-import { useActionState } from 'react'
-import { updateAccountAction } from '@/actions/account.action'
-import { toast } from 'sonner'
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { LoaderIcon, PanelLeft, SquarePen } from "lucide-react";
+import DateField from "@/components/global/DateField";
+import { useProfile } from "@/lib/profileContext";
+import { formatDate } from "@/lib/utils";
+import { useActionState } from "react";
+import { updateAccountAction } from "@/actions/account.action";
+
+import { toast } from "sonner";
+import { uploadProfileImageAction } from "@/actions/user.action";
 
 const Profile = ({ account }) => {
-  const [dob, setDob] = useState(null)
-  const [whDate, setWHDate] = useState(null)
-  const [bpDate, setBPDate] = useState(null)
-  const { setMenuOpen } = useProfile()
-  const [uploadedImage, setUploadedImage] = useState(null)
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setUploadedImage(URL.createObjectURL(file))
-    }
-  }
-
-  const initialState = {
-    msg: '',
-    success: false,
-  }
-
-  const [state, action, loading] = useActionState(
-    updateAccountAction,
-    initialState
-  )
+  const [dob, setDob] = useState(null);
+  const [whDate, setWHDate] = useState(null);
+  const [bpDate, setBPDate] = useState(null);
+  const { setMenuOpen } = useProfile();
+  const [uploadedImage, setUploadedImage] = useState(
+    account.profileImage || null
+  );
+  const [uploadPending, setUploadPending] = useState(false);
 
   const {
     userId,
@@ -51,18 +40,62 @@ const Profile = ({ account }) => {
     bpCheckDate,
     medicalConditions,
     currentMedicines,
-  } = account
+    profileImage,
+  } = account;
 
-  useEffect(() => {
-    if (state.msg) {
-      if (state.success) {
-        toast.success(state.msg)
+  // ---------- Account update action ----------
+  const accountInitialState = {
+    msg: "",
+    success: false,
+  };
+
+  const [accountState, accountAction, accountPending] = useActionState(
+    updateAccountAction,
+    accountInitialState
+  );
+
+  // ---------- Handle profile image upload (no useActionState here) ----------
+  const handleImageUpload = async (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    // Optimistic preview
+    setUploadedImage(URL.createObjectURL(selectedFile));
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      setUploadPending(true);
+      const res = await uploadProfileImageAction(formData);
+
+      if (res?.success) {
+        if (res.imagePath) {
+          // Use the path returned from the server
+          setUploadedImage(res.imagePath);
+        }
+        toast.success(res.msg || "Profile image uploaded successfully");
       } else {
-        toast.warning(state.msg)
+        toast.error(res?.msg || "Image upload failed");
       }
+    } catch (err) {
+      console.error("Image upload error:", err);
+      toast.error("Image upload failed");
+    } finally {
+      setUploadPending(false);
     }
-    state.msg = ''
-  }, [state.msg])
+  };
+
+  // ---------- Toasts for account update ----------
+  useEffect(() => {
+    if (!accountState.msg) return;
+
+    if (accountState.success) {
+      toast.success(accountState.msg);
+    } else {
+      toast.warning(accountState.msg);
+    }
+  }, [accountState.msg, accountState.success]);
 
   return (
     <div className='flex-1 space-y-6 p-[24px] md:p-[50px]'>
@@ -83,18 +116,27 @@ const Profile = ({ account }) => {
         <div className='flex items-center gap-4'>
           <div className='relative w-[64px] lg:w-[100px] h-[64px] lg:h-[100px] rounded-full  bg-[#F6F5F4]'>
             <Image
-              src={uploadedImage || '/images/profile-placeholder.png'}
+              src={
+                uploadedImage ||
+                profileImage ||
+                "/images/profile-placeholder.png"
+              }
               alt='Profile'
               fill
               className='object-cover  w-[64px] lg:w-[100px] h-[64px] lg:h-[100px] rounded-full border-2 border-[#CE8936]'
             />
             {/* Upload Button on Image */}
             <label className='absolute bottom-0 right-0 bg-white shadow-lg p-2 rounded-full cursor-pointer'>
-              <SquarePen className='w-4 h-4 text-[#d67b0e]' />
+              {uploadPending ? (
+                <LoaderIcon className='w-4 h-4 animate-spin text-[#d67b0e]' />
+              ) : (
+                <SquarePen className='w-4 h-4 text-[#d67b0e]' />
+              )}
               <input
                 type='file'
                 accept='image/*'
                 onChange={handleImageUpload}
+                name='profileImage'
                 className='hidden'
               />
             </label>
@@ -109,8 +151,9 @@ const Profile = ({ account }) => {
           </div>
         </div>
       </div>
+
       {/* FORM */}
-      <form className='space-y-6' action={action}>
+      <form className='space-y-6' action={accountAction}>
         <input type='hidden' name='userId' value={userId} />
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
           {/* First / Last name */}
@@ -149,6 +192,7 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#F0E3D6] text-[#3A3D42] w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
+
           {/* Email / Phone */}
           <div className='md:col-span-2'>
             <label
@@ -180,6 +224,7 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
+
           {/* DOB / NHS */}
           <input type='hidden' name='dob' value={dob ? dob : dateOfBirth} />
           <DateField
@@ -207,6 +252,7 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
+
           {/* Home address / Zip */}
           <div className='md:col-span-3'>
             <label
@@ -246,6 +292,8 @@ const Profile = ({ account }) => {
               Health Profile
             </h2>
           </div>
+
+          {/* Weight / Height */}
           <div className='md:col-span-1'>
             <label
               htmlFor='weight'
@@ -295,12 +343,13 @@ const Profile = ({ account }) => {
             bg='bg-white border border-[#EEE0CF] text-black'
           />
 
+          {/* Blood pressure */}
           <div className='md:col-span-1'>
             <label
               htmlFor='bp-top'
               className='block text-base mb-2 text-[#0D060C]'
             >
-              Blood Preasure Top
+              Blood Pressure Top
             </label>
             <input
               id='bp-top'
@@ -314,13 +363,13 @@ const Profile = ({ account }) => {
 
           <div className='md:col-span-1'>
             <label
-              htmlFor='homeZip'
+              htmlFor='bp-bottom'
               className='block text-base mb-2 text-[#0D060C]'
             >
-              Blood Preasure Bottom
+              Blood Pressure Bottom
             </label>
             <input
-              id='bp-top'
+              id='bp-bottom'
               type='text'
               defaultValue={bpBottom}
               name='bpbottom'
@@ -345,6 +394,7 @@ const Profile = ({ account }) => {
             bg='bg-white border border-[#EEE0CF] text-black'
           />
 
+          {/* Medical conditions / Medicines */}
           <div className='md:col-span-2'>
             <label
               htmlFor='med-con'
@@ -384,9 +434,10 @@ const Profile = ({ account }) => {
             <button
               type='submit'
               className=' text-white inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 sm:min-w-[200px] min-w-full cursor-pointer '
+              disabled={accountPending}
             >
               <span className='flex items-center justify-center'>
-                {loading ? (
+                {accountPending ? (
                   <span className='ml-2 -rotate-45 group-hover:rotate-0 transition duration-300'>
                     <LoaderIcon
                       role='status'
@@ -403,7 +454,7 @@ const Profile = ({ account }) => {
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

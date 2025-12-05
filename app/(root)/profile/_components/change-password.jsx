@@ -1,21 +1,45 @@
 "use client";
+
+import { changePasswordAction } from "@/actions/user.action";
 import { useProfile } from "@/lib/profileContext";
-import { ArrowRight, CircleCheck, PanelLeft } from "lucide-react";
-import React from "react";
+import { CircleCheck, PanelLeft } from "lucide-react";
+import React, { useActionState, useEffect, useRef } from "react";
+import { toast } from "sonner";
+
+const initialState = {
+  msg: "",
+  success: false,
+};
 
 const ChangePassword = () => {
   const { setMenuOpen } = useProfile();
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: hook up to your API
-  };
+  const formRef = useRef(null);
+
+  const [state, formAction, isPending] = useActionState(
+    changePasswordAction,
+    initialState
+  );
+
+  console.log(state, "state");
+
+  // ✅ clean React reset
+  useEffect(() => {
+    if (state.msg) {
+      if (state.success) {
+        formRef.current?.reset();
+        toast.success(state.msg);
+      } else {
+        toast.error(state.msg);
+      }
+    }
+  }, [state.msg]);
+
   return (
     <div className='max-w-[630px] mx-auto flex-1 space-y-6 py-[24px] md:py-[150px] px-[24px] md:px-0'>
-      {/* Header */}
       <div className='flex items-center gap-[50px]'>
         <button
           onClick={() => setMenuOpen(true)}
-          className='md:hidden w-[40px] h-[40px]  items-center gap-2 bg-[#d67b0e] text-white flex justify-center rounded-full'
+          className='md:hidden w-[40px] h-[40px] items-center gap-2 bg-[#d67b0e] text-white flex justify-center rounded-full'
         >
           <PanelLeft />
         </button>
@@ -24,81 +48,59 @@ const ChangePassword = () => {
         </h2>
       </div>
 
-      {/* form */}
-
-      <form onSubmit={handleSubmit} className='space-y-8'>
-        {/* Current password */}
+      <form ref={formRef} action={formAction} className='space-y-4'>
         <div>
-          <label
-            htmlFor='currentPassword'
-            className='block text-base mb-2 text-[#0D060C]'
-          >
+          <label htmlFor='currentPassword' className='block text-base mb-2'>
             Your Password
           </label>
           <input
             id='currentPassword'
+            name='currentPassword'
             type='password'
-            placeholder='Current password'
-            className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
+            required
+            className='bg-white border border-[#EEE0CF] w-full py-[17px] px-[16px] rounded-[6px]'
           />
         </div>
 
-        {/* New password */}
         <div>
-          <label
-            htmlFor='newPassword'
-            className='block text-base mb-2 text-[#0D060C]'
-          >
+          <label htmlFor='newPassword' className='block text-base mb-2'>
             New Password
           </label>
           <input
             id='newPassword'
+            name='newPassword'
             type='password'
-            placeholder='Enter your new password'
-            className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
+            required
+            minLength={8}
+            maxLength={12}
+            className='bg-white border border-[#EEE0CF] w-full py-[17px] px-[16px] rounded-[6px]'
           />
-
-          {/* helper text */}
           <p className='flex items-center gap-2 text-[16px] text-[#9a9b9d] mt-2'>
             <CircleCheck className='inline-block w-4 h-4' />
             <span>Your password must be 8–12 characters long</span>
           </p>
         </div>
 
-        {/* Confirm password */}
         <div>
-          <label
-            htmlFor='confirmPassword'
-            className='block text-base mb-2 text-[#0D060C]'
-          >
+          <label htmlFor='confirmPassword' className='block text-base mb-2'>
             Re enter your new password
           </label>
           <input
             id='confirmPassword'
+            name='confirmPassword'
             type='password'
-            placeholder='Confirm password'
-            className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
+            required
+            className='bg-white border border-[#EEE0CF] w-full py-[17px] px-[16px] rounded-[6px]'
           />
         </div>
 
-        {/* Buttons */}
-        <div className='flex items-center gap-4 pt-2'>
-          <button
-            type='button'
-            className='cursor-pointer inline-flex items-center justify-center border border-[#D6866B] text-[#D6866B] text-[16px] font-medium py-4 px-8 rounded-full hover:bg-[#D6866B] hover:text-white transition'
-          >
-            Cancel
-          </button>
-
-          <button
-            type='submit'
-            className='cursor-pointer text-white inline-block bg-[#D6866B] text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 sm:w-auto w-full'
-          >
-            <span className='flex items-center justify-center'>
-              <span>Update</span>
-            </span>
-          </button>
-        </div>
+        <button
+          type='submit'
+          disabled={isPending}
+          className='bg-[#D6866B] hover:bg-black text-white py-4 px-9 rounded-full transition-all duration-300 disabled:opacity-60 cursor-pointer'
+        >
+          {isPending ? "Updating..." : "Update"}
+        </button>
       </form>
     </div>
   );

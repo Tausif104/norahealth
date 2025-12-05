@@ -50,7 +50,44 @@ model Account {
   bpCheckDate           DateTime
   medicalConditions     String
   currentMedicines      String
+  profileImage          String?
 
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id])
+}
+
+model BookingSlot {
+  id        Int       @id @default(autoincrement())
+  slotDate  DateTime  @db.Date // the calendar day
+  startTime String // "09:00"
+  endTime   String // "09:10"
+  isBooked  Boolean   @default(false)
+  bookings  Booking[]
+
+  @@index([slotDate, startTime])
+}
+
+model Booking {
+  id          Int       @id @default(autoincrement())
+  fullName    String
+  email       String
+  phoneNumber String
+  notes       String?
+  ocRequest   OcRequest
+
+  serviceName  String
+  providerName String
+  nhsService   String
+  appointment  DateTime
+  createdAt    DateTime @default(now())
+
+  slotId Int?
+  slot   BookingSlot? @relation(fields: [slotId], references: [id])
+
+  @@index([slotId])
+}
+
+enum OcRequest {
+  SAME_OC
+  DIFFERENT_OC
 }
