@@ -36,97 +36,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { CreateRecordForm } from './create-record-form'
-
-const data = [
-  {
-    id: '1',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-  {
-    id: '2',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-  {
-    id: '3',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-  {
-    id: '4',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-  {
-    id: '5',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-  {
-    id: '6',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-  {
-    id: '6',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-  {
-    id: '6',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-  {
-    id: '6',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-  {
-    id: '6',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-  {
-    id: '6',
-    weight: '90kg',
-    height: '10 Feet',
-    lastwhCheck: '10 Dec 2025',
-    bloodPressure: '103',
-    lastBpCheckDate: '10 Dec 2025',
-  },
-]
+import { formatDate } from '@/lib/utils'
 
 export const columns = [
   {
@@ -170,7 +80,9 @@ export const columns = [
     accessorKey: 'lastwhCheck',
     header: 'Last (W/H) Check',
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('lastwhCheck')}</div>
+      <div className='capitalize'>
+        {formatDate(row.getValue('lastwhCheck'))}
+      </div>
     ),
   },
   {
@@ -184,7 +96,9 @@ export const columns = [
     accessorKey: 'lastBpCheckDate',
     header: 'Last BP Check',
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('lastBpCheckDate')}</div>
+      <div className='capitalize'>
+        {formatDate(row.getValue('lastBpCheckDate'))}
+      </div>
     ),
   },
 
@@ -219,14 +133,16 @@ export const columns = [
   },
 ]
 
-export function RecordTable() {
+export function RecordTable({ record }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
   const [columnVisibility, setColumnVisibility] = React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
 
+  console.log(record)
+
   const table = useReactTable({
-    data,
+    data: record,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/client/prisma'
 import { loggedInUserAction } from './user.action'
+import { revalidatePath } from 'next/cache'
 
 // create record
 export const createRecordAction = async (prevState, formData) => {
@@ -39,6 +40,8 @@ export const createRecordAction = async (prevState, formData) => {
     },
   })
 
+  revalidatePath('/profile/health-records')
+
   if (record) {
     return {
       msg: 'Record Created',
@@ -48,3 +51,25 @@ export const createRecordAction = async (prevState, formData) => {
 }
 
 // get all the record
+export const getAllRecordsAction = async () => {
+  const payload = await loggedInUserAction()
+
+  if (!payload?.payload?.id) {
+    return {
+      msg: 'User not logged In',
+      success: false,
+    }
+  }
+
+  const userId = payload?.payload?.id
+
+  const records = await prisma.record.findMany({
+    where: {
+      userId: userId,
+    },
+  })
+
+  return {
+    records,
+  }
+}

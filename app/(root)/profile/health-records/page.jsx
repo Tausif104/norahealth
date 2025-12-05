@@ -1,11 +1,15 @@
 import React from 'react'
-import HealthRecords from '../_components/health-records'
 import { RecordTable } from './_components/record-table'
+import { getAllRecordsAction } from '@/actions/record.action'
 
-const page = () => {
+const page = async () => {
+  const records = await getAllRecordsAction()
+
+  console.log(records)
+
   return (
     <>
-      <RecordTable />
+      <RecordTable record={records?.records} />
     </>
   )
 }
