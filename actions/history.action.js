@@ -51,6 +51,9 @@ export const getAllHistoryAction = async () => {
     where: {
       userId: Number(userId),
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
   })
 
   return {

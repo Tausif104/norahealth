@@ -4,10 +4,9 @@ import {
   Car,
   Cross,
   HeartPulse,
-  Lock,
+  HeartCrackIcon,
   LockOpen,
   PanelLeft,
-  ShoppingBag,
   User,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -72,6 +71,18 @@ const Sidebar = () => {
         >
           <HeartPulse className='w-4 h-4' />
           <span>Medical History</span>
+        </Link>
+        {/* Medical History */}
+        <Link
+          href='/profile/medications'
+          className={`${baseClasses} ${
+            pathname === '/profile/medications'
+              ? activeClasses
+              : inactiveClasses
+          }`}
+        >
+          <HeartCrackIcon className='w-4 h-4' />
+          <span>Medications</span>
         </Link>
 
         {/* Orders */}

@@ -67,6 +67,9 @@ export const getAllRecordsAction = async () => {
     where: {
       userId: userId,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
   })
 
   return {
