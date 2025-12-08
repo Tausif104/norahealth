@@ -14,6 +14,8 @@ import { loggedInUserAction, logoutAction } from '@/actions/user.action'
 const Navigation = async () => {
   const payload = await loggedInUserAction()
 
+  const isAdmin = payload?.payload?.isAdmin
+
   return (
     <nav className='flex items-center gap-6'>
       <ul className='flex items-center gap-6'>
@@ -42,9 +44,15 @@ const Navigation = async () => {
                 {payload?.payload?.email}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href='/profile'>Profile</Link>
-              </DropdownMenuItem>
+              {isAdmin ? (
+                <DropdownMenuItem>
+                  <Link href='/admin'>Admin</Link>
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem>
+                  <Link href='/profile'>Profile</Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem>
                 <form action={logoutAction}>
                   <button

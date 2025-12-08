@@ -292,7 +292,6 @@ export const changePasswordAction = async (prevState, formData) => {
 }
 export const uploadProfileImageAction = async (formData) => {
   const file = formData.get('file')
-  console.log(file)
 
   try {
     if (!file) {
