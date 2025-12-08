@@ -1,26 +1,26 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { LoaderIcon, PanelLeft, SquarePen } from "lucide-react";
-import DateField from "@/components/global/DateField";
-import { useProfile } from "@/lib/profileContext";
-import { formatDate } from "@/lib/utils";
-import { useActionState } from "react";
-import { updateAccountAction } from "@/actions/account.action";
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import { LoaderIcon, PanelLeft, SquarePen } from 'lucide-react'
+import DateField from '@/components/global/DateField'
+import { useProfile } from '@/lib/profileContext'
+import { formatDate } from '@/lib/utils'
+import { useActionState } from 'react'
+import { updateAccountAction } from '@/actions/account.action'
 
-import { toast } from "sonner";
-import { uploadProfileImageAction } from "@/actions/user.action";
+import { toast } from 'sonner'
+import { uploadProfileImageAction } from '@/actions/user.action'
 
 const Profile = ({ account }) => {
-  const [dob, setDob] = useState(null);
-  const [whDate, setWHDate] = useState(null);
-  const [bpDate, setBPDate] = useState(null);
-  const { setMenuOpen } = useProfile();
+  const [dob, setDob] = useState(null)
+  const [whDate, setWHDate] = useState(null)
+  const [bpDate, setBPDate] = useState(null)
+  const { setMenuOpen } = useProfile()
   const [uploadedImage, setUploadedImage] = useState(
     account.profileImage || null
-  );
-  const [uploadPending, setUploadPending] = useState(false);
+  )
+  const [uploadPending, setUploadPending] = useState(false)
 
   const {
     userId,
@@ -41,61 +41,62 @@ const Profile = ({ account }) => {
     medicalConditions,
     currentMedicines,
     profileImage,
-  } = account;
+  } = account
 
   // ---------- Account update action ----------
   const accountInitialState = {
-    msg: "",
+    msg: '',
     success: false,
-  };
+  }
 
   const [accountState, accountAction, accountPending] = useActionState(
     updateAccountAction,
     accountInitialState
-  );
+  )
 
   // ---------- Handle profile image upload (no useActionState here) ----------
   const handleImageUpload = async (e) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
+    const selectedFile = e.target.files[0]
+    if (!selectedFile) return
 
     // Optimistic preview
-    setUploadedImage(URL.createObjectURL(selectedFile));
+    setUploadedImage(URL.createObjectURL(selectedFile))
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
+    const formData = new FormData()
+    formData.append('file', selectedFile)
 
     try {
-      setUploadPending(true);
-      const res = await uploadProfileImageAction(formData);
+      setUploadPending(true)
+      const res = await uploadProfileImageAction(formData)
 
       if (res?.success) {
         if (res.imagePath) {
           // Use the path returned from the server
-          setUploadedImage(res.imagePath);
+          setUploadedImage(res.imagePath)
         }
-        toast.success(res.msg || "Profile image uploaded successfully");
+        toast.success(res.msg || 'Profile image uploaded successfully')
       } else {
-        toast.error(res?.msg || "Image upload failed");
+        toast.error(res?.msg || 'Image upload failed')
       }
     } catch (err) {
-      console.error("Image upload error:", err);
-      toast.error("Image upload failed");
+      console.error('Image upload error:', err)
+      toast.error('Image upload failed')
     } finally {
-      setUploadPending(false);
+      setUploadPending(false)
     }
-  };
+  }
 
   // ---------- Toasts for account update ----------
   useEffect(() => {
-    if (!accountState.msg) return;
+    if (!accountState.msg) return
 
     if (accountState.success) {
-      toast.success(accountState.msg);
+      toast.success(accountState.msg)
     } else {
-      toast.warning(accountState.msg);
+      toast.warning(accountState.msg)
     }
-  }, [accountState.msg, accountState.success]);
+    accountState.msg = ''
+  }, [accountState.msg])
 
   return (
     <div className='flex-1 space-y-6 p-[24px] md:p-[50px]'>
@@ -119,7 +120,7 @@ const Profile = ({ account }) => {
               src={
                 uploadedImage ||
                 profileImage ||
-                "/images/profile-placeholder.png"
+                '/images/profile-placeholder.png'
               }
               alt='Profile'
               fill
@@ -454,7 +455,7 @@ const Profile = ({ account }) => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile
