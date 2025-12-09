@@ -7,7 +7,7 @@ export async function middleware(req) {
 
   // 1. Define paths based on access type
   const guestOnly = ['/login', '/register']
-  const userOnlyPrefixes = ['/profile', '/account'] // Paths only normal users can access
+  const userOnlyPrefixes = ['/profile', '/account', '/health'] // Paths only normal users can access
   const adminOnlyPrefixes = ['/admin'] // Paths only admins can access
 
   // Attempt to decode the token to get user info (isAdmin flag)
@@ -86,6 +86,7 @@ export const config = {
     '/register',
     '/profile/:path*',
     '/account/:path*',
+    '/health/:path*',
     '/admin/:path*',
   ],
 }

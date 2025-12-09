@@ -14,6 +14,7 @@ model User {
   isAdmin     Boolean      @default(false)
   createdAt   DateTime     @default(now())
   account     Account?
+  health      Health?
   records     Record[]
   history     History[]
   medications Medication[]
@@ -50,7 +51,6 @@ model Medication {
 model Account {
   id Int @id @default(autoincrement())
 
-  // personal details
   firstName   String
   lastName    String
   phoneNumber String
@@ -60,7 +60,12 @@ model Account {
   address     String
   zipCode     String
 
-  // Health details
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Health {
+  id                    Int      @id @default(autoincrement())
   weight                String
   height                String
   weightHeightCheckDate DateTime
