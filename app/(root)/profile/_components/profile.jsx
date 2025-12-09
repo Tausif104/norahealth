@@ -1,26 +1,26 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
-import { LoaderIcon, PanelLeft, SquarePen } from 'lucide-react'
-import DateField from '@/components/global/DateField'
-import { useProfile } from '@/lib/profileContext'
-import { formatDate } from '@/lib/utils'
-import { useActionState } from 'react'
-import { updateAccountAction } from '@/actions/account.action'
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { LoaderIcon, PanelLeft, SquarePen } from "lucide-react";
+import DateField from "@/components/global/DateField";
+import { useProfile } from "@/lib/profileContext";
+import { formatDate } from "@/lib/utils";
+import { useActionState } from "react";
+import { updateAccountAction } from "@/actions/account.action";
 
-import { toast } from 'sonner'
-import { uploadProfileImageAction } from '@/actions/user.action'
+import { toast } from "sonner";
+import { uploadProfileImageAction } from "@/actions/user.action";
 
 const Profile = ({ account }) => {
-  const [dob, setDob] = useState(null)
-  const [whDate, setWHDate] = useState(null)
-  const [bpDate, setBPDate] = useState(null)
-  const { setMenuOpen } = useProfile()
+  const [dob, setDob] = useState(null);
+  const [whDate, setWHDate] = useState(null);
+  const [bpDate, setBPDate] = useState(null);
+  const { setMenuOpen } = useProfile();
   const [uploadedImage, setUploadedImage] = useState(
     account.profileImage || null
-  )
-  const [uploadPending, setUploadPending] = useState(false)
+  );
+  const [uploadPending, setUploadPending] = useState(false);
 
   const {
     userId,
@@ -41,62 +41,62 @@ const Profile = ({ account }) => {
     medicalConditions,
     currentMedicines,
     profileImage,
-  } = account
+  } = account;
 
   // ---------- Account update action ----------
   const accountInitialState = {
-    msg: '',
+    msg: "",
     success: false,
-  }
+  };
 
   const [accountState, accountAction, accountPending] = useActionState(
     updateAccountAction,
     accountInitialState
-  )
+  );
 
   // ---------- Handle profile image upload (no useActionState here) ----------
   const handleImageUpload = async (e) => {
-    const selectedFile = e.target.files[0]
-    if (!selectedFile) return
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
 
     // Optimistic preview
-    setUploadedImage(URL.createObjectURL(selectedFile))
+    setUploadedImage(URL.createObjectURL(selectedFile));
 
-    const formData = new FormData()
-    formData.append('file', selectedFile)
+    const formData = new FormData();
+    formData.append("file", selectedFile);
 
     try {
-      setUploadPending(true)
-      const res = await uploadProfileImageAction(formData)
+      setUploadPending(true);
+      const res = await uploadProfileImageAction(formData);
 
       if (res?.success) {
         if (res.imagePath) {
           // Use the path returned from the server
-          setUploadedImage(res.imagePath)
+          setUploadedImage(res.imagePath);
         }
-        toast.success(res.msg || 'Profile image uploaded successfully')
+        toast.success(res.msg || "Profile image uploaded successfully");
       } else {
-        toast.error(res?.msg || 'Image upload failed')
+        toast.error(res?.msg || "Image upload failed");
       }
     } catch (err) {
-      console.error('Image upload error:', err)
-      toast.error('Image upload failed')
+      console.error("Image upload error:", err);
+      toast.error("Image upload failed");
     } finally {
-      setUploadPending(false)
+      setUploadPending(false);
     }
-  }
+  };
 
   // ---------- Toasts for account update ----------
   useEffect(() => {
-    if (!accountState.msg) return
+    if (!accountState.msg) return;
 
     if (accountState.success) {
-      toast.success(accountState.msg)
+      toast.success(accountState.msg);
     } else {
-      toast.warning(accountState.msg)
+      toast.warning(accountState.msg);
     }
-    accountState.msg = ''
-  }, [accountState.msg])
+    accountState.msg = "";
+  }, [accountState.msg]);
 
   return (
     <div className='flex-1 space-y-6 p-[24px] md:p-[50px]'>
@@ -120,7 +120,7 @@ const Profile = ({ account }) => {
               src={
                 uploadedImage ||
                 profileImage ||
-                '/images/profile-placeholder.png'
+                "/images/profile-placeholder.png"
               }
               alt='Profile'
               fill
@@ -157,13 +157,12 @@ const Profile = ({ account }) => {
       <form className='space-y-6' action={accountAction}>
         <input type='hidden' name='userId' value={userId} />
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-          {/* First / Last name */}
           <div className='col-span-4 mt-3'>
             <h2 className='text-theme text-2xl font-semibold'>
               Personal Profile
             </h2>
           </div>
-          <div className='md:col-span-2'>
+          <div className='col-span-4 md:col-span-2'>
             <label
               htmlFor='firstName'
               className='block text-base mb-2 text-[#0D060C]'
@@ -178,7 +177,7 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-          <div className='md:col-span-2'>
+          <div className='col-span-4 md:col-span-2'>
             <label
               htmlFor='lastName'
               className='block text-base mb-2 text-[#0D060C]'
@@ -194,8 +193,7 @@ const Profile = ({ account }) => {
             />
           </div>
 
-          {/* Email / Phone */}
-          <div className='md:col-span-2'>
+          <div className='col-span-4 md:col-span-2'>
             <label
               htmlFor='email'
               className='block text-base mb-2 text-[#0D060C]'
@@ -210,7 +208,7 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-          <div className='md:col-span-2'>
+          <div className='col-span-4 md:col-span-2'>
             <label
               htmlFor='phone'
               className='block text-base mb-2 text-[#0D060C]'
@@ -225,20 +223,21 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
+          <div className='col-span-4 md:col-span-2'>
+            <input type='hidden' name='dob' value={dob ? dob : dateOfBirth} />
+            <DateField
+              id='dob'
+              label='Date of Birth'
+              selected={dob}
+              onChange={setDob}
+              placeholder={formatDate(dateOfBirth)}
+              className='md:col-span-2 '
+              name='dob'
+              bg='bg-white border border-[#EEE0CF] text-black'
+            />
+          </div>
 
-          {/* DOB / NHS */}
-          <input type='hidden' name='dob' value={dob ? dob : dateOfBirth} />
-          <DateField
-            id='dob'
-            label='Date of Birth'
-            selected={dob}
-            onChange={setDob}
-            placeholder={formatDate(dateOfBirth)}
-            className='md:col-span-2 '
-            name='dob'
-            bg='bg-white border border-[#EEE0CF] text-black'
-          />
-          <div className='md:col-span-2'>
+          <div className='col-span-4 md:col-span-2'>
             <label
               htmlFor='nhs'
               className='block text-base mb-2 text-[#0D060C]'
@@ -254,8 +253,7 @@ const Profile = ({ account }) => {
             />
           </div>
 
-          {/* Home address / Zip */}
-          <div className='md:col-span-3'>
+          <div className='col-span-4 md:col-span-3'>
             <label
               htmlFor='homeAddress'
               className='block text-base mb-2 text-[#0D060C]'
@@ -271,7 +269,7 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-          <div className='md:col-span-1'>
+          <div className='col-span-4 md:col-span-1'>
             <label
               htmlFor='homeZip'
               className='block text-base mb-2 text-[#0D060C]'
@@ -294,8 +292,7 @@ const Profile = ({ account }) => {
             </h2>
           </div>
 
-          {/* Weight / Height */}
-          <div className='md:col-span-1'>
+          <div className='col-span-4 md:col-span-1'>
             <label
               htmlFor='weight'
               className='block text-base mb-2 text-[#0D060C]'
@@ -311,7 +308,7 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-          <div className='md:col-span-1'>
+          <div className='col-span-4 md:col-span-1'>
             <label
               htmlFor='height'
               className='block text-base mb-2 text-[#0D060C]'
@@ -327,25 +324,25 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
+          <div className='col-span-4 md:col-span-2'>
+            <input
+              type='hidden'
+              name='whdate'
+              value={whDate ? whDate : weightHeightCheckDate}
+            />
+            <DateField
+              id='wh-date'
+              label='Weight Height Check Date'
+              selected={whDate}
+              onChange={setWHDate}
+              placeholder={formatDate(weightHeightCheckDate)}
+              className='md:col-span-2 '
+              name='whdate'
+              bg='bg-white border border-[#EEE0CF] text-black'
+            />
+          </div>
 
-          <input
-            type='hidden'
-            name='whdate'
-            value={whDate ? whDate : weightHeightCheckDate}
-          />
-          <DateField
-            id='wh-date'
-            label='Weight Height Check Date'
-            selected={whDate}
-            onChange={setWHDate}
-            placeholder={formatDate(weightHeightCheckDate)}
-            className='md:col-span-2 '
-            name='whdate'
-            bg='bg-white border border-[#EEE0CF] text-black'
-          />
-
-          {/* Blood pressure */}
-          <div className='md:col-span-1'>
+          <div className='col-span-4 md:col-span-1'>
             <label
               htmlFor='bp-top'
               className='block text-base mb-2 text-[#0D060C]'
@@ -362,7 +359,7 @@ const Profile = ({ account }) => {
             />
           </div>
 
-          <div className='md:col-span-1'>
+          <div className='col-span-4 md:col-span-1'>
             <label
               htmlFor='bp-bottom'
               className='block text-base mb-2 text-[#0D060C]'
@@ -378,25 +375,25 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
+          <div className='col-span-4 md:col-span-2'>
+            <input
+              type='hidden'
+              name='bpdate'
+              value={bpDate ? bpDate : bpCheckDate}
+            />
+            <DateField
+              id='bp-check-date'
+              label='BP Check Date'
+              selected={bpDate}
+              onChange={setBPDate}
+              placeholder={formatDate(bpCheckDate)}
+              className='md:col-span-2 '
+              name='bpdate'
+              bg='bg-white border border-[#EEE0CF] text-black'
+            />
+          </div>
 
-          <input
-            type='hidden'
-            name='bpdate'
-            value={bpDate ? bpDate : bpCheckDate}
-          />
-          <DateField
-            id='bp-check-date'
-            label='BP Check Date'
-            selected={bpDate}
-            onChange={setBPDate}
-            placeholder={formatDate(bpCheckDate)}
-            className='md:col-span-2 '
-            name='bpdate'
-            bg='bg-white border border-[#EEE0CF] text-black'
-          />
-
-          {/* Medical conditions / Medicines */}
-          <div className='md:col-span-2'>
+          <div className='col-span-4 md:col-span-2'>
             <label
               htmlFor='med-con'
               className='block text-base mb-2 text-[#0D060C]'
@@ -413,7 +410,7 @@ const Profile = ({ account }) => {
             />
           </div>
 
-          <div className='md:col-span-2'>
+          <div className='col-span-4 md:col-span-2'>
             <label
               htmlFor='current-med'
               className='block text-base mb-2 text-[#0D060C]'
@@ -430,8 +427,7 @@ const Profile = ({ account }) => {
             />
           </div>
 
-          {/* Save button */}
-          <div className='md:col-span-4'>
+          <div className='col-span-4'>
             <button
               type='submit'
               className=' text-white inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 sm:min-w-[200px] min-w-full cursor-pointer '
@@ -455,7 +451,7 @@ const Profile = ({ account }) => {
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

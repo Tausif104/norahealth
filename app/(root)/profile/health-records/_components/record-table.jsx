@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import * as React from 'react'
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,11 +12,17 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from '@tanstack/react-table'
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Trash } from 'lucide-react'
-
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
+} from "@tanstack/react-table";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  MoreHorizontal,
+  Trash,
+  PanelLeft,
+} from "lucide-react";
+import { useProfile } from "@/lib/profileContext";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,8 +31,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,19 +40,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { CreateRecordForm } from './create-record-form'
-import { formatDate } from '@/lib/utils'
-import { deleteRecord } from '@/actions/record.action'
+} from "@/components/ui/table";
+import { CreateRecordForm } from "./create-record-form";
+import { formatDate } from "@/lib/utils";
+import { deleteRecord } from "@/actions/record.action";
 
 export const columns = [
   {
-    id: 'select',
+    id: "select",
     header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
+          (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label='Select all'
@@ -64,50 +70,50 @@ export const columns = [
   },
 
   {
-    accessorKey: 'weight',
-    header: 'Weight',
+    accessorKey: "weight",
+    header: "Weight",
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('weight')}</div>
+      <div className='capitalize'>{row.getValue("weight")}</div>
     ),
   },
   {
-    accessorKey: 'height',
-    header: 'Height',
+    accessorKey: "height",
+    header: "Height",
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('height')}</div>
+      <div className='capitalize'>{row.getValue("height")}</div>
     ),
   },
   {
-    accessorKey: 'lastwhCheck',
-    header: 'Last (W/H) Check',
+    accessorKey: "lastwhCheck",
+    header: "Last (W/H) Check",
     cell: ({ row }) => (
       <div className='capitalize'>
-        {formatDate(row.getValue('lastwhCheck'))}
+        {formatDate(row.getValue("lastwhCheck"))}
       </div>
     ),
   },
   {
-    accessorKey: 'bloodPressure',
-    header: 'Blood Pressure',
+    accessorKey: "bloodPressure",
+    header: "Blood Pressure",
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('bloodPressure')}</div>
+      <div className='capitalize'>{row.getValue("bloodPressure")}</div>
     ),
   },
   {
-    accessorKey: 'lastBpCheckDate',
-    header: 'Last BP Check',
+    accessorKey: "lastBpCheckDate",
+    header: "Last BP Check",
     cell: ({ row }) => (
       <div className='capitalize'>
-        {formatDate(row.getValue('lastBpCheckDate'))}
+        {formatDate(row.getValue("lastBpCheckDate"))}
       </div>
     ),
   },
 
   {
-    id: 'actions',
+    id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const recordItem = row.original
+      const recordItem = row.original;
 
       return (
         <DropdownMenu>
@@ -134,17 +140,17 @@ export const columns = [
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];
 
 export function RecordTable({ record }) {
-  const [sorting, setSorting] = React.useState([])
-  const [columnFilters, setColumnFilters] = React.useState([])
-  const [columnVisibility, setColumnVisibility] = React.useState({})
-  const [rowSelection, setRowSelection] = React.useState({})
-
+  const [sorting, setSorting] = React.useState([]);
+  const [columnFilters, setColumnFilters] = React.useState([]);
+  const [columnVisibility, setColumnVisibility] = React.useState({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const { setMenuOpen } = useProfile();
   const table = useReactTable({
     data: record,
     columns,
@@ -169,13 +175,22 @@ export function RecordTable({ record }) {
         pageIndex: 0,
       },
     },
-  })
+  });
 
   return (
     <div className='w-full p-10'>
-      <div className='flex justify-between items-center'>
-        <h1>Health Records</h1>
+      <div className='flex items-center gap-[50px]'>
+        <button
+          onClick={() => setMenuOpen(true)}
+          className='md:hidden w-[40px] h-[40px]  items-center gap-2 bg-[#d67b0e] text-white flex justify-center rounded-full'
+        >
+          <PanelLeft />
+        </button>
+        <h2 className='text-[#0D060C] text-[20px] md:text-[24px] font-semibold'>
+          Health Records
+        </h2>
       </div>
+
       <div className='flex items-center py-4'>
         <CreateRecordForm />
         <DropdownMenu>
@@ -200,7 +215,7 @@ export function RecordTable({ record }) {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -220,7 +235,7 @@ export function RecordTable({ record }) {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -231,7 +246,7 @@ export function RecordTable({ record }) {
                 <TableRow
                   className='bg-white'
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -258,7 +273,7 @@ export function RecordTable({ record }) {
       </div>
       <div className='flex items-center justify-end space-x-2 py-4'>
         <div className='text-muted-foreground flex-1 text-sm'>
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className='space-x-2'>
@@ -281,5 +296,5 @@ export function RecordTable({ record }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

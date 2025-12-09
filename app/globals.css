@@ -228,9 +228,9 @@ ul.slick-dots .slick-active button {
 }
 
 .react-calendar-custom {
-  border: none;
+  border: none !important;
   width: 100%;
-  background-color: transparent;
+  background-color: transparent !important;
 }
 .marked {
   background-color: rgb(223, 221, 221) !important;
@@ -307,15 +307,19 @@ ul.slick-dots .slick-active button {
 .react-calendar__tile--now:enabled:focus {
   background: #ce8936 !important;
 }
-.react-calendar__tile--active {
-  background: #ce8936 !important;
-  color: #ffff !important;
-}
+
 .react-calendar__month-view__days__day--weekend:disabled {
   color: #000 !important;
 }
 .react-calendar__tile:disabled {
-  background-color: transparent;
+  background-color: transparent !important;
+}
+.react-calendar__tile {
+  background-color: #f5ede4 !important;
+}
+.react-calendar__tile--active {
+  background: #ce8936 !important;
+  color: #ffff !important;
 }
 abbr[title] {
   -webkit-text-decoration: none;

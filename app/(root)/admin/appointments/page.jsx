@@ -1,5 +1,13 @@
-const AppointmentsPage = () => {
-  return <>Appointments</>
-}
+const {
+  default: AppointmentTable,
+} = require("../_components/appointment-table");
 
-export default AppointmentsPage
+const AppointmentsPage = () => {
+  return (
+    <>
+      <AppointmentTable />
+    </>
+  );
+};
+
+export default AppointmentsPage;
