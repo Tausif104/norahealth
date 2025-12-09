@@ -290,6 +290,8 @@ export const changePasswordAction = async (prevState, formData) => {
     }
   }
 }
+
+// upload profile image
 export const uploadProfileImageAction = async (formData) => {
   const file = formData.get('file')
 
