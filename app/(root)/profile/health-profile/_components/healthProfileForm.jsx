@@ -23,8 +23,6 @@ const HealthProfileForm = ({ health }) => {
     currentMedicines,
   } = health
 
-  console.log(health)
-
   const accountInitialState = {
     msg: '',
     success: false,

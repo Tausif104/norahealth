@@ -18,6 +18,7 @@ model User {
   records     Record[]
   history     History[]
   medications Medication[]
+  orders      Order[]
 }
 
 model Record {
@@ -46,6 +47,22 @@ model Medication {
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
   createdAt DateTime @default(now())
+}
+
+model Order {
+  id           Int         @id @default(autoincrement())
+  medicineName String
+  trackingId   String
+  status       OrderStatus @default(clinicalreview)
+  user         User        @relation(fields: [userId], references: [id])
+  userId       Int
+  createdAt    DateTime    @default(now())
+}
+
+enum OrderStatus {
+  clinicalreview
+  posted
+  delivered
 }
 
 model Account {

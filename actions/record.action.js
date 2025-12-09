@@ -192,7 +192,5 @@ export const deleteRecordByAdmin = async (formData) => {
     },
   })
 
-  console.log(res)
-
   revalidatePath(`/admin/${userId}/records`)
 }
