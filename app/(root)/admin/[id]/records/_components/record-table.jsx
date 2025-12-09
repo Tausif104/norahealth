@@ -13,13 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import {
-  ArrowUpDown,
-  BadgeCheckIcon,
-  ChevronDown,
-  MoreHorizontal,
-  Trash,
-} from 'lucide-react'
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Trash } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -32,6 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -40,10 +35,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
+import { CreateRecordForm } from './create-record-form'
 import { formatDate } from '@/lib/utils'
-import Link from 'next/link'
-import { CreateUserForm } from './create-user-form'
+import { deleteRecordByAdmin } from '@/actions/record.action'
 
 export const columns = [
   {
@@ -70,61 +64,52 @@ export const columns = [
   },
 
   {
-    accessorKey: 'id',
-    header: 'ID',
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('id')}</div>,
+    accessorKey: 'weight',
+    header: 'Weight',
+    cell: ({ row }) => (
+      <div className='capitalize'>{row.getValue('weight')}</div>
+    ),
   },
   {
-    accessorKey: 'email',
-    header: 'Email',
+    accessorKey: 'height',
+    header: 'Height',
     cell: ({ row }) => (
-      <div>
-        <Link href='/' className='hover:underline'>
-          {row.getValue('email')}
-        </Link>
+      <div className='capitalize'>{row.getValue('height')}</div>
+    ),
+  },
+  {
+    accessorKey: 'lastwhCheck',
+    header: 'Last (W/H) Check',
+    cell: ({ row }) => (
+      <div className='capitalize'>
+        {formatDate(row.getValue('lastwhCheck'))}
       </div>
     ),
   },
   {
-    accessorKey: 'isAdmin',
-    header: 'Role',
-    cell: ({ row, table }) => {
-      const isAdmin = row.getValue('isAdmin')
-      const id = row.getValue('id').toString()
-      const currentUserId = table?.options?.admin?.admin?.id.toString()
-
-      console.log(table?.options?.admin?.admin?.id)
-      return (
-        <div className='capitalize'>
-          {isAdmin ? (
-            <Badge
-              variant='secondary'
-              className='bg-green-400 text-white dark:bg-blue-600'
-            >
-              {id === currentUserId && <BadgeCheckIcon />}
-              Admin
-            </Badge>
-          ) : (
-            <Badge variant='outline'>Patient</Badge>
-          )}
-        </div>
-      )
-    },
+    accessorKey: 'bloodPressure',
+    header: 'Blood Pressure',
+    cell: ({ row }) => (
+      <div className='capitalize'>{row.getValue('bloodPressure')}</div>
+    ),
   },
   {
-    accessorKey: 'createdAt',
-    header: 'Created At',
+    accessorKey: 'lastBpCheckDate',
+    header: 'Last BP Check',
     cell: ({ row }) => (
-      <div className='capitalize'>{formatDate(row.getValue('createdAt'))} </div>
+      <div className='capitalize'>
+        {formatDate(row.getValue('lastBpCheckDate'))}
+      </div>
     ),
   },
 
   {
     id: 'actions',
     enableHiding: false,
-    cell: ({ row }) => {
-      const userId = row.getValue('id')
+    cell: ({ row, table }) => {
+      const recordItem = row.original
 
+      const userId = table?.options?.userId
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -135,21 +120,19 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href='/'>Account</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/records`}>Records </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/history`}>Medical History</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/medications`}>Medications</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/orders`}>Orders</Link>
+            <DropdownMenuItem asChild className='p-0'>
+              <form action={deleteRecordByAdmin}>
+                <input type='hidden' name='recordId' value={recordItem.id} />
+                <input type='hidden' name='userId' value={userId} />
+                <Button
+                  type='submit'
+                  className='cursor-pointer block w-full'
+                  variant='destructive'
+                  onClick={() => navigator.clipboard.writeText(recordItem.id)}
+                >
+                  Delete
+                </Button>
+              </form>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -158,15 +141,15 @@ export const columns = [
   },
 ]
 
-export function UserTable({ users, admin }) {
+export function RecordTable({ record, userId }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
   const [columnVisibility, setColumnVisibility] = React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data: users || [],
-    admin: admin,
+    data: record,
+    userId,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -194,15 +177,10 @@ export function UserTable({ users, admin }) {
   return (
     <div className='w-full p-10'>
       <div className='flex justify-between items-center'>
-        <h1>
-          Users{' '}
-          <Badge variant='primary' className='bg-white'>
-            {table?.options?.data.length}
-          </Badge>
-        </h1>
+        <h1>Health Records</h1>
       </div>
       <div className='flex items-center py-4'>
-        <CreateUserForm />
+        <CreateRecordForm />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='ml-auto'>

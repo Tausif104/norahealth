@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/client/prisma'
 import { loggedInUserAction } from './user.action'
 import { revalidatePath } from 'next/cache'
+import { getAdminUser } from './admin.action'
 
 // create medication action
 export const createMedicationAction = async (prevState, formData) => {
@@ -81,6 +82,90 @@ export const deleteMedicationAction = async (formData) => {
   })
 
   revalidatePath('/profile/medications')
+
+  if (res) {
+    return {
+      msg: 'Medication Deleted',
+      success: true,
+    }
+  }
+}
+
+// get medication by user id
+export const getMedicationByUserId = async (userId) => {
+  const user = await getAdminUser()
+
+  const isAdmin = user?.admin?.isAdmin || false
+
+  if (!isAdmin) {
+    return { success: false, message: 'Unauthorized. User is not admin' }
+  }
+
+  const medication = await prisma.medication.findMany({
+    where: {
+      userId: Number(userId),
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
+
+  return {
+    medication,
+  }
+}
+
+// create Medication by admin
+export const createMedicationByAdminAction = async (prevState, formData) => {
+  const medication = formData.get('medication')
+  const userId = formData.get('userId')
+
+  const user = await getAdminUser()
+
+  const isAdmin = user?.admin?.isAdmin || false
+
+  if (!isAdmin) {
+    return { success: false, message: 'Unauthorized. User is not admin' }
+  }
+
+  const res = await prisma.medication.create({
+    data: {
+      label: medication,
+      userId: Number(userId),
+    },
+  })
+
+  revalidatePath(`/admin/${userId}/medications`)
+
+  if (res) {
+    return {
+      msg: 'Medication Created',
+      success: true,
+    }
+  }
+}
+
+// delete medication action by admin
+export const deleteMedicationByAdmin = async (formData) => {
+  const medicationId = formData.get('medicationId')
+  const userId = formData.get('userId')
+
+  const user = await getAdminUser()
+
+  const isAdmin = user?.admin?.isAdmin || false
+
+  if (!isAdmin) {
+    return { success: false, message: 'Unauthorized. User is not admin' }
+  }
+
+  const res = await prisma.medication.delete({
+    where: {
+      id: Number(medicationId),
+      userId: Number(userId),
+    },
+  })
+
+  revalidatePath(`/admin/${userId}/medications`)
 
   if (res) {
     return {
