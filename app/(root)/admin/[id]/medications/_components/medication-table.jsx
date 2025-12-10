@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import * as React from 'react'
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,11 +12,17 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from '@tanstack/react-table'
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Trash } from 'lucide-react'
+} from "@tanstack/react-table";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  MoreHorizontal,
+  PanelLeft,
+  Trash,
+} from "lucide-react";
 
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,8 +31,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,19 +40,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { CreateMedicationForm } from './create-medication-form'
-import { formatDate } from '@/lib/utils'
-import { deleteMedicationByAdmin } from '@/actions/medication.action'
+} from "@/components/ui/table";
+import { CreateMedicationForm } from "./create-medication-form";
+import { formatDate } from "@/lib/utils";
+import { deleteMedicationByAdmin } from "@/actions/medication.action";
+import { useAdmin } from "@/lib/adminContext";
 
 export const columns = [
   {
-    id: 'select',
+    id: "select",
     header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
+          (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label='Select all'
@@ -64,27 +71,27 @@ export const columns = [
   },
 
   {
-    accessorKey: 'label',
-    header: 'Label',
+    accessorKey: "label",
+    header: "Label",
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('label')}</div>
+      <div className='capitalize'>{row.getValue("label")}</div>
     ),
   },
 
   {
-    accessorKey: 'createdAt',
-    header: 'Created At',
+    accessorKey: "createdAt",
+    header: "Created At",
     cell: ({ row }) => (
-      <div className='capitalize'>{formatDate(row.getValue('createdAt'))}</div>
+      <div className='capitalize'>{formatDate(row.getValue("createdAt"))}</div>
     ),
   },
 
   {
-    id: 'actions',
+    id: "actions",
     enableHiding: false,
     cell: ({ row, table }) => {
-      const medicationItem = row.original
-      const userId = table?.options?.userId
+      const medicationItem = row.original;
+      const userId = table?.options?.userId;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -117,16 +124,17 @@ export const columns = [
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];
 
 export function MedicationTable({ medications, userId }) {
-  const [sorting, setSorting] = React.useState([])
-  const [columnFilters, setColumnFilters] = React.useState([])
-  const [columnVisibility, setColumnVisibility] = React.useState({})
-  const [rowSelection, setRowSelection] = React.useState({})
+  const { setMenuOpen } = useAdmin();
+  const [sorting, setSorting] = React.useState([]);
+  const [columnFilters, setColumnFilters] = React.useState([]);
+  const [columnVisibility, setColumnVisibility] = React.useState({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data: medications || [],
@@ -153,13 +161,21 @@ export function MedicationTable({ medications, userId }) {
         pageIndex: 0,
       },
     },
-  })
+  });
 
   return (
     <div className='w-full p-10'>
-      <div className='flex justify-between items-center'>
-        <h1>Medications</h1>
+      {/* HEADER */}
+      <div className='flex items-center gap-4 mb-4'>
+        <button
+          onClick={() => setMenuOpen(true)}
+          className='lg:hidden w-[40px] h-[40px] bg-[#d67b0e] text-white flex justify-center items-center rounded-full'
+        >
+          <PanelLeft />
+        </button>
+        <h2 className='text-xl font-semibold'>Medications</h2>
       </div>
+
       <div className='flex items-center py-4'>
         <CreateMedicationForm />
         <DropdownMenu>
@@ -184,7 +200,7 @@ export function MedicationTable({ medications, userId }) {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -204,7 +220,7 @@ export function MedicationTable({ medications, userId }) {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -215,7 +231,7 @@ export function MedicationTable({ medications, userId }) {
                 <TableRow
                   className='bg-white'
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -242,7 +258,7 @@ export function MedicationTable({ medications, userId }) {
       </div>
       <div className='flex items-center justify-end space-x-2 py-4'>
         <div className='text-muted-foreground flex-1 text-sm'>
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className='space-x-2'>
@@ -265,5 +281,5 @@ export function MedicationTable({ medications, userId }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

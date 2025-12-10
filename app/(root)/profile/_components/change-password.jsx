@@ -1,36 +1,36 @@
-'use client'
+"use client";
 
-import { changePasswordAction } from '@/actions/user.action'
-import { useProfile } from '@/lib/profileContext'
-import { CircleCheck, PanelLeft } from 'lucide-react'
-import React, { useActionState, useEffect, useRef } from 'react'
-import { toast } from 'sonner'
+import { changePasswordAction } from "@/actions/user.action";
+import { useProfile } from "@/lib/profileContext";
+import { CircleCheck, PanelLeft } from "lucide-react";
+import React, { useActionState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 const initialState = {
-  msg: '',
+  msg: "",
   success: false,
-}
+};
 
 const ChangePassword = () => {
-  const { setMenuOpen } = useProfile()
-  const formRef = useRef(null)
+  const { setMenuOpen } = useProfile();
+  const formRef = useRef(null);
 
   const [state, formAction, isPending] = useActionState(
     changePasswordAction,
     initialState
-  )
+  );
 
   // ✅ clean React reset
   useEffect(() => {
     if (state.msg) {
       if (state.success) {
-        formRef.current?.reset()
-        toast.success(state.msg)
+        formRef.current?.reset();
+        toast.success(state.msg);
       } else {
-        toast.error(state.msg)
+        toast.error(state.msg);
       }
     }
-  }, [state.msg])
+  }, [state.msg]);
 
   return (
     <div className='max-w-[630px] mx-auto flex-1 space-y-6 py-[24px] md:py-[150px] px-[24px] md:px-0'>
@@ -97,11 +97,11 @@ const ChangePassword = () => {
           disabled={isPending}
           className='bg-[#D6866B] hover:bg-black text-white py-4 px-9 rounded-full transition-all duration-300 disabled:opacity-60 cursor-pointer'
         >
-          {isPending ? 'Updating...' : 'Update'}
+          {isPending ? "Updating..." : "Update"}
         </button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default ChangePassword
+export default ChangePassword;

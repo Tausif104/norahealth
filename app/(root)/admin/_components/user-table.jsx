@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import * as React from 'react'
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,17 +12,18 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from '@tanstack/react-table'
+} from "@tanstack/react-table";
 import {
   ArrowUpDown,
   BadgeCheckIcon,
   ChevronDown,
   MoreHorizontal,
+  PanelLeft,
   Trash,
-} from 'lucide-react'
+} from "lucide-react";
 
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -31,7 +32,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -39,20 +40,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { formatDate } from '@/lib/utils'
-import Link from 'next/link'
-import { CreateUserForm } from './create-user-form'
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/utils";
+import Link from "next/link";
+import { CreateUserForm } from "./create-user-form";
+import { useAdmin } from "@/lib/adminContext";
 
 export const columns = [
   {
-    id: 'select',
+    id: "select",
     header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
+          (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label='Select all'
@@ -70,28 +72,28 @@ export const columns = [
   },
 
   {
-    accessorKey: 'id',
-    header: 'ID',
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('id')}</div>,
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <div className='capitalize'>{row.getValue("id")}</div>,
   },
   {
-    accessorKey: 'email',
-    header: 'Email',
+    accessorKey: "email",
+    header: "Email",
     cell: ({ row }) => (
       <div>
         <Link href='/' className='hover:underline'>
-          {row.getValue('email')}
+          {row.getValue("email")}
         </Link>
       </div>
     ),
   },
   {
-    accessorKey: 'isAdmin',
-    header: 'Role',
+    accessorKey: "isAdmin",
+    header: "Role",
     cell: ({ row, table }) => {
-      const isAdmin = row.getValue('isAdmin')
-      const id = row.getValue('id').toString()
-      const currentUserId = table?.options?.admin?.admin?.id.toString()
+      const isAdmin = row.getValue("isAdmin");
+      const id = row.getValue("id").toString();
+      const currentUserId = table?.options?.admin?.admin?.id.toString();
 
       return (
         <div className='capitalize'>
@@ -107,22 +109,22 @@ export const columns = [
             <Badge variant='outline'>Patient</Badge>
           )}
         </div>
-      )
+      );
     },
   },
   {
-    accessorKey: 'createdAt',
-    header: 'Created At',
+    accessorKey: "createdAt",
+    header: "Created At",
     cell: ({ row }) => (
-      <div className='capitalize'>{formatDate(row.getValue('createdAt'))} </div>
+      <div className='capitalize'>{formatDate(row.getValue("createdAt"))} </div>
     ),
   },
 
   {
-    id: 'actions',
+    id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const userId = row.getValue('id')
+      const userId = row.getValue("id");
 
       return (
         <DropdownMenu>
@@ -152,16 +154,17 @@ export const columns = [
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];
 
 export function UserTable({ users, admin }) {
-  const [sorting, setSorting] = React.useState([])
-  const [columnFilters, setColumnFilters] = React.useState([])
-  const [columnVisibility, setColumnVisibility] = React.useState({})
-  const [rowSelection, setRowSelection] = React.useState({})
+  const { setMenuOpen } = useAdmin();
+  const [sorting, setSorting] = React.useState([]);
+  const [columnFilters, setColumnFilters] = React.useState([]);
+  const [columnVisibility, setColumnVisibility] = React.useState({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data: users || [],
@@ -188,17 +191,28 @@ export function UserTable({ users, admin }) {
         pageIndex: 0,
       },
     },
-  })
+  });
 
   return (
     <div className='w-full p-10'>
       <div className='flex justify-between items-center'>
-        <h1>
-          Users{' '}
-          <Badge variant='primary' className='bg-white'>
-            {table?.options?.data.length}
-          </Badge>
-        </h1>
+        {" "}
+        {/* HEADER */}
+        <div className='flex items-center gap-4 mb-4'>
+          <button
+            onClick={() => setMenuOpen(true)}
+            className='lg:hidden w-[40px] h-[40px] bg-[#d67b0e] text-white flex justify-center items-center rounded-full'
+          >
+            <PanelLeft />
+          </button>
+          <h2 className='text-xl font-semibold'>
+            {" "}
+            Users{" "}
+            <Badge variant='primary' className='bg-white'>
+              {table?.options?.data.length}
+            </Badge>
+          </h2>
+        </div>
       </div>
       <div className='flex items-center py-4'>
         <CreateUserForm />
@@ -224,7 +238,7 @@ export function UserTable({ users, admin }) {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -244,7 +258,7 @@ export function UserTable({ users, admin }) {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -255,7 +269,7 @@ export function UserTable({ users, admin }) {
                 <TableRow
                   className='bg-white'
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -282,7 +296,7 @@ export function UserTable({ users, admin }) {
       </div>
       <div className='flex items-center justify-end space-x-2 py-4'>
         <div className='text-muted-foreground flex-1 text-sm'>
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className='space-x-2'>
@@ -305,5 +319,5 @@ export function UserTable({ users, admin }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

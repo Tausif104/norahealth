@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Calendar from "react-calendar";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Trash } from "lucide-react";
+import { PanelLeft, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -24,6 +24,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { useAdmin } from "@/lib/adminContext";
 
 /**
  * Reusable confirm dialog hook (uses shadcn AlertDialog)
@@ -86,6 +87,7 @@ function useConfirmDialog() {
 
 export default function BookingSlots() {
   const router = useRouter();
+  const { setMenuOpen } = useAdmin();
 
   // parse "YYYY-MM-DD" from server into Date object for calendar
   function parseYMD(ymd) {
@@ -292,6 +294,16 @@ export default function BookingSlots() {
     <div className='bg-[#f4e7e1] rounded-2xl overflow-hidden flex flex-col md:flex-row h-full'>
       {/* Left: react-calendar */}
       <div className='max-w-[730px] w-full p-6 bg-[#faf9f8] rounded-2xl'>
+        {/* HEADER */}
+        <div className='flex items-center gap-4 mb-4'>
+          <button
+            onClick={() => setMenuOpen(true)}
+            className='lg:hidden w-[40px] h-[40px] bg-[#d67b0e] text-white flex justify-center items-center rounded-full'
+          >
+            <PanelLeft />
+          </button>
+          <h2 className='text-xl font-semibold'>Appointment Slots</h2>
+        </div>
         <Link
           href='/admin/booking-slot/create-slot'
           className=' bg-[#d67b0e] hover:bg-black px-3 py-2 w-fit rounded-lg flex items-center justify-center text-white text-[12px] md:text-[16px] font-medium  tracking-widest'

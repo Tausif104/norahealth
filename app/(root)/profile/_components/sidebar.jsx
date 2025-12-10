@@ -1,5 +1,5 @@
-'use client'
-import { useProfile } from '@/lib/profileContext'
+"use client";
+import { useProfile } from "@/lib/profileContext";
 import {
   Car,
   Cross,
@@ -9,29 +9,29 @@ import {
   PanelLeft,
   HeartIcon,
   User,
-} from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import React from 'react'
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
 
 const Sidebar = () => {
-  const { menuOpen, setMenuOpen } = useProfile()
-  const pathname = usePathname()
+  const { menuOpen, setMenuOpen } = useProfile();
+  const pathname = usePathname();
 
   const baseClasses =
-    'w-full flex items-center gap-2 py-2.5 px-3 rounded-[16px] text-left transition'
-  const activeClasses = 'bg-[#d67b0e] text-white'
-  const inactiveClasses = 'text-[#3A3D42] hover:bg-[#f4d9c0]'
+    "w-full flex items-center gap-2 py-2.5 px-3 rounded-[16px] text-left transition";
+  const activeClasses = "bg-[#d67b0e] text-white";
+  const inactiveClasses = "text-[#3A3D42] hover:bg-[#f4d9c0]";
 
   return (
     <aside
-      className={`w-[300px] bg-[#F4E7E1] md:rounded-[12px] p-6 pr-8 md:p-12 flex-shrink-0 absolute md:relative top-0 md:top-auto md:left-0 h-dvh md:h-auto ${
-        menuOpen ? 'left-0' : '-left-[500px]'
+      className={`w-[300px] bg-[#F4E7E1] lg:rounded-[12px] p-6 pr-8 lg:p-12 flex-shrink-0 absolute lg:relative top-0 lg:top-auto lg:left-0 h-dvh lg:h-auto ${
+        menuOpen ? "left-0" : "-left-[500px]"
       } transition-all duration-500 z-20`}
     >
       <button
         onClick={() => setMenuOpen(false)}
-        className='md:hidden w-[40px] h-[40px] items-center gap-2 bg-[#CE8936] text-white flex justify-center rounded-full absolute top-6 -right-5 z-10'
+        className='lg:hidden w-[40px] h-[40px] items-center gap-2 bg-[#CE8936] text-white flex justify-center rounded-full absolute top-6 -right-5 z-10'
       >
         <PanelLeft />
       </button>
@@ -41,7 +41,7 @@ const Sidebar = () => {
         <Link
           href='/profile'
           className={`${baseClasses} ${
-            pathname === '/profile' ? activeClasses : inactiveClasses
+            pathname === "/profile" ? activeClasses : inactiveClasses
           }`}
         >
           <User className='w-4 h-4' />
@@ -51,7 +51,7 @@ const Sidebar = () => {
         <Link
           href='/profile/health-profile'
           className={`${baseClasses} ${
-            pathname === '/profile/health-profile'
+            pathname === "/profile/health-profile"
               ? activeClasses
               : inactiveClasses
           }`}
@@ -64,7 +64,7 @@ const Sidebar = () => {
         <Link
           href='/profile/health-records'
           className={`${baseClasses} ${
-            pathname === '/profile/health-records'
+            pathname === "/profile/health-records"
               ? activeClasses
               : inactiveClasses
           }`}
@@ -77,7 +77,7 @@ const Sidebar = () => {
         <Link
           href='/profile/medical-history'
           className={`${baseClasses} ${
-            pathname === '/profile/medical-history'
+            pathname === "/profile/medical-history"
               ? activeClasses
               : inactiveClasses
           }`}
@@ -89,7 +89,7 @@ const Sidebar = () => {
         <Link
           href='/profile/medications'
           className={`${baseClasses} ${
-            pathname === '/profile/medications'
+            pathname === "/profile/medications"
               ? activeClasses
               : inactiveClasses
           }`}
@@ -102,7 +102,7 @@ const Sidebar = () => {
         <Link
           href='/profile/orders'
           className={`${baseClasses} ${
-            pathname === '/profile/orders' ? activeClasses : inactiveClasses
+            pathname === "/profile/orders" ? activeClasses : inactiveClasses
           }`}
         >
           <Car className='w-4 h-4' />
@@ -113,7 +113,7 @@ const Sidebar = () => {
         <Link
           href='/profile/change-password'
           className={`${baseClasses} ${
-            pathname === '/profile/change-password'
+            pathname === "/profile/change-password"
               ? activeClasses
               : inactiveClasses
           }`}
@@ -123,7 +123,7 @@ const Sidebar = () => {
         </Link>
       </nav>
     </aside>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

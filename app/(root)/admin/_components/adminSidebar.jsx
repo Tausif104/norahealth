@@ -16,13 +16,13 @@ const AdminSidebar = () => {
 
   return (
     <aside
-      className={`w-[300px] bg-[#F4E7E1] md:rounded-[12px] p-6 pr-8 md:p-12 flex-shrink-0 absolute md:relative top-0 md:top-auto md:left-0 h-dvh md:h-auto ${
+      className={`w-[300px] bg-[#F4E7E1] lg:rounded-[12px] p-6 pr-8 lg:p-12 flex-shrink-0 absolute lg:relative top-0 lg:top-auto lg:left-0 h-dvh lg:h-auto ${
         menuOpen ? "left-0" : "-left-[500px]"
       } transition-all duration-500 z-20`}
     >
       <button
         onClick={() => setMenuOpen(false)}
-        className='md:hidden w-[40px] h-[40px] items-center gap-2 bg-[#CE8936] text-white flex justify-center rounded-full absolute top-6 -right-5 z-10'
+        className='lg:hidden w-[40px] h-[40px] items-center gap-2 bg-[#CE8936] text-white flex justify-center rounded-full absolute top-6 -right-5 z-10'
       >
         <PanelLeft />
       </button>
