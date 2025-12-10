@@ -13,13 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import {
-  ArrowUpDown,
-  BadgeCheckIcon,
-  ChevronDown,
-  MoreHorizontal,
-  Trash,
-} from 'lucide-react'
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Trash } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -40,10 +34,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
+import { CreateHistoryForm, CreateRecordForm } from './create-history-form'
 import { formatDate } from '@/lib/utils'
-import Link from 'next/link'
-import { CreateUserForm } from './create-user-form'
+import { deleteHistoryByAdmin } from '@/actions/history.action'
 
 export const columns = [
   {
@@ -70,60 +63,27 @@ export const columns = [
   },
 
   {
-    accessorKey: 'id',
-    header: 'ID',
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('id')}</div>,
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
+    accessorKey: 'history',
+    header: 'History',
     cell: ({ row }) => (
-      <div>
-        <Link href='/' className='hover:underline'>
-          {row.getValue('email')}
-        </Link>
-      </div>
+      <div className='capitalize'>{row.getValue('history')}</div>
     ),
   },
-  {
-    accessorKey: 'isAdmin',
-    header: 'Role',
-    cell: ({ row, table }) => {
-      const isAdmin = row.getValue('isAdmin')
-      const id = row.getValue('id').toString()
-      const currentUserId = table?.options?.admin?.admin?.id.toString()
 
-      return (
-        <div className='capitalize'>
-          {isAdmin ? (
-            <Badge
-              variant='secondary'
-              className='bg-green-400 text-white dark:bg-blue-600'
-            >
-              {id === currentUserId && <BadgeCheckIcon />}
-              Admin
-            </Badge>
-          ) : (
-            <Badge variant='outline'>Patient</Badge>
-          )}
-        </div>
-      )
-    },
-  },
   {
     accessorKey: 'createdAt',
     header: 'Created At',
     cell: ({ row }) => (
-      <div className='capitalize'>{formatDate(row.getValue('createdAt'))} </div>
+      <div className='capitalize'>{formatDate(row.getValue('createdAt'))}</div>
     ),
   },
 
   {
     id: 'actions',
     enableHiding: false,
-    cell: ({ row }) => {
-      const userId = row.getValue('id')
-
+    cell: ({ row, table }) => {
+      const historyItem = row.original
+      const userId = table?.options?.userId
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -134,21 +94,19 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href='/'>Account</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/records`}>Records </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/history`}>Medical History</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/medications`}>Medications</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/orders`}>Orders</Link>
+            <DropdownMenuItem asChild className='p-0'>
+              <form action={deleteHistoryByAdmin}>
+                <input type='hidden' name='historyId' value={historyItem.id} />
+                <input type='hidden' name='userId' value={userId} />
+                <Button
+                  type='submit'
+                  className='cursor-pointer block w-full'
+                  variant='destructive'
+                  onClick={() => navigator.clipboard.writeText(historyItem.id)}
+                >
+                  Delete
+                </Button>
+              </form>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -157,15 +115,15 @@ export const columns = [
   },
 ]
 
-export function UserTable({ users, admin }) {
+export function HistoryTable({ history, userId }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
   const [columnVisibility, setColumnVisibility] = React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data: users || [],
-    admin: admin,
+    data: history,
+    userId,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -193,15 +151,10 @@ export function UserTable({ users, admin }) {
   return (
     <div className='w-full p-10'>
       <div className='flex justify-between items-center'>
-        <h1>
-          Users{' '}
-          <Badge variant='primary' className='bg-white'>
-            {table?.options?.data.length}
-          </Badge>
-        </h1>
+        <h1>Medical History</h1>
       </div>
       <div className='flex items-center py-4'>
-        <CreateUserForm />
+        <CreateHistoryForm />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='ml-auto'>

@@ -7,6 +7,7 @@ import {
   HeartCrackIcon,
   LockOpen,
   PanelLeft,
+  HeartIcon,
   User,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -45,6 +46,18 @@ const Sidebar = () => {
         >
           <User className='w-4 h-4' />
           <span>Profile</span>
+        </Link>
+        {/* Health Profille */}
+        <Link
+          href='/profile/health-profile'
+          className={`${baseClasses} ${
+            pathname === '/profile/health-profile'
+              ? activeClasses
+              : inactiveClasses
+          }`}
+        >
+          <HeartIcon className='w-4 h-4' />
+          <span>Health Profile</span>
         </Link>
 
         {/* Health Records */}

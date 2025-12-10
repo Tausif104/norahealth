@@ -14,18 +14,6 @@ export const createAccountAction = async (prevState, formData) => {
   const nhs = formData.get('nhs')?.toString() || ''
   const address = formData.get('address')?.toString() || ''
   const zip = formData.get('zip')?.toString() || ''
-  const weight = formData.get('weight')?.toString() || ''
-  const height = formData.get('height')?.toString() || ''
-  const whdate = formData.get('whdate')
-    ? new Date(formData.get('whdate'))
-    : undefined
-  const bptop = formData.get('bptop')?.toString() || ''
-  const bpbottom = formData.get('bpbottom')?.toString() || ''
-  const bpdate = formData.get('bpdate')
-    ? new Date(formData.get('bpdate'))
-    : undefined
-  const medicalconditions = formData.get('medicalconditions')?.toString() || ''
-  const currentmedicines = formData.get('currentmedicines')?.toString() || ''
 
   if (
     !firstname ||
@@ -34,15 +22,7 @@ export const createAccountAction = async (prevState, formData) => {
     !secondemail ||
     !dob ||
     !address ||
-    !zip ||
-    !weight ||
-    !height ||
-    !whdate ||
-    !bptop ||
-    !bpbottom ||
-    !bpdate ||
-    !medicalconditions ||
-    !currentmedicines
+    !zip
   ) {
     return {
       success: false,
@@ -78,16 +58,6 @@ export const createAccountAction = async (prevState, formData) => {
       nhsNumber: nhs,
       address: address,
       zipCode: zip,
-
-      // health
-      weight: weight,
-      height: height,
-      weightHeightCheckDate: whdate,
-      bpTop: bptop,
-      bpBottom: bpbottom,
-      bpCheckDate: bpdate,
-      medicalConditions: medicalconditions,
-      currentMedicines: currentmedicines,
     },
 
     create: {
@@ -102,16 +72,6 @@ export const createAccountAction = async (prevState, formData) => {
       nhsNumber: nhs,
       address: address,
       zipCode: zip,
-
-      // health
-      weight: weight,
-      height: height,
-      weightHeightCheckDate: whdate,
-      bpTop: bptop,
-      bpBottom: bpbottom,
-      bpCheckDate: bpdate,
-      medicalConditions: medicalconditions,
-      currentMedicines: currentmedicines,
     },
   })
 
@@ -172,14 +132,14 @@ export const updateAccountAction = async (prevState, formData) => {
   const nhs = formData.get('nhs')
   const address = formData.get('address')
   const zip = formData.get('zip')
-  const weight = formData.get('weight')
-  const height = formData.get('height')
-  const whdate = new Date(formData.get('whdate'))
-  const bptop = formData.get('bptop')
-  const bpbottom = formData.get('bpbottom')
-  const bpdate = new Date(formData.get('bpdate'))
-  const medicalconditions = formData.get('medicalconditions')
-  const currentmedicines = formData.get('currentmedicines')
+  // const weight = formData.get('weight')
+  // const height = formData.get('height')
+  // const whdate = new Date(formData.get('whdate'))
+  // const bptop = formData.get('bptop')
+  // const bpbottom = formData.get('bpbottom')
+  // const bpdate = new Date(formData.get('bpdate'))
+  // const medicalconditions = formData.get('medicalconditions')
+  // const currentmedicines = formData.get('currentmedicines')
 
   if (loggedInUserId.toString() !== userId) {
     return null
@@ -202,14 +162,14 @@ export const updateAccountAction = async (prevState, formData) => {
       zipCode: zip,
 
       // health
-      weight: weight,
-      height: height,
-      weightHeightCheckDate: whdate,
-      bpTop: bptop,
-      bpBottom: bpbottom,
-      bpCheckDate: bpdate,
-      medicalConditions: medicalconditions,
-      currentMedicines: currentmedicines,
+      // weight: weight,
+      // height: height,
+      // weightHeightCheckDate: whdate,
+      // bpTop: bptop,
+      // bpBottom: bpbottom,
+      // bpCheckDate: bpdate,
+      // medicalConditions: medicalconditions,
+      // currentMedicines: currentmedicines,
     },
 
     create: {
@@ -225,14 +185,14 @@ export const updateAccountAction = async (prevState, formData) => {
       zipCode: zip,
 
       // health
-      weight: weight,
-      height: height,
-      weightHeightCheckDate: whdate,
-      bpTop: bptop,
-      bpBottom: bpbottom,
-      bpCheckDate: bpdate,
-      medicalConditions: medicalconditions,
-      currentMedicines: currentmedicines,
+      // weight: weight,
+      // height: height,
+      // weightHeightCheckDate: whdate,
+      // bpTop: bptop,
+      // bpBottom: bpbottom,
+      // bpCheckDate: bpdate,
+      // medicalConditions: medicalconditions,
+      // currentMedicines: currentmedicines,
     },
   })
 

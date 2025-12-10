@@ -13,13 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import {
-  ArrowUpDown,
-  BadgeCheckIcon,
-  ChevronDown,
-  MoreHorizontal,
-  Trash,
-} from 'lucide-react'
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Trash } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -32,6 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -40,10 +35,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
+import { CreateOrderForm } from './create-order-form'
 import { formatDate } from '@/lib/utils'
-import Link from 'next/link'
-import { CreateUserForm } from './create-user-form'
+import { deleteMedicationByAdmin } from '@/actions/medication.action'
+import { Badge } from '@/components/ui/badge'
 
 export const columns = [
   {
@@ -70,60 +65,59 @@ export const columns = [
   },
 
   {
-    accessorKey: 'id',
-    header: 'ID',
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('id')}</div>,
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
+    accessorKey: 'medicineName',
+    header: 'Medicine Name',
     cell: ({ row }) => (
-      <div>
-        <Link href='/' className='hover:underline'>
-          {row.getValue('email')}
-        </Link>
-      </div>
+      <div className='capitalize'>{row.getValue('medicineName')}</div>
     ),
   },
+
   {
-    accessorKey: 'isAdmin',
-    header: 'Role',
-    cell: ({ row, table }) => {
-      const isAdmin = row.getValue('isAdmin')
-      const id = row.getValue('id').toString()
-      const currentUserId = table?.options?.admin?.admin?.id.toString()
+    accessorKey: 'trackingId',
+    header: 'Tracking ID',
+    cell: ({ row }) => (
+      <div className='capitalize'>{row.getValue('trackingId')}</div>
+    ),
+  },
+
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const orderStatus = row.getValue('status')
 
       return (
-        <div className='capitalize'>
-          {isAdmin ? (
-            <Badge
-              variant='secondary'
-              className='bg-green-400 text-white dark:bg-blue-600'
-            >
-              {id === currentUserId && <BadgeCheckIcon />}
-              Admin
+        <div>
+          {orderStatus === 'clinicalreview' ? (
+            <Badge className='bg-yellow-500 text-white'>
+              Under Clinical Review
             </Badge>
+          ) : orderStatus === 'delivered' ? (
+            <Badge className='bg-blue-500 text-white'>Delivered</Badge>
           ) : (
-            <Badge variant='outline'>Patient</Badge>
+            <Badge className='bg-green-500 text-white'>
+              Posted via Royal Mail.
+            </Badge>
           )}
         </div>
       )
     },
   },
+
   {
     accessorKey: 'createdAt',
     header: 'Created At',
     cell: ({ row }) => (
-      <div className='capitalize'>{formatDate(row.getValue('createdAt'))} </div>
+      <div className='capitalize'>{formatDate(row.getValue('createdAt'))}</div>
     ),
   },
 
   {
     id: 'actions',
     enableHiding: false,
-    cell: ({ row }) => {
-      const userId = row.getValue('id')
-
+    cell: ({ row, table }) => {
+      const medicationItem = row.original
+      const userId = table?.options?.userId
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -134,21 +128,25 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href='/'>Account</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/records`}>Records </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/history`}>Medical History</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/medications`}>Medications</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/${userId}/orders`}>Orders</Link>
+            <DropdownMenuItem asChild className='p-0'>
+              <form action={deleteMedicationByAdmin}>
+                <input
+                  type='hidden'
+                  name='medicationId'
+                  value={medicationItem.id}
+                />
+                <input type='hidden' name='userId' value={userId} />
+                <Button
+                  type='submit'
+                  className='cursor-pointer block w-full'
+                  variant='destructive'
+                  onClick={() =>
+                    navigator.clipboard.writeText(medicationItem.id)
+                  }
+                >
+                  Delete
+                </Button>
+              </form>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -157,15 +155,15 @@ export const columns = [
   },
 ]
 
-export function UserTable({ users, admin }) {
+export function OrderTable({ orders, userId }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
   const [columnVisibility, setColumnVisibility] = React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data: users || [],
-    admin: admin,
+    data: orders || [],
+    userId,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -193,15 +191,10 @@ export function UserTable({ users, admin }) {
   return (
     <div className='w-full p-10'>
       <div className='flex justify-between items-center'>
-        <h1>
-          Users{' '}
-          <Badge variant='primary' className='bg-white'>
-            {table?.options?.data.length}
-          </Badge>
-        </h1>
+        <h1>Orders</h1>
       </div>
       <div className='flex items-center py-4'>
-        <CreateUserForm />
+        <CreateOrderForm />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='ml-auto'>

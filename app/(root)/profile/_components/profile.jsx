@@ -32,14 +32,6 @@ const Profile = ({ account }) => {
     nhsNumber,
     address,
     zipCode,
-    weight,
-    height,
-    weightHeightCheckDate,
-    bpTop,
-    bpBottom,
-    bpCheckDate,
-    medicalConditions,
-    currentMedicines,
     profileImage,
   } = account;
 
@@ -292,7 +284,8 @@ const Profile = ({ account }) => {
             </h2>
           </div>
 
-          <div className='col-span-4 md:col-span-1'>
+          {/* Weight / Height */}
+          <div className='md:col-span-1'>
             <label
               htmlFor='weight'
               className='block text-base mb-2 text-[#0D060C]'
@@ -308,7 +301,7 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-          <div className='col-span-4 md:col-span-1'>
+          <div className='md:col-span-1'>
             <label
               htmlFor='height'
               className='block text-base mb-2 text-[#0D060C]'
@@ -324,25 +317,25 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-          <div className='col-span-4 md:col-span-2'>
-            <input
-              type='hidden'
-              name='whdate'
-              value={whDate ? whDate : weightHeightCheckDate}
-            />
-            <DateField
-              id='wh-date'
-              label='Weight Height Check Date'
-              selected={whDate}
-              onChange={setWHDate}
-              placeholder={formatDate(weightHeightCheckDate)}
-              className='md:col-span-2 '
-              name='whdate'
-              bg='bg-white border border-[#EEE0CF] text-black'
-            />
-          </div>
 
-          <div className='col-span-4 md:col-span-1'>
+          <input
+            type='hidden'
+            name='whdate'
+            value={whDate ? whDate : weightHeightCheckDate}
+          />
+          <DateField
+            id='wh-date'
+            label='Weight Height Check Date'
+            selected={whDate}
+            onChange={setWHDate}
+            placeholder={formatDate(weightHeightCheckDate)}
+            className='md:col-span-2 '
+            name='whdate'
+            bg='bg-white border border-[#EEE0CF] text-black'
+          />
+
+          {/* Blood pressure */}
+          <div className='md:col-span-1'>
             <label
               htmlFor='bp-top'
               className='block text-base mb-2 text-[#0D060C]'
@@ -359,7 +352,7 @@ const Profile = ({ account }) => {
             />
           </div>
 
-          <div className='col-span-4 md:col-span-1'>
+          <div className='md:col-span-1'>
             <label
               htmlFor='bp-bottom'
               className='block text-base mb-2 text-[#0D060C]'
@@ -375,25 +368,25 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-          <div className='col-span-4 md:col-span-2'>
-            <input
-              type='hidden'
-              name='bpdate'
-              value={bpDate ? bpDate : bpCheckDate}
-            />
-            <DateField
-              id='bp-check-date'
-              label='BP Check Date'
-              selected={bpDate}
-              onChange={setBPDate}
-              placeholder={formatDate(bpCheckDate)}
-              className='md:col-span-2 '
-              name='bpdate'
-              bg='bg-white border border-[#EEE0CF] text-black'
-            />
-          </div>
 
-          <div className='col-span-4 md:col-span-2'>
+          <input
+            type='hidden'
+            name='bpdate'
+            value={bpDate ? bpDate : bpCheckDate}
+          />
+          <DateField
+            id='bp-check-date'
+            label='BP Check Date'
+            selected={bpDate}
+            onChange={setBPDate}
+            placeholder={formatDate(bpCheckDate)}
+            className='md:col-span-2 '
+            name='bpdate'
+            bg='bg-white border border-[#EEE0CF] text-black'
+          />
+
+          {/* Medical conditions / Medicines */}
+          <div className='md:col-span-2'>
             <label
               htmlFor='med-con'
               className='block text-base mb-2 text-[#0D060C]'
@@ -410,7 +403,7 @@ const Profile = ({ account }) => {
             />
           </div>
 
-          <div className='col-span-4 md:col-span-2'>
+          <div className='md:col-span-2'>
             <label
               htmlFor='current-med'
               className='block text-base mb-2 text-[#0D060C]'
