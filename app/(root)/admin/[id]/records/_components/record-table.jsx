@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import * as React from "react";
+import * as React from 'react'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,17 +12,17 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table'
 import {
   ArrowUpDown,
   ChevronDown,
   MoreHorizontal,
   PanelLeft,
   Trash,
-} from "lucide-react";
+} from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -31,8 +31,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -40,20 +40,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { CreateRecordForm } from "./create-record-form";
-import { formatDate } from "@/lib/utils";
-import { deleteRecordByAdmin } from "@/actions/record.action";
-import { useAdmin } from "@/lib/adminContext";
+} from '@/components/ui/table'
+import { CreateRecordForm } from './create-record-form'
+import { formatDate } from '@/lib/utils'
+import { deleteRecordByAdmin } from '@/actions/record.action'
+import { useAdmin } from '@/lib/adminContext'
+import AdminNavigation from '../../_components/admin-navigation'
 
 export const columns = [
   {
-    id: "select",
+    id: 'select',
     header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label='Select all'
@@ -71,52 +72,52 @@ export const columns = [
   },
 
   {
-    accessorKey: "weight",
-    header: "Weight",
+    accessorKey: 'weight',
+    header: 'Weight',
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue("weight")}</div>
+      <div className='capitalize'>{row.getValue('weight')}</div>
     ),
   },
   {
-    accessorKey: "height",
-    header: "Height",
+    accessorKey: 'height',
+    header: 'Height',
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue("height")}</div>
+      <div className='capitalize'>{row.getValue('height')}</div>
     ),
   },
   {
-    accessorKey: "lastwhCheck",
-    header: "Last (W/H) Check",
+    accessorKey: 'lastwhCheck',
+    header: 'Last (W/H) Check',
     cell: ({ row }) => (
       <div className='capitalize'>
-        {formatDate(row.getValue("lastwhCheck"))}
+        {formatDate(row.getValue('lastwhCheck'))}
       </div>
     ),
   },
   {
-    accessorKey: "bloodPressure",
-    header: "Blood Pressure",
+    accessorKey: 'bloodPressure',
+    header: 'Blood Pressure',
     cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue("bloodPressure")}</div>
+      <div className='capitalize'>{row.getValue('bloodPressure')}</div>
     ),
   },
   {
-    accessorKey: "lastBpCheckDate",
-    header: "Last BP Check",
+    accessorKey: 'lastBpCheckDate',
+    header: 'Last BP Check',
     cell: ({ row }) => (
       <div className='capitalize'>
-        {formatDate(row.getValue("lastBpCheckDate"))}
+        {formatDate(row.getValue('lastBpCheckDate'))}
       </div>
     ),
   },
 
   {
-    id: "actions",
+    id: 'actions',
     enableHiding: false,
     cell: ({ row, table }) => {
-      const recordItem = row.original;
+      const recordItem = row.original
 
-      const userId = table?.options?.userId;
+      const userId = table?.options?.userId
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -143,17 +144,17 @@ export const columns = [
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      );
+      )
     },
   },
-];
+]
 
 export function RecordTable({ record, userId }) {
-  const { setMenuOpen } = useAdmin();
-  const [sorting, setSorting] = React.useState([]);
-  const [columnFilters, setColumnFilters] = React.useState([]);
-  const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const { setMenuOpen } = useAdmin()
+  const [sorting, setSorting] = React.useState([])
+  const [columnFilters, setColumnFilters] = React.useState([])
+  const [columnVisibility, setColumnVisibility] = React.useState({})
+  const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
     data: record,
@@ -180,11 +181,14 @@ export function RecordTable({ record, userId }) {
         pageIndex: 0,
       },
     },
-  });
+  })
 
   return (
     <div className='w-full p-10'>
       {/* HEADER */}
+      <div className='flex items-center gap-4 mb-4'>
+        <AdminNavigation userId={userId} />
+      </div>
       <div className='flex items-center gap-4 mb-4'>
         <button
           onClick={() => setMenuOpen(true)}
@@ -219,7 +223,7 @@ export function RecordTable({ record, userId }) {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                );
+                )
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -239,7 +243,7 @@ export function RecordTable({ record, userId }) {
                             header.getContext()
                           )}
                     </TableHead>
-                  );
+                  )
                 })}
               </TableRow>
             ))}
@@ -250,7 +254,7 @@ export function RecordTable({ record, userId }) {
                 <TableRow
                   className='bg-white'
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -277,7 +281,7 @@ export function RecordTable({ record, userId }) {
       </div>
       <div className='flex items-center justify-end space-x-2 py-4'>
         <div className='text-muted-foreground flex-1 text-sm'>
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className='space-x-2'>
@@ -300,5 +304,5 @@ export function RecordTable({ record, userId }) {
         </div>
       </div>
     </div>
-  );
+  )
 }

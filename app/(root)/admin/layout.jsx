@@ -1,6 +1,6 @@
-import { AdminProvider } from "@/lib/adminContext";
-import React from "react";
-import AdminSidebar from "./_components/adminSidebar";
+import { AdminProvider } from '@/lib/adminContext'
+import React from 'react'
+import AdminSidebar from './_components/adminSidebar'
 
 const layout = ({ children }) => {
   return (
@@ -16,7 +16,7 @@ const layout = ({ children }) => {
         </div>
       </section>
     </AdminProvider>
-  );
-};
+  )
+}
 
-export default layout;
+export default layout

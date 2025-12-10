@@ -1,3 +1,4 @@
+import AdminNavigation from '../_components/admin-navigation'
 import { HistoryTable } from './_components/history-table'
 import { getHistoryByUserId } from '@/actions/history.action'
 
