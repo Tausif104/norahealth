@@ -1,24 +1,54 @@
-'use client'
+"use client";
 
-import 'slick-carousel/slick/slick.css'
-import { useRef } from 'react'
-import Slider from 'react-slick'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
-import ReviewItem from '@/components/global/review-item'
-import { testimonials } from '@/data/testimonials'
+import "slick-carousel/slick/slick.css";
+import { useEffect, useRef, useState } from "react";
+import Slider from "react-slick";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import ReviewItem from "@/components/global/review-item";
+import { testimonials } from "@/data/testimonials";
 
 const ReviewsSection = () => {
-  const sliderRef = useRef(null)
+  const sliderRef = useRef(null);
+  const [isClient, setIsClient] = useState(false);
+
+  const [slidesToShow, setSlidesToShow] = useState(3);
+
+  const [rows, setRows] = useState(2);
+
+  useEffect(() => {
+    setIsClient(true);
+    const calc = () => {
+      const w = window.innerWidth;
+
+      if (w <= 500) {
+        setSlidesToShow(1);
+        setRows(1);
+      } else if (w <= 991) {
+        setSlidesToShow(1);
+        setRows(1);
+      } else if (w <= 1000) {
+        setSlidesToShow(2);
+        setRows(1);
+      } else {
+        setSlidesToShow(3);
+        setRows(2);
+      }
+    };
+
+    calc();
+    window.addEventListener("resize", calc);
+    return () => window.removeEventListener("resize", calc);
+  }, [isClient]);
 
   const settings = {
     dots: false,
     infinite: true,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: slidesToShow,
     slidesToScroll: 1,
     autoplay: true,
     arrows: false,
-    rows: 2,
+    rows: rows,
     speed: 1000,
     autoplaySpeed: 5000,
     responsive: [
@@ -45,6 +75,10 @@ const ReviewsSection = () => {
         },
       },
     ],
+  };
+
+  if (!isClient) {
+    return null;
   }
 
   return (
@@ -79,7 +113,7 @@ const ReviewsSection = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default ReviewsSection
+export default ReviewsSection;
