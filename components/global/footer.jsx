@@ -11,7 +11,7 @@ const Footer = () => {
     {
       id: 2,
       label: "About Us",
-      link: "/about-us",
+      link: "/about",
     },
     {
       id: 3,
@@ -31,7 +31,7 @@ const Footer = () => {
     {
       id: 6,
       label: "Contact us",
-      link: "/contact-us",
+      link: "/contact",
     },
   ];
 
