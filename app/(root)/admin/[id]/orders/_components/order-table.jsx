@@ -1,13 +1,13 @@
-"use client";
+'use client'
 
-import * as React from "react";
+import * as React from 'react'
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
+} from '@/components/ui/select'
 
 import {
   ColumnDef,
@@ -20,24 +20,24 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table'
 import {
   ArrowUpDown,
   ChevronDown,
   MoreHorizontal,
   PanelLeft,
   Trash,
-} from "lucide-react";
+} from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -46,8 +46,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -55,32 +55,33 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { CreateOrderForm } from "./create-order-form";
-import { formatDate } from "@/lib/utils";
-import { deleteMedicationByAdmin } from "@/actions/medication.action";
-import { Badge } from "@/components/ui/badge";
-import { useAdmin } from "@/lib/adminContext";
-import { deleteOrder, updateOrderStatus } from "@/actions/order.action";
+} from '@/components/ui/table'
+import { CreateOrderForm } from './create-order-form'
+import { formatDate } from '@/lib/utils'
+import { deleteMedicationByAdmin } from '@/actions/medication.action'
+import { Badge } from '@/components/ui/badge'
+import { useAdmin } from '@/lib/adminContext'
+import { deleteOrder, updateOrderStatus } from '@/actions/order.action'
+import AdminNavigation from '../../_components/admin-navigation'
 
 export function OrderTable({ orders, userId }) {
-  const { setMenuOpen } = useAdmin();
-  const [sorting, setSorting] = React.useState([]);
-  const [columnFilters, setColumnFilters] = React.useState([]);
-  const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [open, setOpen] = React.useState(false);
-  const [selectedOrder, setSelectedOrder] = React.useState(null);
-  const [status, setStatus] = React.useState("");
+  const { setMenuOpen } = useAdmin()
+  const [sorting, setSorting] = React.useState([])
+  const [columnFilters, setColumnFilters] = React.useState([])
+  const [columnVisibility, setColumnVisibility] = React.useState({})
+  const [rowSelection, setRowSelection] = React.useState({})
+  const [open, setOpen] = React.useState(false)
+  const [selectedOrder, setSelectedOrder] = React.useState(null)
+  const [status, setStatus] = React.useState('')
 
   const columns = [
     {
-      id: "select",
+      id: 'select',
       header: ({ table }) => (
         <Checkbox
           checked={
             table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label='Select all'
@@ -98,34 +99,34 @@ export function OrderTable({ orders, userId }) {
     },
 
     {
-      accessorKey: "medicineName",
-      header: "Medicine Name",
+      accessorKey: 'medicineName',
+      header: 'Medicine Name',
       cell: ({ row }) => (
-        <div className='capitalize'>{row.getValue("medicineName")}</div>
+        <div className='capitalize'>{row.getValue('medicineName')}</div>
       ),
     },
 
     {
-      accessorKey: "trackingId",
-      header: "Tracking ID",
+      accessorKey: 'trackingId',
+      header: 'Tracking ID',
       cell: ({ row }) => (
-        <div className='capitalize'>{row.getValue("trackingId")}</div>
+        <div className='capitalize'>{row.getValue('trackingId')}</div>
       ),
     },
 
     {
-      accessorKey: "status",
-      header: "Status",
+      accessorKey: 'status',
+      header: 'Status',
       cell: ({ row }) => {
-        const orderStatus = row.getValue("status");
+        const orderStatus = row.getValue('status')
 
         return (
           <div>
-            {orderStatus === "clinicalreview" ? (
+            {orderStatus === 'clinicalreview' ? (
               <Badge className='bg-yellow-500 text-white'>
                 Under Clinical Review
               </Badge>
-            ) : orderStatus === "delivered" ? (
+            ) : orderStatus === 'delivered' ? (
               <Badge className='bg-blue-500 text-white'>Delivered</Badge>
             ) : (
               <Badge className='bg-green-500 text-white'>
@@ -133,24 +134,24 @@ export function OrderTable({ orders, userId }) {
               </Badge>
             )}
           </div>
-        );
+        )
       },
     },
 
     {
-      accessorKey: "createdAt",
-      header: "Created At",
+      accessorKey: 'createdAt',
+      header: 'Created At',
       cell: ({ row }) => (
         <div className='capitalize'>
-          {formatDate(row.getValue("createdAt"))}
+          {formatDate(row.getValue('createdAt'))}
         </div>
       ),
     },
 
     {
-      id: "actions",
+      id: 'actions',
       cell: ({ row, table }) => {
-        const order = row.original;
+        const order = row.original
 
         return (
           <DropdownMenu>
@@ -187,10 +188,10 @@ export function OrderTable({ orders, userId }) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        );
+        )
       },
     },
-  ];
+  ]
 
   const table = useReactTable({
     data: orders || [],
@@ -206,9 +207,9 @@ export function OrderTable({ orders, userId }) {
     onRowSelectionChange: setRowSelection,
     meta: {
       openDialog: (order) => {
-        setSelectedOrder(order);
-        setStatus(order.status);
-        setOpen(true);
+        setSelectedOrder(order)
+        setStatus(order.status)
+        setOpen(true)
       },
       status,
       setStatus,
@@ -226,11 +227,14 @@ export function OrderTable({ orders, userId }) {
         pageIndex: 0,
       },
     },
-  });
+  })
 
   return (
     <div className='w-full p-10'>
       {/* HEADER */}
+      <div className='flex items-center gap-4 mb-4'>
+        <AdminNavigation userId={userId} />
+      </div>
       <div className='flex items-center gap-4 mb-4'>
         <button
           onClick={() => setMenuOpen(true)}
@@ -265,7 +269,7 @@ export function OrderTable({ orders, userId }) {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                );
+                )
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -285,7 +289,7 @@ export function OrderTable({ orders, userId }) {
                             header.getContext()
                           )}
                     </TableHead>
-                  );
+                  )
                 })}
               </TableRow>
             ))}
@@ -296,7 +300,7 @@ export function OrderTable({ orders, userId }) {
                 <TableRow
                   className='bg-white'
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -371,7 +375,7 @@ export function OrderTable({ orders, userId }) {
       </div>
       <div className='flex items-center justify-end space-x-2 py-4'>
         <div className='text-muted-foreground flex-1 text-sm'>
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className='space-x-2'>
@@ -394,5 +398,5 @@ export function OrderTable({ orders, userId }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
