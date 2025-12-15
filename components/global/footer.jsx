@@ -25,6 +25,11 @@ const Footer = () => {
     },
     {
       id: 5,
+      label: "Policy",
+      link: "/legal-policies",
+    },
+    {
+      id: 6,
       label: "Contact us",
       link: "/contact-us",
     },
