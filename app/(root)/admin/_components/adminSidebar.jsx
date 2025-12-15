@@ -61,17 +61,6 @@ const AdminSidebar = () => {
           <ClipboardClock className='w-4 h-4' />
           <span>Appointment Slot</span>
         </Link>
-
-        {/* Medical History */}
-        <Link
-          href='/admin/lead'
-          className={`${baseClasses} ${
-            pathname === "/admin/lead" ? activeClasses : inactiveClasses
-          }`}
-        >
-          <Contact className='w-4 h-4' />
-          <span>Contact Lead</span>
-        </Link>
       </nav>
     </aside>
   );

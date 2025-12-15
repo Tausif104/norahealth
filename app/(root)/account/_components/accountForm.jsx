@@ -1,38 +1,38 @@
-'use client'
-import { useState, useEffect } from 'react'
-import DateField from '@/components/global/DateField'
-import { useActionState } from 'react'
-import { createAccountAction } from '@/actions/account.action'
-import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
-import { LoaderIcon } from 'lucide-react'
+"use client";
+import { useState, useEffect } from "react";
+import DateField from "@/components/global/DateField";
+import { useActionState } from "react";
+import { createAccountAction } from "@/actions/account.action";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { LoaderIcon } from "lucide-react";
 
 const AccountForm = () => {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [dob, setDob] = useState(null)
+  const [dob, setDob] = useState(null);
 
   const initialState = {
-    msg: '',
+    msg: "",
     success: false,
-  }
+  };
 
   const [state, action, loading] = useActionState(
     createAccountAction,
     initialState
-  )
+  );
 
   useEffect(() => {
     if (state.msg) {
       if (state.success) {
-        toast.success(state.msg)
-        router.push('/health')
+        toast.success(state.msg);
+        router.push("/health");
       } else {
-        toast.warning(state.msg)
+        toast.warning(state.msg);
       }
     }
-    state.msg = ''
-  }, [state.msg])
+    state.msg = "";
+  }, [state.msg]);
 
   return (
     <form action={action}>
@@ -106,7 +106,7 @@ const AccountForm = () => {
           />
         </div>
 
-        <input type='hidden' name='dob' value={dob ? dob : ''} />
+        <input type='hidden' name='dob' value={dob ? dob : ""} />
         <DateField
           id='dob'
           label='Date of Birth'
@@ -152,13 +152,13 @@ const AccountForm = () => {
         {/* Zip code → 25% */}
         <div className='md:col-span-1'>
           <label className='block text-base mb-2 text-[#0D060C]' htmlFor='zip'>
-            Zip code
+            Post code
           </label>
           <input
             type='text'
             name='zip'
             id='zip'
-            placeholder='Zip code'
+            placeholder='Post code'
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>
@@ -181,14 +181,14 @@ const AccountForm = () => {
                   />
                 </span>
               ) : (
-                <span>Update Account</span>
+                <span>Create Account</span>
               )}
             </span>
           </button>
         </div>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default AccountForm
+export default AccountForm;

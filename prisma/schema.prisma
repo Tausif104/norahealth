@@ -68,17 +68,17 @@ enum OrderStatus {
 model Account {
   id Int @id @default(autoincrement())
 
-  firstName   String
-  lastName    String
-  phoneNumber String
-  secondEmail String
-  dob         DateTime
-  nhsNumber   String?
-  address     String
-  zipCode     String
-
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+  firstName    String
+  lastName     String
+  phoneNumber  String
+  secondEmail  String
+  dob          DateTime
+  nhsNumber    String?
+  address      String
+  zipCode      String
+  profileImage String?
+  userId       Int      @unique
+  user         User     @relation(fields: [userId], references: [id])
 }
 
 model Health {
@@ -91,7 +91,6 @@ model Health {
   bpCheckDate           DateTime
   medicalConditions     String
   currentMedicines      String
-  profileImage          String?
 
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id])

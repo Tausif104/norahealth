@@ -1,34 +1,34 @@
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from "next/image";
+import Link from "next/link";
 
 const Footer = () => {
   const menuItems = [
     {
       id: 1,
-      label: 'Home',
-      link: '/',
+      label: "Home",
+      link: "/",
     },
     {
       id: 2,
-      label: 'About Us',
-      link: '/about-us',
+      label: "About Us",
+      link: "/about-us",
     },
     {
       id: 3,
-      label: 'Get Contraception',
-      link: '/get-contraception',
+      label: "Get Contraception",
+      link: "/booking",
     },
     {
       id: 4,
-      label: 'Contraception Choices',
-      link: '/contraception-choices',
+      label: "Contraception Choices",
+      link: "/contraception-choices/begin",
     },
     {
       id: 5,
-      label: 'Contact us',
-      link: '/contact-us',
+      label: "Contact us",
+      link: "/contact-us",
     },
-  ]
+  ];
 
   return (
     <footer>
@@ -104,7 +104,7 @@ const Footer = () => {
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

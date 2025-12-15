@@ -26,7 +26,7 @@ const Bookings = () => {
               </h2>
               <div className='space-y-5'>
                 <div className='text-[#3A3D42] flex items-start gap-2'>
-                  <Clock className='w-5 ' /> <span>5m</span>
+                  <Clock className='w-5 ' /> <span>10m</span>
                 </div>
                 <div className='text-[#3A3D42] flex items-start gap-2'>
                   <MapPin className='min-w-5 ' />{" "}

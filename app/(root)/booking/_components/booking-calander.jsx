@@ -151,7 +151,7 @@ export default function BookingCalander() {
     const booking = {
       ...(bookingData ?? {}),
       bookingdate: formatYMD(value), // "YYYY-MM-DD"
-      bookingtime: extractStartTime(slotId), // "HH:MM"
+      bookingtime: slotId, // "HH:MM"
     };
 
     setBookingData(booking);
@@ -190,13 +190,6 @@ export default function BookingCalander() {
             <div className='text-sm mb-2'>
               Sorry, no availability on this date. Try another day.
             </div>
-            <div className='text-sm'>
-              You can also contact us by phone at{" "}
-              <a href='tel:02086797198' className='underline'>
-                020 8679 7198
-              </a>
-              .
-            </div>
           </div>
         ) : (
           <div className='space-y-2 max-h-[480px] overflow-y-scroll custom-scrollbar pr-3'>
@@ -215,7 +208,7 @@ export default function BookingCalander() {
               return (
                 <button
                   key={slot.id}
-                  onClick={() => handleSlotSelect(slot.id)}
+                  onClick={() => handleSlotSelect(slot.startTime)}
                   className={`w-full cursor-pointer text-center p-3 rounded-md border transition focus:outline-none flex items-center justify-center text-base font-medium text-black
                     ${
                       isActive

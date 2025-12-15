@@ -1,28 +1,28 @@
-import OutlineBtn from '@/components/global/outline-btn'
-import Image from 'next/image'
+import OutlineBtn from "@/components/global/outline-btn";
+import Image from "next/image";
 
 const WhyChooseNora = () => {
   const data = [
     {
       id: 1,
-      img: '/images/why-choose-us/1.svg',
-      title: 'Privacy',
+      img: "/images/why-choose-us/1.svg",
+      title: "Privacy",
       description:
-        'Discreet assessments and packaging for complete confidentiality',
+        "Discreet assessments and packaging for complete confidentiality",
     },
     {
       id: 2,
-      img: '/images/why-choose-us/2.svg',
-      title: 'Convenience',
-      description: 'Within 24 hours (Monday-Friday) during working hours',
+      img: "/images/why-choose-us/2.svg",
+      title: "Convenience",
+      description: "Within 24 hours (Monday-Friday) during working hours",
     },
     {
       id: 3,
-      img: '/images/why-choose-us/3.svg',
-      title: 'Safety',
-      description: 'Reviewed by qualified UK clinicians before approval',
+      img: "/images/why-choose-us/3.svg",
+      title: "Safety",
+      description: "Reviewed by qualified UK clinicians before approval",
     },
-  ]
+  ];
 
   return (
     <section className='relative py-[60px] pb-0 md:py-0  z-10 after:absolute after:content-[""] after:w-[50%] after:h-full md:after:bg-[url("/images/why-choose.svg")] after:bg-fixed after:top-0 after:left-[50%] after:-z-10 after:bg-cover after:bg-center'>
@@ -39,7 +39,7 @@ const WhyChooseNora = () => {
               we ensure you get the care you need without the hassle of
               traditional appointments.
             </p>
-            <OutlineBtn label='Order Now' url='/' />
+            <OutlineBtn label='Order Now' url='/booking' />
           </div>
           <div className='col-span-6  flex items-center md:mt-0 mt-[60px]'>
             <div className='md:pl-[80px] flex flex-col md:gap-5 gap-4 md:bg-none bg-[url("/images/why-choose.svg")] sm:px-0 px-[24px] md:py-0 py-[60px] w-full'>
@@ -72,7 +72,7 @@ const WhyChooseNora = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default WhyChooseNora
+export default WhyChooseNora;

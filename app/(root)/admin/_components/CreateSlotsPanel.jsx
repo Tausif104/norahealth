@@ -56,6 +56,7 @@ export default function CreateSlotsPanel({ defaultInterval = 10 }) {
       const res = await createBookingSlots(payload);
       setResult(res);
       // optionally refresh or clear
+      setRanges([{ id: Date.now(), startTime: "09:00", endTime: "10:00" }]);
     } catch (err) {
       console.error("createBookingSlots error", err);
       setResult({ success: false, msg: "Failed to create slots" });

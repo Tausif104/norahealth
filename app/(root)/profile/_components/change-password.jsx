@@ -55,6 +55,7 @@ const ChangePassword = () => {
             id='currentPassword'
             name='currentPassword'
             type='password'
+            placeholder='Enter your current password'
             required
             className='bg-white border border-[#EEE0CF] w-full py-[17px] px-[16px] rounded-[6px]'
           />
@@ -68,6 +69,7 @@ const ChangePassword = () => {
             id='newPassword'
             name='newPassword'
             type='password'
+            placeholder='Enter your new password'
             required
             minLength={8}
             maxLength={12}
@@ -87,6 +89,7 @@ const ChangePassword = () => {
             id='confirmPassword'
             name='confirmPassword'
             type='password'
+            placeholder='Re enter your new password'
             required
             className='bg-white border border-[#EEE0CF] w-full py-[17px] px-[16px] rounded-[6px]'
           />

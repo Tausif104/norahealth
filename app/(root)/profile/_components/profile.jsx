@@ -268,7 +268,7 @@ const Profile = ({ account }) => {
               htmlFor='homeZip'
               className='block text-base mb-2 text-[#0D060C]'
             >
-              Zip code
+              Post code
             </label>
             <input
               id='homeZip'

@@ -1,8 +1,8 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import Navigation from './navigation'
-import { Mail, Phone } from 'lucide-react'
-import MobileHeader from './mobile-header'
+import Image from "next/image";
+import Link from "next/link";
+import Navigation from "./navigation";
+import { Mail, Phone } from "lucide-react";
+import MobileHeader from "./mobile-header";
 
 const Header = async () => {
   return (
@@ -57,10 +57,7 @@ const Header = async () => {
                 <span className='bg-[#ffffff30] bg-opacity-50 w-[25px] h-[25px] rounded-full flex justify-center items-center'>
                   <Phone className='text-white' width={13} />
                 </span>
-                <a
-                  href='mailto:02086797198'
-                  className='text-white cursor-pointer'
-                >
+                <a href='tel:02086797198' className='text-white cursor-pointer'>
                   0208 679 7198
                 </a>
               </div>
@@ -84,7 +81,7 @@ const Header = async () => {
         </div>
       </header>
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

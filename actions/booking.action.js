@@ -255,6 +255,184 @@ export const deleteBooking = async (formDataOrObj) => {
   return { success: true, msg: "Booking deleted" };
 };
 
+// export const createBookingSlots = async (formOrObj) => {
+//   // allow FormData (from <form action={createBookingSlots}>) or plain object
+
+//   let slotDate;
+//   let ranges;
+//   let intervalMinutes = 10;
+
+//   if (formOrObj && typeof formOrObj.get === "function") {
+//     // formData path
+//     slotDate = formOrObj.get("slotDate"); // expected "YYYY-MM-DD"
+//     const rangesJson = formOrObj.get("ranges"); // if you send ranges as JSON string
+//     intervalMinutes = Number(formOrObj.get("intervalMinutes") || 10);
+//     try {
+//       ranges = rangesJson ? JSON.parse(rangesJson) : [];
+//     } catch (e) {
+//       ranges = [];
+//     }
+//   } else if (formOrObj) {
+//     slotDate = formOrObj.slotDate;
+//     ranges = formOrObj.ranges || [];
+//     intervalMinutes = formOrObj.intervalMinutes || 10;
+//   } else {
+//     return { success: false, msg: "No input provided" };
+//   }
+
+//   if (!slotDate || !Array.isArray(ranges) || ranges.length === 0) {
+//     return {
+//       success: false,
+//       msg: "Please provide a slotDate and at least one time range",
+//     };
+//   }
+
+//   // simple time format checker HH:MM
+//   const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+//   // function to convert "YYYY-MM-DD" + "HH:MM" into Date object (local)
+//   const toDateTime = (dateStr, timeStr) => {
+//     // dateStr: "YYYY-MM-DD", timeStr: "HH:MM"
+//     const [y, mo, d] = dateStr.split("-").map(Number);
+//     const [hh, mm] = timeStr.split(":").map(Number);
+//     return new Date(y, mo - 1, d, hh, mm, 0, 0);
+//   };
+
+//   // Expand ranges into startTimes (HH:MM strings) for the given interval
+//   const expandRangeToStarts = (startTime, endTime, interval) => {
+//     // returns array of startTimes like "09:00", "09:10", ... where slot end is <= endTime
+//     const arr = [];
+//     const start = startTime;
+//     const end = endTime;
+
+//     // To compare, convert to minutes since midnight
+//     const toMins = (t) => {
+//       const [hh, mm] = t.split(":").map(Number);
+//       return hh * 60 + mm;
+//     };
+
+//     const sMin = toMins(start);
+//     const eMin = toMins(end);
+
+//     if (sMin >= eMin) return arr; // invalid range
+
+//     for (let t = sMin; t + interval <= eMin; t += interval) {
+//       const hh = Math.floor(t / 60)
+//         .toString()
+//         .padStart(2, "0");
+//       const mm = (t % 60).toString().padStart(2, "0");
+//       arr.push(`${hh}:${mm}`);
+//     }
+//     return arr;
+//   };
+
+//   // collect all candidate startTimes (avoid duplicates in the candidate list)
+//   const candidateSet = new Set();
+//   for (const r of ranges) {
+//     const s = (r.startTime || "").trim();
+//     const e = (r.endTime || "").trim();
+//     if (!timeRegex.test(s) || !timeRegex.test(e)) {
+//       return {
+//         success: false,
+//         msg: `Invalid time format in range ${s} - ${e}`,
+//       };
+//     }
+//     if (s >= e) {
+//       return {
+//         success: false,
+//         msg: `startTime must be before endTime for range ${s} - ${e}`,
+//       };
+//     }
+
+//     const starts = expandRangeToStarts(s, e, Number(intervalMinutes));
+//     for (const st of starts) candidateSet.add(st);
+//   }
+
+//   const candidateStarts = Array.from(candidateSet).sort(); // sorted ascending
+
+//   if (candidateStarts.length === 0) {
+//     return {
+//       success: false,
+//       msg: "No slots generated from given ranges (check interval and range lengths)",
+//     };
+//   }
+
+//   // Convert slotDate to Date object for comparison with DB
+//   const slotDateObj = new Date(slotDate); // note: stored as Date with 00:00 time in DB per @db.Date
+//   // We will query existing slots for that slotDate and those startTimes to avoid duplicates.
+
+//   // Find existing slots for that date with overlapping startTimes
+//   const existing = await prisma.bookingSlot.findMany({
+//     where: {
+//       slotDate: slotDateObj,
+//       startTime: { in: candidateStarts },
+//     },
+//     select: { startTime: true },
+//   });
+
+//   const existingStartSet = new Set(existing.map((e) => e.startTime));
+
+//   // filter out already existing starts
+//   const toCreate = candidateStarts.filter((st) => !existingStartSet.has(st));
+
+//   // prepare create payload
+//   const createData = toCreate.map((st) => ({
+//     slotDate: slotDateObj,
+//     startTime: st,
+//     // compute endTime by adding intervalMinutes to st
+//     endTime: (() => {
+//       const [hh, mm] = st.split(":").map(Number);
+//       let total = hh * 60 + mm + Number(intervalMinutes);
+//       const eh = Math.floor(total / 60)
+//         .toString()
+//         .padStart(2, "0");
+//       const em = (total % 60).toString().padStart(2, "0");
+//       return `${eh}:${em}`;
+//     })(),
+//     isBooked: false,
+//   }));
+
+//   let created = [];
+//   if (createData.length > 0) {
+//     // Use createMany for efficiency
+//     // Prisma createMany doesn't return created rows; returns count
+//     try {
+//       await prisma.bookingSlot.createMany({
+//         data: createData,
+//         skipDuplicates: true, // skip if unique constraint exists (won't hurt if not)
+//       });
+
+//       // optionally fetch created rows for details (if you need them)
+//       // But we can return counts summary
+//     } catch (err) {
+//       // fallback: attempt individual creates (rare)
+//       for (const item of createData) {
+//         try {
+//           const c = await prisma.bookingSlot.create({ data: item });
+//           created.push(c);
+//         } catch (e) {
+//           // skip on error
+//         }
+//       }
+//     }
+//   }
+
+//   // Revalidate the page that lists slots (adjust path as needed)
+//   revalidatePath("/admin/booking-slot");
+
+//   return {
+//     success: true,
+//     msg: "Slots processed",
+//     summary: {
+//       candidateCount: candidateStarts.length,
+//       existingCount: existingStartSet.size,
+//       createdCount: createData.length,
+//       createdStarts: createData.map((c) => c.startTime),
+//       skippedStarts: Array.from(existingStartSet),
+//     },
+//   };
+// };
+
 export const createBookingSlots = async (formOrObj) => {
   // allow FormData (from <form action={createBookingSlots}>) or plain object
 
@@ -290,38 +468,31 @@ export const createBookingSlots = async (formOrObj) => {
   // simple time format checker HH:MM
   const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
-  // function to convert "YYYY-MM-DD" + "HH:MM" into Date object (local)
-  const toDateTime = (dateStr, timeStr) => {
-    // dateStr: "YYYY-MM-DD", timeStr: "HH:MM"
-    const [y, mo, d] = dateStr.split("-").map(Number);
-    const [hh, mm] = timeStr.split(":").map(Number);
-    return new Date(y, mo - 1, d, hh, mm, 0, 0);
+  // helper: convert "HH:MM" => minutes since midnight
+  const toMins = (t) => {
+    const [hh, mm] = t.split(":").map(Number);
+    return hh * 60 + mm;
+  };
+
+  // helper: convert minutes => "HH:MM"
+  const minsToHHMM = (m) => {
+    const hh = Math.floor(m / 60)
+      .toString()
+      .padStart(2, "0");
+    const mm = (m % 60).toString().padStart(2, "0");
+    return `${hh}:${mm}`;
   };
 
   // Expand ranges into startTimes (HH:MM strings) for the given interval
   const expandRangeToStarts = (startTime, endTime, interval) => {
-    // returns array of startTimes like "09:00", "09:10", ... where slot end is <= endTime
     const arr = [];
-    const start = startTime;
-    const end = endTime;
-
-    // To compare, convert to minutes since midnight
-    const toMins = (t) => {
-      const [hh, mm] = t.split(":").map(Number);
-      return hh * 60 + mm;
-    };
-
-    const sMin = toMins(start);
-    const eMin = toMins(end);
+    const sMin = toMins(startTime);
+    const eMin = toMins(endTime);
 
     if (sMin >= eMin) return arr; // invalid range
 
     for (let t = sMin; t + interval <= eMin; t += interval) {
-      const hh = Math.floor(t / 60)
-        .toString()
-        .padStart(2, "0");
-      const mm = (t % 60).toString().padStart(2, "0");
-      arr.push(`${hh}:${mm}`);
+      arr.push(minsToHHMM(t));
     }
     return arr;
   };
@@ -337,7 +508,7 @@ export const createBookingSlots = async (formOrObj) => {
         msg: `Invalid time format in range ${s} - ${e}`,
       };
     }
-    if (s >= e) {
+    if (toMins(s) >= toMins(e)) {
       return {
         success: false,
         msg: `startTime must be before endTime for range ${s} - ${e}`,
@@ -359,57 +530,110 @@ export const createBookingSlots = async (formOrObj) => {
 
   // Convert slotDate to Date object for comparison with DB
   const slotDateObj = new Date(slotDate); // note: stored as Date with 00:00 time in DB per @db.Date
-  // We will query existing slots for that slotDate and those startTimes to avoid duplicates.
 
-  // Find existing slots for that date with overlapping startTimes
-  const existing = await prisma.bookingSlot.findMany({
+  // Fetch ALL existing slots for that date (we will check overlap in JS).
+  // This is simpler and correct for overlap detection; indexes on slotDate make this efficient.
+  const existingSlots = await prisma.bookingSlot.findMany({
     where: {
       slotDate: slotDateObj,
-      startTime: { in: candidateStarts },
     },
-    select: { startTime: true },
+    select: { startTime: true, endTime: true },
   });
 
-  const existingStartSet = new Set(existing.map((e) => e.startTime));
+  // Build array of existing intervals in minutes
+  const existingIntervals = existingSlots.map((s) => {
+    return { s: toMins(s.startTime), e: toMins(s.endTime) };
+  });
 
-  // filter out already existing starts
-  const toCreate = candidateStarts.filter((st) => !existingStartSet.has(st));
+  // function to check overlap: returns true if [aStart, aEnd) overlaps [bStart, bEnd)
+  const overlaps = (aStart, aEnd, bStart, bEnd) => {
+    return aStart < bEnd && bStart < aEnd;
+  };
 
-  // prepare create payload
-  const createData = toCreate.map((st) => ({
-    slotDate: slotDateObj,
-    startTime: st,
-    // compute endTime by adding intervalMinutes to st
-    endTime: (() => {
-      const [hh, mm] = st.split(":").map(Number);
-      let total = hh * 60 + mm + Number(intervalMinutes);
-      const eh = Math.floor(total / 60)
-        .toString()
-        .padStart(2, "0");
-      const em = (total % 60).toString().padStart(2, "0");
-      return `${eh}:${em}`;
-    })(),
-    isBooked: false,
-  }));
+  // Filter out candidate starts that overlap any existing interval
+  const acceptedStarts = [];
+  const skippedDueToOverlap = [];
 
-  let created = [];
+  for (const st of candidateStarts) {
+    const cStart = toMins(st);
+    const cEnd = cStart + Number(intervalMinutes);
+
+    // check overlap with any existing
+    const conflict = existingIntervals.some((iv) =>
+      overlaps(cStart, cEnd, iv.s, iv.e)
+    );
+
+    if (conflict) {
+      skippedDueToOverlap.push(st);
+      continue;
+    }
+
+    // Also check overlap with already acceptedStarts (defensive, in case ranges produced overlapping candidates)
+    const conflictWithAccepted = acceptedStarts.some((as) => {
+      const aStart = toMins(as);
+      const aEnd = aStart + Number(intervalMinutes);
+      return overlaps(cStart, cEnd, aStart, aEnd);
+    });
+
+    if (conflictWithAccepted) {
+      skippedDueToOverlap.push(st);
+      continue;
+    }
+
+    acceptedStarts.push(st);
+  }
+
+  if (acceptedStarts.length === 0) {
+    // Nothing to create
+    return {
+      success: true,
+      msg: "No new slots to create (all candidates overlap existing slots or duplicates).",
+      summary: {
+        candidateCount: candidateStarts.length,
+        existingCount: existingSlots.length,
+        createdCount: 0,
+        createdStarts: [],
+        skippedStarts: skippedDueToOverlap,
+      },
+    };
+  }
+
+  // prepare create payload for acceptedStarts
+  const createData = acceptedStarts.map((st) => {
+    const [hh, mm] = st.split(":").map(Number);
+    let total = hh * 60 + mm + Number(intervalMinutes);
+    const eh = Math.floor(total / 60)
+      .toString()
+      .padStart(2, "0");
+    const em = (total % 60).toString().padStart(2, "0");
+    return {
+      slotDate: slotDateObj,
+      startTime: st,
+      endTime: `${eh}:${em}`,
+      isBooked: false,
+    };
+  });
+
+  let createdCount = 0;
+  let createdStarts = [];
+
   if (createData.length > 0) {
-    // Use createMany for efficiency
-    // Prisma createMany doesn't return created rows; returns count
     try {
+      // createMany with skipDuplicates - but skipDuplicates only works for unique constraints; still efficient.
       await prisma.bookingSlot.createMany({
         data: createData,
-        skipDuplicates: true, // skip if unique constraint exists (won't hurt if not)
+        skipDuplicates: true,
       });
 
-      // optionally fetch created rows for details (if you need them)
-      // But we can return counts summary
+      createdCount = createData.length;
+      createdStarts = createData.map((c) => c.startTime);
     } catch (err) {
       // fallback: attempt individual creates (rare)
       for (const item of createData) {
         try {
           const c = await prisma.bookingSlot.create({ data: item });
-          created.push(c);
+          createdCount += 1;
+          createdStarts.push(c.startTime);
         } catch (e) {
           // skip on error
         }
@@ -425,10 +649,10 @@ export const createBookingSlots = async (formOrObj) => {
     msg: "Slots processed",
     summary: {
       candidateCount: candidateStarts.length,
-      existingCount: existingStartSet.size,
-      createdCount: createData.length,
-      createdStarts: createData.map((c) => c.startTime),
-      skippedStarts: Array.from(existingStartSet),
+      existingCount: existingSlots.length,
+      createdCount,
+      createdStarts,
+      skippedStarts: skippedDueToOverlap,
     },
   };
 };

@@ -1,4 +1,5 @@
-import PrimaryBtn from '@/components/global/primary-btn'
+import PrimaryBtn from "@/components/global/primary-btn";
+import Link from "next/link";
 
 const ChoicesSection = () => {
   return (
@@ -14,30 +15,37 @@ const ChoicesSection = () => {
             </p>
           </div>
           <div>
-            <PrimaryBtn label='Help me Choose' url='/' />
+            <PrimaryBtn
+              label='Help me Choose'
+              url='/contraception-choices/begin'
+            />
           </div>
         </div>
         <div className='md:mt-[50px] mt-[30px]'>
           <div className='grid md:grid-cols-2 grid-cols-1 md:gap-8 gap-4'>
             <div className='bg-[url(/images/choice-one.png)] lg:h-[485px] h-[320px] bg-cover bg-center flex items-end justify-center md:pb-[25px] pb-[20px] md:px-[40px] px-[20px] border border-[#FFF4EF] hover:border-[#CD8936] rounded-[16px] transition duration-300 group cursor-pointer'>
               <div className='bg-[#FFF4EF] w-full text-center p-[10px] rounded-[8px] group-hover:bg-[#CD8936] transition duration-300'>
-                <h3 className='md:text-[24px] text-[16px] font-semibold group-hover:text-white transition duration-300'>
-                  Combined Oral Contraceptive Pills
-                </h3>
+                <Link href='/contraception-choices/outcomes/oral'>
+                  <h3 className='md:text-[24px] text-[16px] font-semibold group-hover:text-white transition duration-300'>
+                    Combined Oral Contraceptive Pills
+                  </h3>
+                </Link>
               </div>
             </div>
             <div className='bg-[url(/images/choice-two.png)] lg:h-[485px] h-[320px] bg-cover bg-center flex items-end justify-center md:pb-[25px] pb-[20px] md:px-[40px] px-[20px] border border-[#FFF4EF] hover:border-[#CD8936] rounded-[16px] transition duration-300 group cursor-pointer'>
               <div className='bg-[#FFF4EF] w-full text-center p-[10px] rounded-[8px] group-hover:bg-[#CD8936] transition duration-300'>
-                <h3 className='md:text-[24px] text-[16px] font-semibold group-hover:text-white transition duration-300'>
-                  Progestogen-Only Pills
-                </h3>
+                <Link href='/contraception-choices/outcomes/only'>
+                  <h3 className='md:text-[24px] text-[16px] font-semibold group-hover:text-white transition duration-300'>
+                    Progestogen-Only Pills
+                  </h3>
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default ChoicesSection
+export default ChoicesSection;

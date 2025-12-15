@@ -137,9 +137,7 @@ export const columns = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href='/'>Account</Link>
-            </DropdownMenuItem>
+
             <DropdownMenuItem>
               <Link href={`/admin/${userId}/records`}>Records </Link>
             </DropdownMenuItem>

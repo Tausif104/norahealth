@@ -1,6 +1,6 @@
-import OutlineBtn from '@/components/global/outline-btn'
-import PrimaryBtn from '@/components/global/primary-btn'
-import Image from 'next/image'
+import OutlineBtn from "@/components/global/outline-btn";
+import PrimaryBtn from "@/components/global/primary-btn";
+import Image from "next/image";
 
 const Hero = () => {
   return (
@@ -32,8 +32,11 @@ const Hero = () => {
               about your reproductive health with complete peace of mind.
             </p>
             <div className='flex xl:gap-5 lg:gap-4 gap-3 xl:mt-15 md:mt-[24px] mt-[24px] sm:flex-row flex-col'>
-              <PrimaryBtn label='Order Now' url='/order-now' />
-              <OutlineBtn label='Learn More' url='/learn-more' />
+              <PrimaryBtn label='Order Now' url='/booking' />
+              <OutlineBtn
+                label='Learn More'
+                url='/contraception-choices/begin'
+              />
             </div>
           </div>
 
@@ -56,7 +59,7 @@ const Hero = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

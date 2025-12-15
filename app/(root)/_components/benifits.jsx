@@ -1,37 +1,37 @@
-import PrimaryBtn from '@/components/global/primary-btn'
-import Image from 'next/image'
+import PrimaryBtn from "@/components/global/primary-btn";
+import Image from "next/image";
 
 const Benifits = () => {
   const data = [
     {
       id: 1,
-      img: '/images/benifits/icon-1.svg',
-      title: 'Convenient Online Services',
+      img: "/images/benifits/icon-1.svg",
+      title: "Convenient Online Services",
       description:
-        'Easily order prescriptions, book services, and manage your health anytime, anywhere.',
+        "Easily order prescriptions, book services, and manage your health anytime, anywhere.",
     },
     {
       id: 2,
-      img: '/images/benifits/icon-2.svg',
-      title: 'Patient-Centered Care',
+      img: "/images/benifits/icon-2.svg",
+      title: "Patient-Centered Care",
       description:
-        'Get in touch with our clinicians any time for a consultation at no extra charge.',
+        "Get in touch with our clinicians any time for a consultation at no extra charge.",
     },
     {
       id: 3,
-      img: '/images/benifits/icon-3.svg',
-      title: 'Clinician Review',
+      img: "/images/benifits/icon-3.svg",
+      title: "Clinician Review",
       description:
-        'Every request is reviewed meticulously with the aim of prioritizing your health.',
+        "Every request is reviewed meticulously with the aim of prioritizing your health.",
     },
     {
       id: 4,
-      img: '/images/benifits/icon-4.svg',
-      title: 'Delivered to Your Door',
+      img: "/images/benifits/icon-4.svg",
+      title: "Delivered to Your Door",
       description:
-        'Fast Royal Mail delivery in plain packaging - discreet, confidential and always free.',
+        "Fast Royal Mail delivery in plain packaging - discreet, confidential and always free.",
     },
-  ]
+  ];
 
   return (
     <section className='sm:px-0 px-[24px]'>
@@ -47,7 +47,7 @@ const Benifits = () => {
               uncomfortable discussing personal choices in person. With Nora,
               you're in control — from the first click to delivery at your door.
             </p>
-            <PrimaryBtn label='Order Now' url='/' />
+            <PrimaryBtn label='Order Now' url='/booking' />
           </div>
           <div className='col-span-7 flex items-center'>
             <div className='bg-[#FFF8EF] w-full md:py-[50px] py-[16px] md:px-[40px] px-[16px] rounded-[16px] flex flex-col gap-[24px]'>
@@ -80,7 +80,7 @@ const Benifits = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Benifits
+export default Benifits;

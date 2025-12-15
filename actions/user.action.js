@@ -300,27 +300,17 @@ export const uploadProfileImageAction = async (formData) => {
       return { msg: "No file selected", success: false };
     }
 
-    // get logged in user from cookie
-    const cookiesStore = await cookies();
-    const token = cookiesStore.get("auth_token")?.value;
+    const payload = await loggedInUserAction();
+    console.log(payload, "payload");
 
-    if (!token) {
-      return {
-        msg: "You must be logged in to change your password",
-        success: false,
-      };
-    }
-
-    const payload = verifyToken(token);
-
-    if (!payload || !payload.id) {
+    if (!payload || !payload.payload.id) {
       return {
         msg: "Invalid session. Please log in again.",
         success: false,
       };
     }
 
-    const userId = payload.id;
+    const userId = payload.payload.id;
 
     if (!userId) {
       return { msg: "Unauthorized", success: false };

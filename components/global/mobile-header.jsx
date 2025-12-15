@@ -1,7 +1,7 @@
-import { Mail, Phone, User, LogInIcon } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { menuItems } from '@/data/menu'
+import { Mail, Phone, User, LogInIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { menuItems } from "@/data/menu";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,11 +9,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { loggedInUserAction, logoutAction } from '@/actions/user.action'
+} from "@/components/ui/dropdown-menu";
+import { loggedInUserAction, logoutAction } from "@/actions/user.action";
 
 const MobileHeader = async () => {
-  const payload = await loggedInUserAction()
+  const payload = await loggedInUserAction();
+  const isAdmin = payload?.payload?.isAdmin;
   return (
     <header className='block lg:hidden'>
       {/* announcement bar */}
@@ -78,12 +79,19 @@ const MobileHeader = async () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align='end'>
                     <DropdownMenuLabel className='font-bold'>
-                      My Account
+                      {payload?.payload?.email}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <Link href='/profile'>Profile</Link>
-                    </DropdownMenuItem>
+                    {isAdmin ? (
+                      <DropdownMenuItem>
+                        <Link href='/admin'>Admin</Link>
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem>
+                        <Link href='/profile'>Profile</Link>
+                      </DropdownMenuItem>
+                    )}
+
                     <DropdownMenuItem>
                       <form action={logoutAction}>
                         <button
@@ -99,9 +107,12 @@ const MobileHeader = async () => {
               </div>
             ) : (
               <>
-                <span className='text-[#D6866B] w-[40px] h-[40px] border border-[#D6866B] flex items-center justify-center rounded-full hover:bg-[#D6866B] hover:text-white transition'>
+                <Link
+                  href='/login'
+                  className='text-[#D6866B] w-[40px] h-[40px] border border-[#D6866B] flex items-center justify-center rounded-full hover:bg-[#D6866B] hover:text-white transition'
+                >
                   <LogInIcon width={22} />
-                </span>
+                </Link>
               </>
             )}
 
@@ -131,7 +142,7 @@ const MobileHeader = async () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default MobileHeader
+export default MobileHeader;

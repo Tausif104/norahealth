@@ -1,13 +1,13 @@
-import { getUserAccount } from '@/actions/account.action'
-import { redirect } from 'next/navigation'
-import HealthForm from './_components/healthForm'
-import Link from 'next/link'
+import { getUserAccount } from "@/actions/account.action";
+import { redirect } from "next/navigation";
+import HealthForm from "./_components/healthForm";
+import Link from "next/link";
 
 const HealthPage = async () => {
-  const account = await getUserAccount()
+  const account = await getUserAccount();
 
   if (!account?.account) {
-    redirect('/account')
+    redirect("/account");
   }
   return (
     <>
@@ -21,7 +21,7 @@ const HealthPage = async () => {
             {/* Health Details title + line */}
             <div className='flex items-center gap-3'>
               <p className='text-[#1F2122] text-[18px] md:text-[20px] font-semibold'>
-                Helath Details
+                Health Details
               </p>
               <span className='h-[1px] bg-[#F9E4CA] flex-1' />
             </div>
@@ -29,10 +29,10 @@ const HealthPage = async () => {
             <HealthForm />
 
             <p className='text-center text-[#1D2D44] text-base'>
-              This information is not required to create an account. You can{' '}
+              This information is not required to create an account. You can{" "}
               <Link href='/profile' className='text-[#d67b0e] underline'>
                 Skip
-              </Link>{' '}
+              </Link>{" "}
               for now and update it later.
               <br />
             </p>
@@ -40,7 +40,7 @@ const HealthPage = async () => {
         </div>
       </section>
     </>
-  )
-}
+  );
+};
 
-export default HealthPage
+export default HealthPage;
