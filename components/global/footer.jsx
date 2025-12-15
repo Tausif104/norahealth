@@ -59,7 +59,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div className='flex justify-center items-center gap-3'>
+          <div className='hidden justify-center items-center gap-3'>
             <a href='#' className='hover:opacity-60 transition'>
               <Image
                 src='/images/social/facebook.svg'
