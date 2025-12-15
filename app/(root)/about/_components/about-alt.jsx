@@ -1,5 +1,5 @@
-import PrimaryBtn from '@/components/global/primary-btn'
-import Image from 'next/image'
+import PrimaryBtn from "@/components/global/primary-btn";
+import Image from "next/image";
 
 const AboutAlt = () => {
   return (
@@ -19,9 +19,9 @@ const AboutAlt = () => {
                 Our trusted online services connect patients with a clinical
                 team of experienced pharmacists and doctors — with over 15 years
                 of expertise in women's health. We know that everyone's
-                different. That's why our advice is{' '}
-                <span className='text-theme'>personal</span>,{' '}
-                <span className='text-theme'>inclusive</span>, and{' '}
+                different. That's why our advice is{" "}
+                <span className='text-theme'>personal</span>,{" "}
+                <span className='text-theme'>inclusive</span>, and{" "}
                 <span className='text-theme'>culturally sensitive</span> — so
                 you feel heard, respected, and supported every step of the way.
               </p>
@@ -34,7 +34,7 @@ const AboutAlt = () => {
               </p>
             </div>
             <div>
-              <PrimaryBtn url='/' label='Order Now' />
+              <PrimaryBtn url='/booking' label='Order Now' />
             </div>
           </div>
           <div className='col-span-2 md:mb-0 mb-4'>
@@ -48,7 +48,7 @@ const AboutAlt = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default AboutAlt
+export default AboutAlt;

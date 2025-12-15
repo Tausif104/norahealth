@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // basic calendar styling (you can override)
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,29 @@ export default function CreateSlotsPanel({ defaultInterval = 10 }) {
     return `${y}-${mo}-${day}`;
   }
 
+  const today = useMemo(() => {
+    const t = new Date();
+    return new Date(t.getFullYear(), t.getMonth(), t.getDate());
+  }, []);
+
+  function isSameDay(a, b) {
+    if (!a || !b) return false;
+    return (
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate()
+    );
+  }
+
+  function tileDisabled({ date, view }) {
+    if (view !== "month") return false;
+    //  Disable all past dates
+    if (date < today) return true;
+
+    //  Allow today even if not in bookableDates (optional)
+    if (isSameDay(date, today)) return false;
+  }
+
   async function handleSubmit(e) {
     e?.preventDefault?.();
     setLoading(true);
@@ -72,6 +95,7 @@ export default function CreateSlotsPanel({ defaultInterval = 10 }) {
         <h3 className='text-lg font-medium mb-3'>Select date</h3>
         <Calendar
           showNeighboringMonth={false}
+          tileDisabled={tileDisabled}
           onChange={setDate}
           value={date}
           // tileDisabled / tileClassName can be used to show booked dates if desired

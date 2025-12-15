@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import { User, LogInIcon } from 'lucide-react'
-import { menuItems } from '@/data/menu'
+import Link from "next/link";
+import { User, LogInIcon } from "lucide-react";
+import { menuItems } from "@/data/menu";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,13 +8,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { loggedInUserAction, logoutAction } from '@/actions/user.action'
+} from "@/components/ui/dropdown-menu";
+import { loggedInUserAction, logoutAction } from "@/actions/user.action";
 
 const Navigation = async () => {
-  const payload = await loggedInUserAction()
+  const payload = await loggedInUserAction();
 
-  const isAdmin = payload?.payload?.isAdmin
+  const isAdmin = payload?.payload?.isAdmin;
 
   return (
     <nav className='flex items-center gap-6'>
@@ -45,24 +45,27 @@ const Navigation = async () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               {isAdmin ? (
-                <DropdownMenuItem>
-                  <Link href='/admin'>Admin</Link>
-                </DropdownMenuItem>
+                <Link href='/admin' className='cursor-pointer!'>
+                  <DropdownMenuItem className='cursor-pointer!'>
+                    Admin
+                  </DropdownMenuItem>
+                </Link>
               ) : (
-                <DropdownMenuItem>
+                <DropdownMenuItem className='cursor-pointer!'>
                   <Link href='/profile'>Profile</Link>
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem>
-                <form action={logoutAction}>
+
+              <form action={logoutAction}>
+                <DropdownMenuItem>
                   <button
                     type='submit'
                     className='w-full text-left cursor-pointer'
                   >
                     Log Out
                   </button>
-                </form>
-              </DropdownMenuItem>
+                </DropdownMenuItem>
+              </form>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
@@ -75,7 +78,7 @@ const Navigation = async () => {
         )}
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navigation
+export default Navigation;

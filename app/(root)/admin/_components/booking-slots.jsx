@@ -164,6 +164,10 @@ export default function BookingSlots() {
 
   function tileDisabled({ date, view }) {
     if (view !== "month") return false;
+    if (date < today) return true;
+
+    //  Allow today even if not in bookableDates (optional)
+    if (isSameDay(date, today)) return false;
     const isBookable = bookableDates.some((d) => isSameDay(d, date));
     if (isSameDay(date, today)) return false;
     return !isBookable;
