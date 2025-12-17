@@ -1,92 +1,92 @@
-import { NextResponse } from 'next/server'
-import { verifyToken } from './lib/jwt/jwt'
+import { NextResponse } from "next/server";
+import { verifyToken } from "./lib/jwt/jwt";
+
+const ROLE_REDIRECT_MAP = {
+  SUPERADMIN: "/admin",
+  ADMIN: "/admin",
+  AUTHOR: "/author",
+  PATIENT: "/profile", // or USER if you use USER
+};
 
 export async function proxy(req) {
-  const token = req.cookies.get('auth_token')?.value
-  const pathname = req.nextUrl.pathname
+  const token = req.cookies.get("auth_token")?.value;
+  const pathname = req.nextUrl.pathname;
 
-  // 1. Define paths based on access type
-  const guestOnly = ['/login', '/register']
-  const userOnlyPrefixes = ['/profile', '/account', '/health'] // Paths only normal users can access
-  const adminOnlyPrefixes = ['/admin'] // Paths only admins can access
+  const guestOnly = ["/login", "/register"];
 
-  // Attempt to decode the token to get user info (isAdmin flag)
-  // 'decoded' will be null if token is missing or invalid.
-  const decoded = await verifyToken(token || '')
-  const isAdmin = decoded?.isAdmin === true // Explicitly check for true
-
-  // --- 2. Logic for Guest-Only Pages (/login, /register) ---
+  /* ---------------- GUEST PAGES ---------------- */
   if (guestOnly.includes(pathname)) {
-    if (token) {
-      try {
-        await verifyToken(token)
-        // Redirect logic based on user role after successful login
-        const redirectTo = isAdmin ? '/admin' : '/profile'
-        return NextResponse.redirect(new URL(redirectTo, req.url))
-      } catch {
-        // Token exists but is invalid/expired, allow to proceed to login/register
-        // to handle the refresh or sign-in again
-        return NextResponse.next()
-      }
+    if (!token) return NextResponse.next();
+
+    try {
+      const decoded = await verifyToken(token);
+      const redirectTo = ROLE_REDIRECT_MAP[decoded.role] || "/profile";
+      return NextResponse.redirect(new URL(redirectTo, req.url));
+    } catch {
+      return NextResponse.next();
     }
-    // No token, proceed to guest page
-    return NextResponse.next()
   }
 
-  // --- 3. Logic for Protected Pages (All others defined in matcher) ---
-
-  const isUserOnly = userOnlyPrefixes.some((prefix) =>
-    pathname.startsWith(prefix)
-  )
-  const isAdminOnly = adminOnlyPrefixes.some((prefix) =>
-    pathname.startsWith(prefix)
-  )
-
-  // A. Check for missing token on protected pages
+  /* ---------------- PROTECTED PAGES ---------------- */
   if (!token) {
-    // If no token, redirect to login for any protected page
-    return NextResponse.redirect(new URL('/login', req.url))
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // B. Token exists, verify it and check roles
+  let decoded;
   try {
-    // Re-verify the token to ensure it is not expired
-    await verifyToken(token)
-
-    if (isUserOnly) {
-      if (isAdmin) {
-        // Admin trying to view a User-Only path, redirect to admin landing
-        return NextResponse.redirect(new URL('/admin', req.url))
-      }
-      // Normal user viewing User-Only path, allow
-      return NextResponse.next()
-    }
-
-    if (isAdminOnly) {
-      if (!isAdmin) {
-        // Normal user trying to view an Admin-Only path, redirect to user landing
-        return NextResponse.redirect(new URL('/profile', req.url))
-      }
-      // Admin viewing Admin-Only path, allow
-      return NextResponse.next()
-    }
-
-    // Default: Path is protected but doesn't fall into explicit user/admin only category, allow access
-    return NextResponse.next()
+    decoded = await verifyToken(token);
   } catch {
-    // Token is invalid/expired during access attempt, redirect to login
-    return NextResponse.redirect(new URL('/login', req.url))
+    return NextResponse.redirect(new URL("/login", req.url));
   }
+
+  const role = decoded.role;
+
+  /* ---------------- ADMIN AREA ---------------- */
+  if (pathname.startsWith("/admin")) {
+    if (role !== "ADMIN" && role !== "SUPERADMIN") {
+      return NextResponse.redirect(
+        new URL(ROLE_REDIRECT_MAP[role] || "/profile", req.url)
+      );
+    }
+    return NextResponse.next();
+  }
+
+  /* ---------------- AUTHOR AREA ---------------- */
+  if (pathname.startsWith("/author")) {
+    if (role !== "AUTHOR") {
+      return NextResponse.redirect(
+        new URL(ROLE_REDIRECT_MAP[role] || "/profile", req.url)
+      );
+    }
+    return NextResponse.next();
+  }
+
+  /* ---------------- USER AREA ---------------- */
+  if (
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/account") ||
+    pathname.startsWith("/health")
+  ) {
+    if (role !== "PATIENT") {
+      return NextResponse.redirect(
+        new URL(ROLE_REDIRECT_MAP[role] || "/profile", req.url)
+      );
+    }
+    return NextResponse.next();
+  }
+
+  return NextResponse.next();
 }
 
+/* ---------------- MATCHER ---------------- */
 export const config = {
-  // The matcher defines all routes the middleware should execute on
   matcher: [
-    '/login',
-    '/register',
-    '/profile/:path*',
-    '/account/:path*',
-    '/health/:path*',
-    '/admin/:path*',
+    "/login",
+    "/register",
+    "/admin/:path*",
+    "/author/:path*",
+    "/profile/:path*",
+    "/account/:path*",
+    "/health/:path*",
   ],
-}
+};

@@ -121,6 +121,7 @@ export const loginAction = async (prevState, formData) => {
   const safeUser = {
     id: user.id,
     email: user.email,
+    role: user.role,
     isAdmin: user.isAdmin,
     createdAt: user.createdAt,
   };

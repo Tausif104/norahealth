@@ -14,7 +14,10 @@ import { loggedInUserAction, logoutAction } from "@/actions/user.action";
 const Navigation = async () => {
   const payload = await loggedInUserAction();
 
-  const isAdmin = payload?.payload?.isAdmin;
+  const isAdmin =
+    payload?.payload?.role === "ADMIN" ||
+    payload?.payload?.role === "SUPERADMIN";
+  const isAuthor = payload?.payload?.role === "AUTHOR";
 
   return (
     <nav className='flex items-center gap-6'>
@@ -50,6 +53,10 @@ const Navigation = async () => {
                     Admin
                   </DropdownMenuItem>
                 </Link>
+              ) : isAuthor ? (
+                <DropdownMenuItem className='cursor-pointer!'>
+                  <Link href='/author'>Author</Link>
+                </DropdownMenuItem>
               ) : (
                 <DropdownMenuItem className='cursor-pointer!'>
                   <Link href='/profile'>Profile</Link>

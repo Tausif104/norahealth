@@ -19,6 +19,15 @@ model User {
   history     History[]
   medications Medication[]
   orders      Order[]
+  posts       Post[]
+  role        Role?        @default(PATIENT)
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  PATIENT
+  AUTHOR
 }
 
 model Record {
@@ -125,6 +134,39 @@ model Booking {
   slot   BookingSlot? @relation(fields: [slotId], references: [id])
 
   @@index([slotId])
+}
+
+model Post {
+  id              String    @id @default(uuid())
+  title           String
+  postSlug        String    @unique
+  shortDesc       String?
+  bannerImage     String
+  bannerAltText   String?
+  metaTitle       String?   @db.VarChar(70)
+  metaDescription String?   @db.VarChar(160)
+  canonicalUrl    String?
+  content         Json
+  author          User?     @relation(fields: [authorId], references: [id])
+  authorId        Int?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  isActive        Boolean?
+  Comment         Comment[]
+
+  @@index([authorId], name: "author_idx")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  content   String
+  approved  Boolean?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
 }
 
 enum OcRequest {
