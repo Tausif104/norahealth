@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuthor } from "@/lib/authorContext";
+import { useProfile } from "@/lib/profileContext";
 import {
   PanelLeft,
   User,
@@ -8,13 +9,14 @@ import {
   Contact,
   Pen,
   NotebookPen,
+  UserPen,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
 const AuthorSidebar = () => {
-  const { menuOpen, setMenuOpen } = useAuthor();
+  const { menuOpen, setMenuOpen } = useProfile();
   const pathname = usePathname();
 
   const baseClasses =
@@ -41,6 +43,17 @@ const AuthorSidebar = () => {
           href='/author'
           className={`${baseClasses} ${
             pathname === "/author" ? activeClasses : inactiveClasses
+          }`}
+        >
+          <UserPen className='w-4 h-4' />
+          <span>Profile</span>
+        </Link>
+        <Link
+          href='/author/blog'
+          className={`${baseClasses} ${
+            pathname.startsWith("/author/blog")
+              ? activeClasses
+              : inactiveClasses
           }`}
         >
           <NotebookPen className='w-4 h-4' />

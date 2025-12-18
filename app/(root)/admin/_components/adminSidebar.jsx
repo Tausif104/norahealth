@@ -1,6 +1,12 @@
 "use client";
 import { useAdmin } from "@/lib/adminContext";
-import { PanelLeft, User, ClipboardClock, Contact } from "lucide-react";
+import {
+  PanelLeft,
+  User,
+  ClipboardClock,
+  Contact,
+  NotebookPen,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -60,6 +66,15 @@ const AdminSidebar = () => {
         >
           <ClipboardClock className='w-4 h-4' />
           <span>Appointment Slot</span>
+        </Link>
+        <Link
+          href='/admin/blog'
+          className={`${baseClasses} ${
+            pathname.startsWith("/admin/blog") ? activeClasses : inactiveClasses
+          }`}
+        >
+          <NotebookPen className='w-4 h-4' />
+          <span>Blogs</span>
         </Link>
       </nav>
     </aside>

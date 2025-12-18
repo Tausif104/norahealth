@@ -7,6 +7,7 @@ import { signToken, verifyToken } from "@/lib/jwt/jwt";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import cloudinary from "@/lib/cloudinary";
 
 // register action
 export const registerAction = async (prevState, formData) => {
@@ -293,60 +294,126 @@ export const changePasswordAction = async (prevState, formData) => {
 };
 
 // upload profile image
+// export const uploadProfileImageAction = async (formData) => {
+//   const file = formData.get("file");
+
+//   try {
+//     if (!file) {
+//       return { msg: "No file selected", success: false };
+//     }
+
+//     const payload = await loggedInUserAction();
+//     console.log(payload, "payload");
+
+//     if (!payload || !payload.payload.id) {
+//       return {
+//         msg: "Invalid session. Please log in again.",
+//         success: false,
+//       };
+//     }
+
+//     const userId = payload.payload.id;
+
+//     if (!userId) {
+//       return { msg: "Unauthorized", success: false };
+//     }
+
+//     const uploadDir = path.join(process.cwd(), "public/profileImage");
+//     if (!fs.existsSync(uploadDir)) {
+//       fs.mkdirSync(uploadDir, { recursive: true });
+//     }
+
+//     const fileExt = path.extname(file.name);
+//     const fileName = `${Date.now()}-${Math.random()
+//       .toString(36)
+//       .substr(2, 6)}${fileExt}`;
+//     const filePath = path.join(uploadDir, fileName);
+
+//     const buffer = Buffer.from(await file.arrayBuffer());
+//     fs.writeFileSync(filePath, buffer);
+
+//     await prisma.account.update({
+//       where: { userId },
+//       data: {
+//         profileImage: `/profileImage/${fileName}`,
+//       },
+//     });
+//     revalidatePath("/dashboard/profile");
+
+//     return {
+//       msg: "Profile image uploaded successfully",
+//       success: true,
+//       imagePath: `/profileImage/${fileName}`,
+//     };
+//   } catch (err) {
+//     console.error("Upload error:", err);
+//     return { msg: "Image upload failed", success: false };
+//   }
+// };
+
 export const uploadProfileImageAction = async (formData) => {
-  const file = formData.get("file");
-
   try {
-    if (!file) {
-      return { msg: "No file selected", success: false };
+    const file = formData.get("file");
+
+    if (!file || typeof file === "string") {
+      return { success: false, msg: "No file selected" };
     }
 
-    const payload = await loggedInUserAction();
-    console.log(payload, "payload");
+    const session = await loggedInUserAction();
+    console.log(session, "upload");
 
-    if (!payload || !payload.payload.id) {
-      return {
-        msg: "Invalid session. Please log in again.",
-        success: false,
-      };
+    if (!session?.payload?.id) {
+      return { success: false, msg: "Unauthorized" };
     }
 
-    const userId = payload.payload.id;
+    const userId = session.payload.id;
 
-    if (!userId) {
-      return { msg: "Unauthorized", success: false };
-    }
+    // Convert file → buffer
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
-    const uploadDir = path.join(process.cwd(), "public/profileImage");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
+    // Upload to Cloudinary
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: "profile_images",
+            resource_type: "image",
+            transformation: [
+              { width: 400, height: 400, crop: "fill" },
+              { quality: "auto" },
+            ],
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        )
+        .end(buffer);
+    });
 
-    const fileExt = path.extname(file.name);
-    const fileName = `${Date.now()}-${Math.random()
-      .toString(36)
-      .substr(2, 6)}${fileExt}`;
-    const filePath = path.join(uploadDir, fileName);
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-    fs.writeFileSync(filePath, buffer);
-
+    // Save image URL
     await prisma.account.update({
       where: { userId },
       data: {
-        profileImage: `/profileImage/${fileName}`,
+        profileImage: uploadResult.secure_url,
       },
     });
-    revalidatePath("/dashboard/profile");
+
+    if (session.payload.role === "AUTHOR") {
+      revalidatePath("/author");
+    } else {
+      revalidatePath("/profile");
+    }
 
     return {
-      msg: "Profile image uploaded successfully",
       success: true,
-      imagePath: `/profileImage/${fileName}`,
+      msg: "Profile image uploaded successfully",
+      imagePath: uploadResult.secure_url,
     };
   } catch (err) {
-    console.error("Upload error:", err);
-    return { msg: "Image upload failed", success: false };
+    console.error("Cloudinary upload error:", err);
+    return { success: false, msg: "Image upload failed" };
   }
 };
 

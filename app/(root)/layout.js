@@ -1,5 +1,6 @@
 import Footer from "@/components/global/footer";
 import Header from "@/components/global/header";
+import { BlogProvider } from "@/lib/BlogContext";
 import "react-datepicker/dist/react-datepicker.css";
 
 export const metadata = {
@@ -9,10 +10,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <>
+    <BlogProvider>
       <Header />
       <main>{children}</main>
       <Footer />
-    </>
+    </BlogProvider>
   );
 }
