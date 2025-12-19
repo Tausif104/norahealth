@@ -8,6 +8,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import cloudinary from "@/lib/cloudinary";
+import { log } from "console";
 
 // register action
 export const registerAction = async (prevState, formData) => {
@@ -461,4 +462,70 @@ export async function forgotPasswordAction(prevState, formData) {
   }
 
   return { success: false, msg: "Invalid step", step: 1 };
+}
+
+export async function updateUserPasswordAction({ userId, password }) {
+  try {
+    if (!password || password.length < 6) {
+      return {
+        success: false,
+        message: "Password must be at least 6 characters",
+      };
+    }
+
+    const session = await loggedInUserAction();
+
+    if (!session?.payload) {
+      return {
+        success: false,
+        message: "Unauthorized",
+      };
+    }
+
+    const actor = await prisma.user.findUnique({
+      where: { id: session.payload.id },
+      select: { id: true, role: true },
+    });
+
+    if (!actor) {
+      return {
+        success: false,
+        message: "Unauthorized",
+      };
+    }
+
+    // ❌ Prevent updating own password from admin panel
+    if (actor.id === userId) {
+      return {
+        success: false,
+        message: "You cannot update your own password here",
+      };
+    }
+
+    // 🔐 Permission check
+    if (actor.role !== "ADMIN" && actor.role !== "SUPERADMIN") {
+      return {
+        success: false,
+        message: "Permission denied",
+      };
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return {
+      success: true,
+      message: "Password updated successfully",
+    };
+  } catch (error) {
+    console.error("updateUserPasswordAction error:", error);
+    return {
+      success: false,
+      message: "Failed to update password",
+    };
+  }
 }

@@ -49,11 +49,13 @@ import { CreateUserForm } from "./create-user-form";
 import { useAdmin } from "@/lib/adminContext";
 import { updateUserRoleAction } from "@/actions/admin.action";
 import { toast } from "sonner";
+import { UpdateUserDialog } from "./update-user-dialog";
 const formatRole = (role) =>
   role.toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
 
 export function UserTable({ users, admin }) {
   const { setMenuOpen } = useAdmin();
+
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -109,102 +111,132 @@ export function UserTable({ users, admin }) {
         </div>
       ),
     },
+    // {
+    //   accessorKey: "role",
+    //   header: "Role",
+    //   cell: ({ row, table }) => {
+    //     const role = row.getValue("role");
+    //     const userId = row.getValue("id");
+    //     const id = row.getValue("id").toString();
+    //     const currentUserId = table?.options?.admin?.admin?.id.toString();
+
+    //     const actor = table?.options?.admin?.admin;
+    //     const actorRole = actor?.role;
+    //     const actorId = actor?.id;
+
+    //     const isSelf = actorId === userId;
+
+    //     // Permission rules
+    //     const canEdit =
+    //       !isSelf &&
+    //       (actorRole === "SUPERADMIN" ||
+    //         (actorRole === "ADMIN" && role !== "SUPERADMIN"));
+
+    //     const allowedRoles = (() => {
+    //       if (!canEdit) return [];
+
+    //       // ADMIN → PATIENT ↔ AUTHOR
+    //       if (actorRole === "ADMIN") {
+    //         return ["PATIENT", "AUTHOR"].filter((r) => r !== role);
+    //       }
+
+    //       // SUPERADMIN → ANY except self
+    //       if (actorRole === "SUPERADMIN") {
+    //         return ["PATIENT", "AUTHOR", "ADMIN"].filter((r) => r !== role);
+    //       }
+
+    //       return [];
+    //     })();
+
+    //     return (
+    //       <div className='flex items-center gap-3'>
+    //         {/* Role Badge */}
+    //         <Badge
+    //           className={`${
+    //             role === "ADMIN" || role === "SUPERADMIN"
+    //               ? "bg-green-400 text-white dark:bg-blue-600"
+    //               : ""
+    //           }`}
+    //           variant={`${
+    //             role === "ADMIN" || role === "SUPERADMIN"
+    //               ? "secondary"
+    //               : "outline"
+    //           }`}
+    //         >
+    //           {id === currentUserId && <BadgeCheckIcon />}
+    //           {formatRole(role)}
+    //         </Badge>
+
+    //         {/* Edit button */}
+    //         {canEdit && allowedRoles.length > 0 && (
+    //           <DropdownMenu>
+    //             <DropdownMenuTrigger asChild>
+    //               <Button
+    //                 variant='ghost'
+    //                 size='sm'
+    //                 className='h-7 px-2 text-xs'
+    //               >
+    //                 <Edit />
+    //               </Button>
+    //             </DropdownMenuTrigger>
+
+    //             <DropdownMenuContent align='end'>
+    //               {allowedRoles.map((r) => (
+    //                 <DropdownMenuItem
+    //                   key={r}
+    //                   onClick={async () => {
+    //                     const res = await updateUserRoleAction({
+    //                       userId,
+    //                       newRole: r,
+    //                     });
+
+    //                     if (!res.success) {
+    //                       toast.error(res.message);
+    //                     } else {
+    //                       toast.success(`Role updated to ${formatRole(r)}`);
+    //                     }
+    //                   }}
+    //                 >
+    //                   {formatRole(r)}
+    //                 </DropdownMenuItem>
+    //               ))}
+    //             </DropdownMenuContent>
+    //           </DropdownMenu>
+    //         )}
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       accessorKey: "role",
       header: "Role",
       cell: ({ row, table }) => {
         const role = row.getValue("role");
-        const userId = row.getValue("id");
-        const id = row.getValue("id").toString();
-        const currentUserId = table?.options?.admin?.admin?.id.toString();
-
-        const actor = table?.options?.admin?.admin;
-        const actorRole = actor?.role;
-        const actorId = actor?.id;
-
-        const isSelf = actorId === userId;
-
-        // Permission rules
-        const canEdit =
-          !isSelf &&
-          (actorRole === "SUPERADMIN" ||
-            (actorRole === "ADMIN" && role !== "SUPERADMIN"));
-
-        const allowedRoles = (() => {
-          if (!canEdit) return [];
-
-          // ADMIN → PATIENT ↔ AUTHOR
-          if (actorRole === "ADMIN") {
-            return ["PATIENT", "AUTHOR"].filter((r) => r !== role);
-          }
-
-          // SUPERADMIN → ANY except self
-          if (actorRole === "SUPERADMIN") {
-            return ["PATIENT", "AUTHOR", "ADMIN"].filter((r) => r !== role);
-          }
-
-          return [];
-        })();
+        const userId = row.getValue("id").toString();
+        const currentUserId = table?.options?.admin?.admin?.id?.toString();
 
         return (
-          <div className='flex items-center gap-3'>
-            {/* Role Badge */}
-            <Badge
-              className={`${
-                role === "ADMIN" || role === "SUPERADMIN"
-                  ? "bg-green-400 text-white dark:bg-blue-600"
-                  : ""
-              }`}
-              variant={`${
-                role === "ADMIN" || role === "SUPERADMIN"
-                  ? "secondary"
-                  : "outline"
-              }`}
-            >
-              {id === currentUserId && <BadgeCheckIcon />}
-              {formatRole(role)}
-            </Badge>
-
-            {/* Edit button */}
-            {canEdit && allowedRoles.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    className='h-7 px-2 text-xs'
-                  >
-                    <Edit />
-                  </Button>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent align='end'>
-                  {allowedRoles.map((r) => (
-                    <DropdownMenuItem
-                      key={r}
-                      onClick={async () => {
-                        const res = await updateUserRoleAction({
-                          userId,
-                          newRole: r,
-                        });
-
-                        if (!res.success) {
-                          toast.error(res.message);
-                        } else {
-                          toast.success(`Role updated to ${formatRole(r)}`);
-                        }
-                      }}
-                    >
-                      {formatRole(r)}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+          <Badge
+            className={`${
+              role === "ADMIN" || role === "SUPERADMIN"
+                ? "bg-green-400 text-white dark:bg-blue-600"
+                : ""
+            }`}
+            variant={
+              role === "ADMIN" || role === "SUPERADMIN"
+                ? "secondary"
+                : "outline"
+            }
+          >
+            {userId === currentUserId && (
+              <BadgeCheckIcon className='mr-1 h-4 w-4' />
             )}
-          </div>
+            {formatRole(role)}
+          </Badge>
         );
       },
     },
+
     {
       accessorKey: "createdAt",
       header: "Created At",
@@ -218,35 +250,51 @@ export function UserTable({ users, admin }) {
     {
       id: "actions",
       enableHiding: false,
-      cell: ({ row }) => {
-        const userId = row.getValue("id");
+      cell: ({ row, table }) => {
+        const user = row.original;
+        const admin = table.options.admin.admin;
+        const [open, setOpen] = React.useState(false);
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='ghost' className='h-8 w-8 p-0'>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
 
-              <DropdownMenuItem>
-                <Link href={`/admin/${userId}/records`}>Records </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href={`/admin/${userId}/history`}>Medical History</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href={`/admin/${userId}/medications`}>Medications</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href={`/admin/${userId}/orders`}>Orders</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <DropdownMenuContent align='end'>
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem onClick={() => setOpen(true)}>
+                  Update User
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem asChild>
+                  <Link href={`/admin/${user.id}/records`}>Records</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`/admin/${user.id}/history`}>
+                    Medical History
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`/admin/${user.id}/orders`}>Orders</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <UpdateUserDialog
+              open={open}
+              setOpen={setOpen}
+              user={user}
+              admin={admin}
+            />
+          </>
         );
       },
     },

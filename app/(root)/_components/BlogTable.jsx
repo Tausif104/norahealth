@@ -13,6 +13,8 @@ import {
   ArrowUpDown,
   Badge,
   ChevronDown,
+  MessageCircle,
+  MessageCircleMore,
   MoreHorizontal,
   PanelLeft,
   Plus,
@@ -86,23 +88,28 @@ export default function BlogTable({ allPost, userRole }) {
         enableHiding: false,
       },
       {
-        accessorKey: "author",
-        header: "Author",
+        accessorKey: "title",
+        header: "Title",
+
         cell: ({ row }) => (
           <div className='flex items-center gap-3'>
-            <Avatar className='h-6 w-6 rounded-full'>
-              <AvatarImage
-                src={row.original.author?.account?.profileImage || ""}
-              />
+            <Avatar className='h-7 w-7 rounded-sm'>
+              <AvatarImage src={row.original.bannerImage || ""} />
             </Avatar>
-            <span>{row.original.author?.account?.firstName}</span>
+            <span>{row.original.title}</span>
           </div>
         ),
       },
       {
-        accessorKey: "title",
-        header: "Title",
+        accessorKey: "author",
+        header: "Author",
+        cell: ({ row }) => (
+          <div className='flex items-center gap-3'>
+            <span>{row.original.author?.account?.firstName}</span>
+          </div>
+        ),
       },
+
       {
         accessorKey: "createdAt",
         header: ({ column }) => (
@@ -123,6 +130,14 @@ export default function BlogTable({ allPost, userRole }) {
       {
         accessorKey: "comments",
         header: "Comments",
+        cell: ({ row }) => (
+          <div>
+            <span className='flex items-center gap-1'>
+              <MessageCircleMore className='mr-1 w-4 h-4' />
+              {row.original.Comment.length}
+            </span>
+          </div>
+        ),
       },
       {
         id: "actions",
