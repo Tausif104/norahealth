@@ -15,7 +15,7 @@ const Footer = () => {
     },
     {
       id: 3,
-      label: "Get Contraception",
+      label: "Make an Appointment",
       link: "/booking",
     },
     {

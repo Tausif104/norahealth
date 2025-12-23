@@ -87,7 +87,10 @@ export const createUserAction = async (prevState, formData) => {
   });
 
   if (existingUser) {
-    return { success: false, msg: "User with this email already exists" };
+    return {
+      success: false,
+      msg: "Looks like this email already have an account.",
+    };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -97,6 +100,7 @@ export const createUserAction = async (prevState, formData) => {
       email: email,
       password: hashedPassword,
       isAdmin: isAdminUser,
+      role: isAdminUser ? "ADMIN" : "PATIENT",
     },
   });
 

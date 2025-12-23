@@ -1,14 +1,17 @@
-import React from 'react'
-import AccountForm from './_components/accountForm'
-import Link from 'next/link'
-import { getUserAccount } from '@/actions/account.action'
-import { redirect } from 'next/navigation'
+import React from "react";
+import AccountForm from "./_components/accountForm";
+import Link from "next/link";
+import { getUserAccount } from "@/actions/account.action";
+import { redirect } from "next/navigation";
+import { loggedInUserAction } from "@/actions/user.action";
 
 const page = async () => {
-  const account = await getUserAccount()
+  const account = await getUserAccount();
+  const payload = await loggedInUserAction();
+  console.log(payload, "account page");
 
   if (account?.account) {
-    redirect('/profile')
+    redirect("/profile");
   }
   return (
     <>
@@ -27,12 +30,12 @@ const page = async () => {
               <span className='h-[1px] bg-[#F9E4CA] flex-1' />
             </div>
 
-            <AccountForm />
+            <AccountForm user={payload?.payload} />
 
             <p className='text-center text-[#1D2D44] text-base'>
               By logging in, you agree to the personal data processing policy
               <br />
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link href='/login' className='text-[#d67b0e] underline'>
                 Sign In
               </Link>
@@ -41,7 +44,7 @@ const page = async () => {
         </div>
       </section>
     </>
-  )
-}
+  );
+};
 
-export default page
+export default page;

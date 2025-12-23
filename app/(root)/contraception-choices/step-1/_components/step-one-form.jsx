@@ -1,8 +1,8 @@
-import ChoiceCheckBox from '@/components/global/choice-check'
-import OutlineBtn from '@/components/global/outline-btn'
-import PrimaryBtn from '@/components/global/primary-btn'
-import { help } from '@/data/contraception'
-import { ArrowRight } from 'lucide-react'
+import ChoiceCheckBox from "@/components/global/choice-check";
+import OutlineBtn from "@/components/global/outline-btn";
+import PrimaryBtn from "@/components/global/primary-btn";
+import { help } from "@/data/contraception";
+import { ArrowRight } from "lucide-react";
 
 const StepOneForm = ({ action }) => {
   return (
@@ -27,11 +27,11 @@ const StepOneForm = ({ action }) => {
             </span>
           </button>
           <OutlineBtn url='/contraception-choices/step-1' label='Start Again' />
-          <PrimaryBtn url='/' label='Book a Call' />
+          <PrimaryBtn url='/booking' label='Book a Call' />
         </div>
       </form>
     </>
-  )
-}
+  );
+};
 
-export default StepOneForm
+export default StepOneForm;

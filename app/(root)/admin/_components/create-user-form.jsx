@@ -1,5 +1,5 @@
-'use client'
-import { Button } from '@/components/ui/button'
+"use client";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -18,32 +18,38 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { createUserAction } from '@/actions/admin.action'
-import { useState, useEffect, useActionState } from 'react'
-import { LoaderIcon } from 'lucide-react'
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { createUserAction } from "@/actions/admin.action";
+import { useState, useEffect, useActionState } from "react";
+import { LoaderIcon } from "lucide-react";
+import { toast } from "sonner";
 
 export const CreateUserForm = () => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   const initialState = {
-    msg: '',
+    msg: "",
     success: false,
-  }
+  };
 
   const [state, action, loading] = useActionState(
     createUserAction,
     initialState
-  )
+  );
 
   useEffect(() => {
-    if (state.success) {
-      setOpen(false)
+    if (state.msg) {
+      if (state.success) {
+        setOpen(false);
+        toast.success(state.msg);
+      } else {
+        toast.warning(state.msg);
+      }
     }
-    state.success = false
-  }, [state.success])
+    state.msg = "";
+  }, [state.msg]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -100,12 +106,12 @@ export const CreateUserForm = () => {
                   className='size-4 animate-spin mx-auto'
                 />
               ) : (
-                'Save'
+                "Save"
               )}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

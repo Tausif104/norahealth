@@ -6,6 +6,7 @@ import { getUserHealth } from "@/actions/health.action";
 
 const page = async () => {
   const account = await getUserAccount();
+  // console.log(account, "profile page");
 
   if (!account?.account) {
     redirect("/account");
@@ -13,6 +14,7 @@ const page = async () => {
 
   return (
     <>
+      {" "}
       <Profile account={account?.account} />
     </>
   );

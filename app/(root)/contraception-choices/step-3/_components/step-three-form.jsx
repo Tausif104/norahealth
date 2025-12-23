@@ -1,12 +1,12 @@
-import ChoiceCheckBox from '@/components/global/choice-check'
-import OutlineBtn from '@/components/global/outline-btn'
-import { myHealth } from '@/data/contraception'
-import { ArrowRight } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
+import ChoiceCheckBox from "@/components/global/choice-check";
+import OutlineBtn from "@/components/global/outline-btn";
+import { myHealth } from "@/data/contraception";
+import { ArrowRight } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 const StepThreeForm = ({ action }) => {
-  const searchParams = useSearchParams()
-  const sexhealth = searchParams.get('sexhealth')
+  const searchParams = useSearchParams();
+  const sexhealth = searchParams.get("sexhealth");
 
   return (
     <>
@@ -30,10 +30,11 @@ const StepThreeForm = ({ action }) => {
             </span>
           </button>
           <OutlineBtn url='/contraception-choices/step-1' label='Start Again' />
+          <PrimaryBtn label='Book a free call' url='/booking' />
         </div>
       </form>
     </>
-  )
-}
+  );
+};
 
-export default StepThreeForm
+export default StepThreeForm;

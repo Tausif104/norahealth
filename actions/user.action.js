@@ -30,7 +30,7 @@ export const registerAction = async (prevState, formData) => {
 
   if (userExists) {
     return {
-      msg: "User Already Exists",
+      msg: "Looks like you already have an account. Just log in, or reset your password if you’ve forgotten it.",
       success: false,
     };
   }
@@ -56,6 +56,7 @@ export const registerAction = async (prevState, formData) => {
     // creating safe user
     const safeUser = {
       id: user.id,
+      role: user.role,
       email: user.email,
       isAdmin: user.isAdmin,
       createdAt: user.createdAt,
@@ -72,7 +73,7 @@ export const registerAction = async (prevState, formData) => {
       name: "auth_token",
       value: token,
       httpOnly: true,
-      secure: true,
+      secure: false,
       path: "/",
       sameSite: "strict",
       maxAge: 60 * 60 * 24 * 30,

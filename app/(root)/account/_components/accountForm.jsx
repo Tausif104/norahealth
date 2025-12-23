@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { LoaderIcon } from "lucide-react";
 
-const AccountForm = () => {
+const AccountForm = ({ user }) => {
   const router = useRouter();
 
   const [dob, setDob] = useState(null);
@@ -101,6 +101,7 @@ const AccountForm = () => {
             name='secondemail'
             type='email'
             id='email'
+            defaultValue={user?.email}
             placeholder='Email address'
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />

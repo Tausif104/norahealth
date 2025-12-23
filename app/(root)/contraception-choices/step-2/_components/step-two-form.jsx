@@ -1,8 +1,8 @@
-import ChoiceRadio from '@/components/global/choice-radio'
-import OutlineBtn from '@/components/global/outline-btn'
-import PrimaryBtn from '@/components/global/primary-btn'
-import { sexualHealth } from '@/data/contraception'
-import { ArrowRight } from 'lucide-react'
+import ChoiceRadio from "@/components/global/choice-radio";
+import OutlineBtn from "@/components/global/outline-btn";
+import PrimaryBtn from "@/components/global/primary-btn";
+import { sexualHealth } from "@/data/contraception";
+import { ArrowRight } from "lucide-react";
 
 const StepTwoForm = ({ action }) => {
   return (
@@ -26,11 +26,11 @@ const StepTwoForm = ({ action }) => {
             </span>
           </button>
           <OutlineBtn url='/contraception-choices/step-1' label='Start Again' />
-          <PrimaryBtn url='/' label='Book a Free Call' />
+          <PrimaryBtn url='/booking' label='Book a Free Call' />
         </div>
       </form>
     </>
-  )
-}
+  );
+};
 
-export default StepTwoForm
+export default StepTwoForm;

@@ -249,7 +249,7 @@ ul.slick-dots .slick-active button {
   border-radius: 10px !important;
 }
 .react-calendar__month-view__days {
-  justify-content: space-between !important;
+  justify-content: space-around !important;
   gap: 5px !important;
   margin: 0 5px;
   margin-top: 15px;
@@ -275,14 +275,20 @@ ul.slick-dots .slick-active button {
 }
 
 .react-calendar__month-view__weekdays {
-  justify-content: space-between !important;
+  justify-content: space-around !important;
   /* gap: 5px !important; */
   margin: 0 5px;
   margin-top: 15px;
   margin-bottom: 10px;
 }
+.react-calendar__month-view__days__day--neighboringMonth {
+  visibility: hidden;
+}
 .react-calendar__tile.react-calendar__month-view__days__day {
   border-radius: 7.354px;
+}
+.react-calendar__tile.react-calendar__month-view__days__day {
+  flex: 0 0 12% !important;
 }
 .react-calendar__month-view__weekdays__weekday {
   border-radius: 7.354px;

@@ -11,16 +11,21 @@ export const menuItems = [
   },
   {
     id: 3,
-    label: "Get Contraception",
+    label: "Make an Appointment",
     link: "/booking",
   },
   {
     id: 4,
+    label: "Order Contraception",
+    link: "/booking/confirm",
+  },
+  {
+    id: 5,
     label: "Contraception Choices",
     link: "/contraception-choices/begin",
   },
   {
-    id: 5,
+    id: 6,
     label: "Contact us",
     link: "/contact",
   },

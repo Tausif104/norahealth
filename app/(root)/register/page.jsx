@@ -1,14 +1,14 @@
-import { loggedInUserAction } from '@/actions/user.action'
-import RegisterForm from './_components/registerForm'
-import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { loggedInUserAction } from "@/actions/user.action";
+import RegisterForm from "./_components/registerForm";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const RegisterPage = async () => {
-  const payload = await loggedInUserAction()
+  const payload = await loggedInUserAction();
 
-  // if (payload?.payload?.email) {
-  //   redirect('/account')
-  // }
+  if (payload?.payload?.email) {
+    redirect("/account");
+  }
   return (
     <>
       <section className='section-padding'>
@@ -28,7 +28,7 @@ const RegisterPage = async () => {
         </div>
       </section>
     </>
-  )
-}
+  );
+};
 
-export default RegisterPage
+export default RegisterPage;

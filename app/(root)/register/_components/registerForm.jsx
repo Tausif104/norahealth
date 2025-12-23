@@ -1,41 +1,41 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, LoaderIcon, LockKeyhole, Mail } from 'lucide-react'
-import { registerAction } from '@/actions/user.action'
-import { toast } from 'sonner'
+import { useState, useEffect } from "react";
+import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, LoaderIcon, LockKeyhole, Mail } from "lucide-react";
+import { registerAction } from "@/actions/user.action";
+import { toast } from "sonner";
 
 const RegisterForm = () => {
   // router
-  const router = useRouter()
+  const router = useRouter();
 
   // initial State
   const initialState = {
-    msg: '',
+    msg: "",
     success: false,
-  }
+  };
 
   // action state
-  const [state, action, loading] = useActionState(registerAction, initialState)
+  const [state, action, loading] = useActionState(registerAction, initialState);
 
   // to show alerts
   useEffect(() => {
     if (state.msg) {
       if (state.success) {
-        toast.success(state.msg)
-        router.push('/account')
+        toast.success(state.msg);
+        router.push("/account");
       } else {
-        toast.warning(state.msg)
+        toast.warning(state.msg);
       }
     }
-    state.msg = ''
-  }, [state.msg])
+    state.msg = "";
+  }, [state.msg]);
 
   // password show hide
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   return (
     // login form
     <form action={action}>
@@ -64,7 +64,7 @@ const RegisterForm = () => {
             Password
           </label>
           <input
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             id='password'
             name='password'
             placeholder='Password'
@@ -93,7 +93,7 @@ const RegisterForm = () => {
             Confirm Password
           </label>
           <input
-            type={showConfirmPassword ? 'text' : 'password'}
+            type={showConfirmPassword ? "text" : "password"}
             id='Cpassword'
             name='confirm-password'
             placeholder='Confirm Password'
@@ -104,12 +104,12 @@ const RegisterForm = () => {
             {showConfirmPassword ? (
               <Eye
                 className='absolute right-4 bottom-4.5 text-[#3A3D42] cursor-pointer'
-                onClick={() => setShowPassword(!showConfirmPassword)}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               />
             ) : (
               <EyeOff
                 className='absolute right-4 bottom-4.5 text-[#3A3D42] cursor-pointer'
-                onClick={() => setShowPassword(!showConfirmPassword)}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               />
             )}
           </span>
@@ -135,7 +135,7 @@ const RegisterForm = () => {
         </button>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default RegisterForm
+export default RegisterForm;

@@ -1,33 +1,33 @@
-import ChoiceCheckBox from '@/components/global/choice-check'
-import OutlineBtn from '@/components/global/outline-btn'
-import PrimaryBtn from '@/components/global/primary-btn'
-import { contraceptive } from '@/data/contraception'
-import { ArrowRight } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import ChoiceCheckBox from "@/components/global/choice-check";
+import OutlineBtn from "@/components/global/outline-btn";
+import PrimaryBtn from "@/components/global/primary-btn";
+import { contraceptive } from "@/data/contraception";
+import { ArrowRight } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 const StepFiveForm = ({ action }) => {
-  const searchParams = useSearchParams()
-  const sexhealth = searchParams.get('sexhealth')
-  const myhealth = searchParams.get('myhealth')
-  const myhealthtwo = searchParams.get('myhealthtwo')
+  const searchParams = useSearchParams();
+  const sexhealth = searchParams.get("sexhealth");
+  const myhealth = searchParams.get("myhealth");
+  const myhealthtwo = searchParams.get("myhealthtwo");
 
-  const [selected, setSelected] = useState([])
-  const [noneSelected, setNoneSelected] = useState(false)
+  const [selected, setSelected] = useState([]);
+  const [noneSelected, setNoneSelected] = useState(false);
 
   const handleChoiceChange = (value) => {
-    setNoneSelected(false)
+    setNoneSelected(false);
     if (selected.includes(value)) {
-      setSelected(selected.filter((v) => v !== value))
+      setSelected(selected.filter((v) => v !== value));
     } else {
-      setSelected([...selected, value])
+      setSelected([...selected, value]);
     }
-  }
+  };
 
   const handleNoneChange = () => {
-    setNoneSelected(!noneSelected)
-    if (!noneSelected) setSelected([])
-  }
+    setNoneSelected(!noneSelected);
+    if (!noneSelected) setSelected([]);
+  };
 
   return (
     <>
@@ -86,11 +86,11 @@ const StepFiveForm = ({ action }) => {
             </span>
           </button>
           <OutlineBtn url='/contraception-choices/step-1' label='Start Again' />
-          <PrimaryBtn label='Book a free call' url='/' />
+          <PrimaryBtn label='Book a free call' url='/booking' />
         </div>
       </form>
     </>
-  )
-}
+  );
+};
 
-export default StepFiveForm
+export default StepFiveForm;

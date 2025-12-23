@@ -170,7 +170,6 @@ export default function BookingCalander() {
         <div className='calendar-wrapper'>
           <Calendar
             onChange={onDateChange}
-            showNeighboringMonth={false}
             value={value}
             tileDisabled={tileDisabled}
             className='react-calendar-custom w-full border-0'

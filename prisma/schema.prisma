@@ -38,14 +38,14 @@ model Record {
   bloodPressure   String
   lastBpCheckDate DateTime
   userId          Int
-  user            User     @relation(fields: [userId], references: [id])
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt       DateTime @default(now())
 }
 
 model History {
   id        Int      @id @default(autoincrement())
   history   String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
   createdAt DateTime @default(now())
 }
@@ -53,7 +53,7 @@ model History {
 model Medication {
   id        Int      @id @default(autoincrement())
   label     String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
   createdAt DateTime @default(now())
 }
@@ -63,7 +63,7 @@ model Order {
   medicineName String
   trackingId   String
   status       OrderStatus @default(clinicalreview)
-  user         User        @relation(fields: [userId], references: [id])
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       Int
   createdAt    DateTime    @default(now())
 }
@@ -87,7 +87,7 @@ model Account {
   zipCode      String
   profileImage String?
   userId       Int      @unique
-  user         User     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Health {
@@ -102,7 +102,7 @@ model Health {
   currentMedicines      String
 
   userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model BookingSlot {
@@ -117,12 +117,12 @@ model BookingSlot {
 }
 
 model Booking {
-  id          Int       @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   fullName    String
   email       String
   phoneNumber String
   notes       String?
-  ocRequest   OcRequest
+  ocRequest   OcRequest?
 
   serviceName  String
   providerName String
@@ -147,7 +147,7 @@ model Post {
   metaDescription String?   @db.VarChar(160)
   canonicalUrl    String?
   content         Json
-  author          User?     @relation(fields: [authorId], references: [id])
+  author          User?     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId        Int?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
