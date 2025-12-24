@@ -66,6 +66,7 @@ import {
 import { useAdmin } from "@/lib/adminContext";
 import { toast } from "sonner";
 import LoadingIcon from "@/components/global/loading";
+import Link from "next/link";
 
 const TableLoader = ({ colSpan }) => (
   <TableRow>
@@ -143,12 +144,10 @@ const columns = [
               Create Order
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              onClick={() =>
-                (window.location.href = `/admin/appointments/${booking.id}`)
-              }
-            >
-              View Details
+            <DropdownMenuItem>
+              <Link href={`/admin/appointments/${booking.id}`}>
+                View Details
+              </Link>
             </DropdownMenuItem>
 
             <DropdownMenuItem
