@@ -34,7 +34,7 @@ const AboutAlt = () => {
               </p>
             </div>
             <div>
-              <PrimaryBtn url='/booking' label='Order Now' />
+              <PrimaryBtn url='/booking/order' label='Order Now' />
             </div>
           </div>
           <div className='col-span-2 md:mb-0 mb-4'>

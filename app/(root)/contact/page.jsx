@@ -1,7 +1,8 @@
-import PageBanner from '@/components/global/page-banner'
-import ContactInfo from './_components/contact-info'
-import GetInTouch from './_components/get-in-touch'
-import Faq from '../_components/faq'
+import PageBanner from "@/components/global/page-banner";
+import ContactInfo from "./_components/contact-info";
+
+import Faq from "../_components/faq";
+import GetInTouch from "./_components/get-in-touch";
 
 const ContactPage = () => {
   return (
@@ -19,7 +20,7 @@ const ContactPage = () => {
       </div>
       <Faq />
     </>
-  )
-}
+  );
+};
 
-export default ContactPage
+export default ContactPage;

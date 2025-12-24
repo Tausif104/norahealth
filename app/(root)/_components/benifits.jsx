@@ -47,7 +47,7 @@ const Benifits = () => {
               uncomfortable discussing personal choices in person. With Nora,
               you're in control — from the first click to delivery at your door.
             </p>
-            <PrimaryBtn label='Order Now' url='/booking' />
+            <PrimaryBtn label='Order Now' url='/booking/order' />
           </div>
           <div className='col-span-7 flex items-center'>
             <div className='bg-[#FFF8EF] w-full md:py-[50px] py-[16px] md:px-[40px] px-[16px] rounded-[16px] flex flex-col gap-[24px]'>

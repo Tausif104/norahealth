@@ -194,6 +194,37 @@ export const loggedInUserAction = async () => {
     payload,
   };
 };
+// Get Logged In User Details
+export const loggedInUserDetailsAction = async () => {
+  // initiate cookie from next.js
+  const coookiesStore = await cookies();
+
+  // getting token from cookie
+  const token = coookiesStore.get("auth_token")?.value;
+
+  if (!token) {
+    return null;
+  }
+
+  // verify token
+  const payload = await verifyToken(token);
+
+  if (!payload) {
+    return null;
+  }
+
+  const userDetails = await prisma.user.findUnique({
+    where: { id: payload.id },
+    include: {
+      account: true,
+    },
+  });
+
+  return {
+    payload,
+    userDetails,
+  };
+};
 
 // change password
 

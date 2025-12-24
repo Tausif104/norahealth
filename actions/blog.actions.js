@@ -77,6 +77,38 @@ function getString(v) {
 //   }
 // };
 
+export const allPosts = async () => {
+  const posts = await prisma.post.findMany({
+    where: { isActive: true },
+    orderBy: { createdAt: "desc" },
+    include: {
+      author: {
+        select: {
+          id: true,
+          email: true,
+        },
+      },
+      Comment: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
+    },
+  });
+
+  return {
+    success: true,
+    msg: "Posts fetched successfully",
+    postsWithContentObj: posts,
+  };
+};
+
 export const postList = async () => {
   try {
     const user = await loggedInUserAction();
@@ -355,6 +387,25 @@ export const deletePost = async (id) => {
   }
 };
 
+export async function togglePostApproval(postId, isActive) {
+  try {
+    await prisma.post.update({
+      where: { id: postId },
+      data: { isActive },
+    });
+
+    return {
+      success: true,
+      msg: isActive ? "Blog approved successfully" : "Blog unapproved",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      msg: "Failed to update approval status",
+    };
+  }
+}
+
 /** ---------- Get Single Post ---------- */
 
 export const getPostById = async (id) => {
@@ -390,3 +441,106 @@ export const getPostById = async (id) => {
     return { success: false, msg: "Failed to fetch post" };
   }
 };
+
+/* =====================================================
+   GET SINGLE BLOG BY SLUG (PUBLIC)
+===================================================== */
+export async function getBlogBySlug(postSlug) {
+  console.log(postSlug, "postSlug");
+
+  try {
+    const post = await prisma.post.findFirst({
+      where: {
+        postSlug,
+        isActive: true,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            email: true,
+
+            account: {
+              select: {
+                firstName: true,
+                lastName: true,
+                profileImage: true,
+              },
+            },
+          },
+        },
+
+        Comment: {
+          orderBy: { createdAt: "asc" },
+        },
+      },
+    });
+
+    if (!post) {
+      return { success: false, msg: "Blog not found" };
+    }
+
+    return { success: true, post };
+  } catch (error) {
+    return { success: false, msg: "Failed to load blog" };
+  }
+}
+
+// create Comment
+
+export async function createComment(prevState, formData) {
+  try {
+    const postId = formData.get("postId");
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const content = formData.get("content");
+
+    if (!postId || !name || !email || !content) {
+      return { success: false, msg: "All fields are required" };
+    }
+
+    await prisma.comment.create({
+      data: {
+        postId,
+        name,
+        email,
+        content,
+        approved: false, // admin approval required
+      },
+    });
+
+    return {
+      success: true,
+      msg: "Comment submitted and awaiting approval",
+    };
+  } catch (error) {
+    return { success: false, msg: "Failed to submit comment" };
+  }
+}
+
+// approve Comment
+export async function approveComment(commentId) {
+  try {
+    await prisma.comment.update({
+      where: { id: commentId },
+      data: { approved: true },
+    });
+
+    return { success: true, msg: "Comment approved" };
+  } catch (error) {
+    return { success: false, msg: "Approval failed" };
+  }
+}
+
+// delete Comment
+export async function deleteComment(commentId) {
+  try {
+    await prisma.comment.delete({
+      where: { id: commentId },
+    });
+
+    return { success: true, msg: "Comment deleted" };
+  } catch (error) {
+    return { success: false, msg: "Delete failed" };
+  }
+}

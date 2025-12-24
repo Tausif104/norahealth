@@ -1,31 +1,33 @@
-'use client'
+"use client";
 
-import { ArrowRight, LoaderIcon } from 'lucide-react'
-import { resendEmailAction } from '@/actions/resend.action'
-import { useActionState, useEffect } from 'react'
-import { toast } from 'sonner'
+import { ArrowRight, LoaderIcon } from "lucide-react";
+import { resendEmailAction } from "@/actions/resend.action";
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 
 const GetInTouch = () => {
   const initialState = {
-    msg: '',
+    msg: "",
     success: false,
-  }
+  };
 
   const [state, action, loading] = useActionState(
     resendEmailAction,
     initialState
-  )
+  );
+
+  console.log(state);
 
   useEffect(() => {
-    if (!state.msg) return
+    if (!state?.msg) return;
 
     if (state.success) {
-      toast.success(state.msg)
+      toast.success(state.msg);
     } else {
-      toast.warning(state.msg)
+      toast.warning(state.msg);
     }
-    state.msg = ''
-  }, [state.msg])
+    // state.msg = "";
+  }, [state.msg]);
 
   return (
     <div className='shadow-theme md:py-[32px] py-[20px] md:px-[40px] px-[20px] rounded-[16px]'>
@@ -116,7 +118,7 @@ const GetInTouch = () => {
         </button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default GetInTouch
+export default GetInTouch;

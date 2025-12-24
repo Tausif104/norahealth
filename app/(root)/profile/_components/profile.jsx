@@ -11,6 +11,7 @@ import { updateAccountAction } from "@/actions/account.action";
 
 import { toast } from "sonner";
 import { uploadProfileImageAction } from "@/actions/user.action";
+import { de } from "date-fns/locale";
 
 const Profile = ({ account }) => {
   const [dob, setDob] = useState(null);
@@ -31,6 +32,7 @@ const Profile = ({ account }) => {
     address,
     zipCode,
     profileImage,
+    deliveryAddress,
   } = account;
 
   // ---------- Account update action ----------
@@ -87,6 +89,8 @@ const Profile = ({ account }) => {
     }
     accountState.msg = "";
   }, [accountState.msg]);
+
+  console.log(account, "profile");
 
   return (
     <div className='flex-1 space-y-6 p-[24px] md:p-[50px]'>
@@ -279,7 +283,22 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-
+          <div className='col-span-4 md:col-span-4'>
+            <label
+              htmlFor='deliveryAddress'
+              className='block text-base mb-2 text-[#0D060C]'
+            >
+              Delivery Address
+            </label>
+            <input
+              id='deliveryAddress'
+              type='text'
+              defaultValue={deliveryAddress}
+              name='deliveryAddress'
+              placeholder='NG12 4AS'
+              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
+            />
+          </div>
           {/* Save button */}
           <div className='col-span-4 md:col-span-4'>
             <button

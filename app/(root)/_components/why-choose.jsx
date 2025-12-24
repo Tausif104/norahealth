@@ -39,7 +39,7 @@ const WhyChooseNora = () => {
               we ensure you get the care you need without the hassle of
               traditional appointments.
             </p>
-            <OutlineBtn label='Order Now' url='/booking' />
+            <OutlineBtn label='Order Now' url='/booking/order' />
           </div>
           <div className='col-span-6  flex items-center md:mt-0 mt-[60px]'>
             <div className='md:pl-[80px] flex flex-col md:gap-5 gap-4 md:bg-none bg-[url("/images/why-choose.svg")] sm:px-0 px-[24px] md:py-0 py-[60px] w-full'>

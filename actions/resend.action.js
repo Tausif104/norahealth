@@ -1,14 +1,14 @@
-'use server'
+"use server";
 
-import { Resend } from 'resend'
+import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const resendEmailAction = async (prevState, formData) => {
-  const name = formData.get('name')
-  const email = formData.get('email')
-  const phone = formData.get('phone')
-  const message = formData.get('message')
+  const name = formData.get("name");
+  const email = formData.get("email");
+  const phone = formData.get("phone");
+  const message = formData.get("message");
 
   const emailTemplate = `<div style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 6px; overflow: hidden; border: 1px solid #eee;">
@@ -64,31 +64,33 @@ export const resendEmailAction = async (prevState, formData) => {
     </tr>
 
   </table>
-</div>`
+</div>`;
 
   if (!name || !email || !phone || !message) {
     return {
       ...prevState,
-      msg: 'All fields are required.',
+      msg: "All fields are required.",
       success: false,
-    }
+    };
   }
 
   try {
     const res = await resend.emails.send({
-      from: 'Norahealth <onboarding@resend.dev>',
-      to: 'tausifahmed49@gmail.com',
-      subject: 'New Contact Message',
+      from: "Norahealth <onboarding@resend.dev>",
+      to: "tausifahmed49@gmail.com",
+      subject: "New Contact Message",
       html: emailTemplate,
-    })
+    });
 
-    if (res.data.id) {
+    console.log("Resend contact email response:", res);
+
+    if (res?.data?.id) {
       return {
-        msg: 'Your message has been sent successfully.',
+        msg: "Your message has been sent successfully.",
         success: true,
-      }
+      };
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};

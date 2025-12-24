@@ -1,8 +1,9 @@
 "use server";
-
+import bcrypt from "bcrypt";
 import { prisma } from "@/lib/client/prisma";
 import { createCalendarEvent } from "@/lib/googleCalendar";
 import { revalidatePath } from "next/cache";
+import { sendBookingConfirmationEmail } from "./sendBookingConfirmation.action";
 
 function parseYMDtoDate(ymd) {
   const [y, m, d] = ymd.split("-").map(Number);
@@ -43,6 +44,18 @@ export async function createBooking(formData) {
     const bookingdate = formData.get("bookingdate")?.toString(); // "YYYY-MM-DD"
     const bookingtime = formData.get("bookingtime")?.toString(); // "HH:MM"
 
+    console.log(
+      fullName,
+      email,
+      phoneNumber,
+      serviceName,
+      providerName,
+      nhsService,
+      bookingdate,
+      bookingtime,
+      "booking action"
+    );
+
     if (
       !fullName ||
       !email ||
@@ -51,8 +64,7 @@ export async function createBooking(formData) {
       !providerName ||
       !nhsService ||
       !bookingdate ||
-      !bookingtime ||
-      !ocRequest
+      !bookingtime
     ) {
       return {
         success: false,
@@ -61,13 +73,13 @@ export async function createBooking(formData) {
       };
     }
 
-    if (!["SAME_OC", "DIFFERENT_OC"].includes(ocRequest)) {
-      return {
-        success: false,
-        msg: "Invalid OC request value.",
-        data: null,
-      };
-    }
+    // if (!["SAME_OC", "DIFFERENT_OC"].includes(ocRequest)) {
+    //   return {
+    //     success: false,
+    //     msg: "Invalid OC request value.",
+    //     data: null,
+    //   };
+    // }
 
     const slotDate = parseYMDtoDate(bookingdate);
     const appointmentStart = combineDateTime(bookingdate, bookingtime);
@@ -107,7 +119,7 @@ export async function createBooking(formData) {
           email,
           phoneNumber,
           notes,
-          ocRequest,
+          // ocRequest,
           serviceName,
           providerName,
           nhsService,
@@ -127,7 +139,7 @@ export async function createBooking(formData) {
           `Provider: ${providerName}`,
           `NHS Service: ${nhsService}`,
           `Phone: ${phoneNumber}`,
-          `OC Request: ${ocRequest}`,
+          // `OC Request: ${ocRequest}`,
           notes ? `Notes: ${notes}` : null,
         ]
           .filter(Boolean)
@@ -151,6 +163,16 @@ export async function createBooking(formData) {
       // we don't fail the booking for this
     }
 
+    sendBookingConfirmationEmail({
+      to: email,
+      fullName,
+      serviceName,
+      providerName,
+      nhsService,
+      appointment: appointmentStart,
+      notes,
+    });
+
     return {
       success: true,
       msg: "Booking created successfully.",
@@ -169,53 +191,199 @@ export async function createBooking(formData) {
     };
   }
 }
+export async function createBookingOrder(formData) {
+  try {
+    if (!(formData instanceof FormData)) {
+      return { success: false, msg: "Invalid form submission.", data: null };
+    }
 
+    const fullName = formData.get("fullName")?.toString().trim();
+    const email = formData.get("email")?.toString().trim();
+    const phoneNumber = formData.get("phoneNumber")?.toString().trim();
+    const notes = formData.get("notes")?.toString().trim() || null;
+
+    const ocRequest = formData.get("ocRequest")?.toString();
+
+    // ✅ boolean
+    const appointmentRequest = formData.get("appointmentRequest") === "true";
+
+    const serviceName = formData.get("serviceName")?.toString().trim();
+    const providerName = formData.get("providerName")?.toString().trim();
+    const nhsService = formData.get("nhsService")?.toString().trim();
+
+    if (
+      !fullName ||
+      !email ||
+      !phoneNumber ||
+      !serviceName ||
+      !providerName ||
+      !nhsService
+    ) {
+      return {
+        success: false,
+        msg: "Please fill in all required fields.",
+        data: null,
+      };
+    }
+
+    if (!["SAME_OC", "DIFFERENT_OC"].includes(ocRequest)) {
+      return {
+        success: false,
+        msg: "Invalid OC request value.",
+        data: null,
+      };
+    }
+
+    // ✅ SINGLE source of truth for date & time
+    const now = new Date();
+
+    const booking = await prisma.booking.create({
+      data: {
+        fullName,
+        email,
+        phoneNumber,
+        notes,
+        ocRequest,
+        appointmentRequest,
+        serviceName,
+        providerName,
+        nhsService,
+        appointment: now, // ✅ KEEP using now
+      },
+    });
+
+    // ✅ Calendar only if appointment requested
+    if (appointmentRequest) {
+      try {
+        const calendarId = process.env.GOOGLE_CALENDAR_ID;
+
+        if (calendarId) {
+          await createCalendarEvent({
+            calendarId,
+            start: now,
+            end: new Date(now.getTime() + 10 * 60 * 1000),
+            summary: `${serviceName} - ${fullName}`,
+            description: [
+              `Provider: ${providerName}`,
+              `NHS Service: ${nhsService}`,
+              `Phone: ${phoneNumber}`,
+              `OC Request: ${ocRequest}`,
+              notes ? `Notes: ${notes}` : null,
+            ]
+              .filter(Boolean)
+              .join("\n"),
+            location: "Manor Chemist & Clinic",
+            email,
+            name: fullName,
+          });
+        }
+      } catch (err) {
+        console.error("Calendar creation failed:", err);
+      }
+    }
+
+    sendBookingConfirmationEmail({
+      to: email,
+      fullName,
+      serviceName,
+      providerName,
+      nhsService,
+      appointment: appointmentRequest ? now : null,
+      notes,
+    });
+
+    return {
+      success: true,
+      msg: "Contraceptive order placed successfully.",
+      data: {
+        bookingId: booking.id,
+        appointmentRequest,
+        appointment: now,
+      },
+    };
+  } catch (error) {
+    console.error("createBookingOrder error:", error);
+    return {
+      success: false,
+      msg: "Server error while creating order.",
+      data: error.message,
+    };
+  }
+}
+
+// export async function getAllBookingsAction({ year, month, day } = {}) {
+//   // Fetch all bookings (ordered by appointment as baseline)
+//   let bookings = await prisma.booking.findMany({
+//     orderBy: { createdAt: "desc" },
+//   });
+
+//   // Parse filters
+//   const y = year ? Number(year) : null; // e.g. 2024
+//   const m = month ? Number(month) : null; // 1..12
+//   const d = day ? Number(day) : null; // 1..31
+
+//   // Filter according to combos, covering all cases:
+//   bookings = bookings.filter((b) => {
+//     const dt = new Date(b.appointment);
+//     const by = dt.getFullYear();
+//     const bm = dt.getMonth() + 1;
+//     const bd = dt.getDate();
+
+//     // Exact combos:
+//     if (y && m && d) return by === y && bm === m && bd === d;
+//     if (y && m && !d) return by === y && bm === m;
+//     if (y && !m && !d) return by === y;
+//     if (!y && m && !d) return bm === m; // month across years
+//     if (!y && !m && d) return bd === d; // day-of-month across months/years
+//     if (!y && m && d) return bm === m && bd === d; // month+day across years
+
+//     // no filters => keep
+//     return true;
+//   });
+
+//   // Sort result by year -> month -> day (ascending)
+//   bookings.sort((a, b) => {
+//     const A = new Date(a.appointment);
+//     const B = new Date(b.appointment);
+
+//     const Ay = A.getFullYear(),
+//       By = B.getFullYear();
+//     if (Ay !== By) return Ay - By;
+
+//     const Am = A.getMonth() + 1,
+//       Bm = B.getMonth() + 1;
+//     if (Am !== Bm) return Am - Bm;
+
+//     const Ad = A.getDate(),
+//       Bd = B.getDate();
+//     return Ad - Bd;
+//   });
+
+//   return { success: true, msg: "OK", bookings };
+// }
 export async function getAllBookingsAction({ year, month, day } = {}) {
-  // Fetch all bookings (ordered by appointment as baseline)
   let bookings = await prisma.booking.findMany({
-    orderBy: { appointment: "asc" },
+    orderBy: { createdAt: "desc" }, // ✅ newest first
   });
 
-  // Parse filters
-  const y = year ? Number(year) : null; // e.g. 2024
-  const m = month ? Number(month) : null; // 1..12
-  const d = day ? Number(day) : null; // 1..31
+  const y = year ? Number(year) : null;
+  const m = month ? Number(month) : null;
+  const d = day ? Number(day) : null;
 
-  // Filter according to combos, covering all cases:
   bookings = bookings.filter((b) => {
     const dt = new Date(b.appointment);
     const by = dt.getFullYear();
     const bm = dt.getMonth() + 1;
     const bd = dt.getDate();
 
-    // Exact combos:
     if (y && m && d) return by === y && bm === m && bd === d;
     if (y && m && !d) return by === y && bm === m;
     if (y && !m && !d) return by === y;
-    if (!y && m && !d) return bm === m; // month across years
-    if (!y && !m && d) return bd === d; // day-of-month across months/years
-    if (!y && m && d) return bm === m && bd === d; // month+day across years
+    if (!y && m && !d) return bm === m;
+    if (!y && !m && d) return bd === d;
+    if (!y && m && d) return bm === m && bd === d;
 
-    // no filters => keep
     return true;
-  });
-
-  // Sort result by year -> month -> day (ascending)
-  bookings.sort((a, b) => {
-    const A = new Date(a.appointment);
-    const B = new Date(b.appointment);
-
-    const Ay = A.getFullYear(),
-      By = B.getFullYear();
-    if (Ay !== By) return Ay - By;
-
-    const Am = A.getMonth() + 1,
-      Bm = B.getMonth() + 1;
-    if (Am !== Bm) return Am - Bm;
-
-    const Ad = A.getDate(),
-      Bd = B.getDate();
-    return Ad - Bd;
   });
 
   return { success: true, msg: "OK", bookings };
@@ -251,6 +419,12 @@ export const deleteBooking = async (formDataOrObj) => {
 
   // revalidate bookings page
   revalidatePath("/profile/bookings");
+
+  // revalidate admin page
+  revalidatePath("/admin/bookings");
+
+  // revalidate admin page
+  revalidatePath("/admin/appointments");
 
   return { success: true, msg: "Booking deleted" };
 };
@@ -656,3 +830,64 @@ export const createBookingSlots = async (formOrObj) => {
     },
   };
 };
+
+export async function createOrderFromBooking({
+  bookingId,
+  medicineName,
+  trackingId,
+  status,
+}) {
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!booking) {
+      return { success: false, message: "Booking not found" };
+    }
+
+    // 1. Check user by email
+    let user = await prisma.user.findUnique({
+      where: { email: booking.email },
+    });
+    const password = "nora123"; // default password for new users
+    const hashedPassword = await bcrypt.hash(password, 10);
+    // 2. If user does not exist → create user + account
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: booking.email,
+          password: hashedPassword, // later reset flow
+          role: "PATIENT",
+          account: {
+            create: {
+              firstName: booking.fullName.split(" ")[0],
+              lastName: booking.fullName.split(" ").slice(1).join(" "),
+              phoneNumber: booking.phoneNumber,
+              secondEmail: booking.email,
+              dob: new Date("2000-01-01"),
+              address: "N/A",
+              zipCode: "N/A",
+            },
+          },
+        },
+      });
+    }
+
+    // 3. Create order
+    await prisma.order.create({
+      data: {
+        medicineName: medicineName || booking.serviceName,
+        trackingId: trackingId || `ORD-${Date.now()}`,
+        status: status || "clinicalreview",
+        userId: user.id,
+      },
+    });
+
+    revalidatePath("/admin/appointments");
+    return { success: true, msg: "Order created successfully" };
+  } catch (err) {
+    console.error(err);
+    return { success: false, msg: "Server error" };
+  }
+}

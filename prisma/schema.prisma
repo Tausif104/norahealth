@@ -77,17 +77,18 @@ enum OrderStatus {
 model Account {
   id Int @id @default(autoincrement())
 
-  firstName    String
-  lastName     String
-  phoneNumber  String
-  secondEmail  String
-  dob          DateTime
-  nhsNumber    String?
-  address      String
-  zipCode      String
-  profileImage String?
-  userId       Int      @unique
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName       String
+  lastName        String
+  phoneNumber     String
+  secondEmail     String
+  dob             DateTime
+  nhsNumber       String?
+  address         String
+  zipCode         String
+  profileImage    String?
+  deliveryAddress String?
+  userId          Int      @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Health {
@@ -124,11 +125,12 @@ model Booking {
   notes       String?
   ocRequest   OcRequest?
 
-  serviceName  String
-  providerName String
-  nhsService   String
-  appointment  DateTime
-  createdAt    DateTime @default(now())
+  serviceName        String
+  providerName       String
+  nhsService         String
+  appointment        DateTime
+  appointmentRequest Boolean? @default(false)
+  createdAt          DateTime @default(now())
 
   slotId Int?
   slot   BookingSlot? @relation(fields: [slotId], references: [id])

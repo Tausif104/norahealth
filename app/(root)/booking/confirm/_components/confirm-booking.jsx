@@ -9,10 +9,28 @@ import { useRouter } from "next/navigation";
 import { createBooking } from "@/actions/booking.action";
 import { toast } from "sonner";
 
-const ConfirmBooking = () => {
+const ConfirmBooking = ({ userDetails }) => {
   const { bookingData, setBookingData } = useBooking();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const isLoggedIn = Boolean(userDetails?.account);
+
+  const fullNameFromAccount = userDetails?.account
+    ? [userDetails.account.firstName, userDetails.account.lastName]
+        .filter(Boolean)
+        .join(" ")
+    : "";
+
+  const [form, setForm] = useState({
+    fullName: fullNameFromAccount,
+    email: userDetails?.email || "",
+    phoneNumber: userDetails?.account?.phoneNumber || "",
+  });
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }
 
   useEffect(() => {
     if (!bookingData?.bookingdate || !bookingData?.bookingtime) {
@@ -102,6 +120,8 @@ const ConfirmBooking = () => {
                   id='name'
                   name='fullName'
                   type='text'
+                  value={form.fullName}
+                  onChange={handleChange}
                   placeholder='Enter your full name'
                   className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
                   required
@@ -118,6 +138,8 @@ const ConfirmBooking = () => {
                   id='email'
                   name='email'
                   type='email'
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder='Enter your email'
                   className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
                   required
@@ -134,6 +156,8 @@ const ConfirmBooking = () => {
                   id='phone'
                   name='phoneNumber'
                   type='tel'
+                  value={form.phoneNumber}
+                  onChange={handleChange}
                   placeholder='Phone number'
                   className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
                   required
@@ -150,12 +174,12 @@ const ConfirmBooking = () => {
                   id='notes'
                   name='notes'
                   rows={6}
-                  placeholder='If you have any specific questions or concerns you may write them here'
+                  placeholder='Please indicate which contraceptive medicine you are currently on'
                   className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
                 />
               </div>
 
-              <div className='space-y-4'>
+              <div className='space-y-4 hidden'>
                 <label className='block text-base text-[#3A3D42]'>
                   Oral Contraceptive (OC) Request
                 </label>
@@ -174,7 +198,6 @@ const ConfirmBooking = () => {
                           ocRequest: e.target.value,
                         })
                       }
-                      required
                     />
                     <span className="w-6 h-6 rounded-full border border-[#0D060C] peer-checked:border-[#0D060C] relative after:content-[''] after:w-4 after:h-4 after:bg-[#0D060C] after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 peer-checked:after:block after:hidden"></span>
                     <span className='text-[#0D060C]'>Same OC</span>
@@ -194,7 +217,7 @@ const ConfirmBooking = () => {
                         })
                       }
                     />
-                    <span className="w-6 h-6 rounded-full border border-[#0D060C] peer-checked:border-[#0D060C] relative after:content-[''] after:w-4 after:h-4 after:bg-[#0D060C] after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 peer-checked:after:block after:hidden"></span>
+                    <span className="w-6 h-6 rounded-full border border-[#cd8936] peer-checked:border-[#cd8936] relative after:content-[''] after:w-4 after:h-4 after:bg-theme after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 peer-checked:after:block after:hidden"></span>
                     <span className='text-[#0D060C]'>Different OC</span>
                   </label>
                 </div>
@@ -261,7 +284,7 @@ const ConfirmBooking = () => {
                       {submitting ? "Confirming..." : "Confirm Booking"}
                     </span>
                     <span className='ml-2 -rotate-45 group-hover:rotate-0 transition duration-300'>
-                      <ArrowRight />
+                      {submitting ? "" : <ArrowRight />}
                     </span>
                   </span>
                 </button>

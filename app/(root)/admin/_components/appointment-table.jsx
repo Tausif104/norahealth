@@ -2,6 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
@@ -9,6 +20,17 @@ import {
 } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+import { Input } from "@/components/ui/input";
+
 import {
   Select,
   SelectTrigger,
@@ -33,11 +55,35 @@ import {
   TableCell,
 } from "@/components/ui/table";
 
-import { MoreHorizontal, PanelLeft } from "lucide-react";
+import { LoaderIcon, MoreHorizontal, PanelLeft } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
-import { deleteBooking, getAllBookingsAction } from "@/actions/booking.action";
+import {
+  createOrderFromBooking,
+  deleteBooking,
+  getAllBookingsAction,
+} from "@/actions/booking.action";
 import { useAdmin } from "@/lib/adminContext";
+import { toast } from "sonner";
+import LoadingIcon from "@/components/global/loading";
+
+const TableLoader = ({ colSpan }) => (
+  <TableRow>
+    <TableCell colSpan={colSpan} className='h-24 text-center'>
+      <div className='flex items-center justify-center gap-2'>
+        <div className='w-full justify-center items-center h-[30vh] flex'>
+          <span>
+            <LoaderIcon
+              role='status'
+              aria-label='Loading'
+              className='size-5 animate-spin mx-auto'
+            />
+          </span>
+        </div>
+      </div>
+    </TableCell>
+  </TableRow>
+);
 
 // -----------------------
 // TABLE COLUMNS
@@ -71,8 +117,9 @@ const columns = [
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const booking = row.original;
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -91,7 +138,22 @@ const columns = [
             </DropdownMenuItem>
 
             <DropdownMenuItem
-              onClick={() => row.options.meta.onDelete(booking.id)}
+              onClick={() => table.options.meta.onCreateOrder(booking)}
+            >
+              Create Order
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() =>
+                (window.location.href = `/admin/appointments/${booking.id}`)
+              }
+            >
+              View Details
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className='text-red-600'
+              onClick={() => table.options.meta.onDelete(booking.id)}
             >
               Delete
             </DropdownMenuItem>
@@ -111,8 +173,18 @@ export default function AppointmentTable() {
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
 
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteBookingId, setDeleteBookingId] = useState(null);
+
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [orderOpen, setOrderOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+
+  const [medicineName, setMedicineName] = useState("");
+  const [trackingId, setTrackingId] = useState("");
+  const [status, setStatus] = useState("clinicalreview");
 
   // Fetch bookings
   async function fetchBookings() {
@@ -128,6 +200,8 @@ export default function AppointmentTable() {
     } catch (err) {
       console.error(err);
       setBookings([]);
+    } finally {
+      setLoading(false); // ✅ MUST be here
     }
     setLoading(false);
   }
@@ -142,21 +216,22 @@ export default function AppointmentTable() {
     columns,
     meta: {
       onDelete: async (id) => {
-        if (!confirm("Delete booking?")) return;
+        setDeleteBookingId(id);
+        setDeleteOpen(true);
+        // const res = await deleteBooking({ bookingId: id });
+        // if (res?.success) fetchBookings();
+      },
 
-        const res = await deleteBooking({ bookingId: id });
-        if (res?.success) fetchBookings();
-        else alert("Delete failed");
+      onCreateOrder: (booking) => {
+        setSelectedBooking(booking);
+        setMedicineName(booking.serviceName || "");
+        setTrackingId("");
+        setStatus("clinicalreview");
+        setOrderOpen(true);
       },
     },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 10,
-        pageIndex: 0,
-      },
-    },
   });
 
   // Options
@@ -285,14 +360,7 @@ export default function AppointmentTable() {
 
           <TableBody>
             {loading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className='text-center h-24'
-                >
-                  Loading...
-                </TableCell>
-              </TableRow>
+              <TableLoader colSpan={columns.length} />
             ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
@@ -340,6 +408,123 @@ export default function AppointmentTable() {
           Next
         </Button>
       </div>
+
+      <Dialog open={orderOpen} onOpenChange={setOrderOpen}>
+        <DialogContent className='sm:max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Order</DialogTitle>
+            <DialogDescription>
+              Add these information to add Order
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='space-y-4'>
+            <div>
+              <label className='text-sm font-medium'>Medicine Name</label>
+              <Input
+                placeholder='Insert Medicine Name'
+                value={medicineName}
+                onChange={(e) => setMedicineName(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className='text-sm font-medium'>Tracking ID</label>
+              <Input
+                placeholder='EX: #XH45333A4825NR'
+                value={trackingId}
+                onChange={(e) => setTrackingId(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className='text-sm font-medium'>Status</label>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder='Status' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='clinicalreview'>
+                    Clinical Review
+                  </SelectItem>
+                  <SelectItem value='posted'>Posted</SelectItem>
+                  <SelectItem value='delivered'>Delivered</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setOrderOpen(false)}>
+              Cancel
+            </Button>
+
+            <Button
+              className='bg-[#d18a2d] hover:bg-[#b97622]'
+              onClick={async () => {
+                const res = await createOrderFromBooking({
+                  bookingId: selectedBooking.id,
+                  medicineName,
+                  trackingId,
+                  status,
+                });
+
+                if (res?.success) {
+                  toast.success(res?.message || "Order created successfully");
+                  setOrderOpen(false);
+                  // fetchBookings();
+                } else {
+                  alert(res?.message || "Failed");
+                }
+              }}
+            >
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              booking and free the associated time slot.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+            <AlertDialogAction
+              className='bg-red-600 hover:bg-red-700'
+              onClick={async () => {
+                const res = await deleteBooking({
+                  bookingId: deleteBookingId,
+                });
+
+                if (res?.success) {
+                  toast.success("Booking deleted");
+
+                  // ✅ SHOW loader AFTER successful delete
+                  setLoading(true);
+
+                  // refetch bookings (this will hide loader when done)
+                  await fetchBookings();
+                } else {
+                  toast.error(res?.msg || "Delete failed");
+                }
+
+                setDeleteOpen(false);
+                setDeleteBookingId(null);
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

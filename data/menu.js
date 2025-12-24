@@ -17,7 +17,7 @@ export const menuItems = [
   {
     id: 4,
     label: "Order Contraception",
-    link: "/booking/confirm",
+    link: "/booking/order",
   },
   {
     id: 5,
@@ -26,6 +26,11 @@ export const menuItems = [
   },
   {
     id: 6,
+    label: "Blog",
+    link: "/blog",
+  },
+  {
+    id: 7,
     label: "Contact us",
     link: "/contact",
   },

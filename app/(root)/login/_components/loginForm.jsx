@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { Eye, EyeOff, LoaderIcon, LockKeyhole, Mail } from "lucide-react";
 import Link from "next/link";
 import { loginAction } from "@/actions/user.action";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import ForgotPasswordDialog from "./ForgotPasswordDialog";
 
@@ -13,6 +13,9 @@ const LoginForm = () => {
   const router = useRouter();
   const [forgotOpen, setForgotOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+
+  const callbackUrl = searchParams.get("callbackUrl") || "/profile";
 
   const initialState = {
     msg: "",
@@ -25,7 +28,8 @@ const LoginForm = () => {
     if (state.msg) {
       if (state.success) {
         toast.success(state.msg);
-        router.push("/profile");
+        // ✅ redirect back to original protected page
+        router.push(decodeURIComponent(callbackUrl));
       } else {
         toast.warning(state.msg);
       }

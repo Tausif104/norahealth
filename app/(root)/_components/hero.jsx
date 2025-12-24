@@ -32,7 +32,7 @@ const Hero = () => {
               about your reproductive health with complete peace of mind.
             </p>
             <div className='flex xl:gap-5 lg:gap-4 gap-3 2xl:mt-15 md:mt-[24px] mt-[24px] sm:flex-row flex-col'>
-              <PrimaryBtn label='Order Now' url='/booking' />
+              <PrimaryBtn label='Order Now' url='/booking/order' />
               <OutlineBtn label='Learn More' url='/booking' />
             </div>
           </div>

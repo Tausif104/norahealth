@@ -53,11 +53,13 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { deletePost } from "@/actions/blog.actions";
+import { deletePost, togglePostApproval } from "@/actions/blog.actions";
 import { useProfile } from "@/lib/profileContext";
 
 export default function BlogTable({ allPost, userRole }) {
   const data = allPost?.postsWithContentObj || [];
+  const [deletePostId, setDeletePostId] = React.useState(null);
+
   console.log(data, "BlogTable");
   const { setMenuOpen } = useProfile();
 
@@ -139,59 +141,72 @@ export default function BlogTable({ allPost, userRole }) {
           </div>
         ),
       },
+
+      {
+        accessorKey: "isActive",
+        header: "Status",
+        cell: ({ row }) => (
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              row.original.isActive
+                ? "bg-green-100 text-green-700"
+                : "bg-yellow-100 text-yellow-700"
+            }`}
+          >
+            {row.original.isActive ? "Approved" : "Pending"}
+          </span>
+        ),
+      },
+
       {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuItem asChild>
-                <Link href={`/${userRole}/blog/edit-blog/${row.original.id}`}>
-                  Edit
-                </Link>
-              </DropdownMenuItem>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <DropdownMenuItem
-                    onSelect={(e) => e.preventDefault()}
-                    className='text-red-600'
-                  >
-                    Delete
-                  </DropdownMenuItem>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      className='bg-red-600 hover:bg-red-700'
-                      onClick={async () => {
-                        const res = await deletePost(row.original.id);
-                        if (res?.success) {
-                          toast.success(res.msg);
-                          router.refresh();
-                        } else {
-                          toast.error(res?.msg || "Delete failed");
-                        }
-                      }}
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='ghost' className='h-8 w-8 p-0'>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align='end'>
+                {/* APPROVE */}
+                <DropdownMenuItem
+                  onClick={async () => {
+                    const res = await togglePostApproval(
+                      row.original.id,
+                      !row.original.isActive
+                    );
+
+                    if (res?.success) {
+                      toast.success(res.msg);
+                      router.refresh();
+                    } else {
+                      toast.error(res.msg);
+                    }
+                  }}
+                >
+                  {row.original.isActive ? "Unapprove" : "Approve"}
+                </DropdownMenuItem>
+
+                {/* EDIT */}
+                <DropdownMenuItem asChild>
+                  <Link href={`/${userRole}/blog/edit-blog/${row.original.id}`}>
+                    Edit
+                  </Link>
+                </DropdownMenuItem>
+
+                {/* DELETE (no dialog here) */}
+                <DropdownMenuItem
+                  className='text-red-600'
+                  onClick={() => setDeletePostId(row.original.id)}
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
         ),
       },
     ],
