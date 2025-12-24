@@ -54,6 +54,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import { LoaderIcon, MoreHorizontal, PanelLeft } from "lucide-react";
 import { formatDate } from "@/lib/utils";
@@ -90,6 +91,33 @@ const TableLoader = ({ colSpan }) => (
 // TABLE COLUMNS
 // -----------------------
 const columns = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label='Select all'
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label='Select row'
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => <div className='capitalize'>{row.getValue("id")}</div>,
+  },
   {
     accessorKey: "fullName",
     header: "Full Name",
@@ -223,7 +251,7 @@ export default function AppointmentTable() {
 
       onCreateOrder: (booking) => {
         setSelectedBooking(booking);
-        setMedicineName(booking.serviceName || "");
+        setMedicineName("");
         setTrackingId("");
         setStatus("clinicalreview");
         setOrderOpen(true);
@@ -438,8 +466,12 @@ export default function AppointmentTable() {
 
             <div>
               <label className='text-sm font-medium'>Status</label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
+              <Select
+                value={status}
+                onValueChange={setStatus}
+                className='w-full'
+              >
+                <SelectTrigger className='w-full'>
                   <SelectValue placeholder='Status' />
                 </SelectTrigger>
                 <SelectContent>

@@ -163,6 +163,19 @@ const AccountForm = ({ user }) => {
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>
+        {/* Zip code → 25% */}
+        <div className='md:col-span-4'>
+          <label className='block text-base mb-2 text-[#0D060C]' htmlFor='zip'>
+            Delivery Address
+          </label>
+          <input
+            type='text'
+            name='deliveryAddress'
+            id='deliveryAddress'
+            placeholder='Delivery Address'
+            className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
+          />
+        </div>
       </div>
 
       <div className='grid grid-cols-1 md:grid-cols-4 gap-6 mt-8'>
