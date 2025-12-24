@@ -108,6 +108,8 @@ export async function createBooking(formData) {
       };
     }
 
+    const bookingType = "Booking";
+
     const [updatedSlot, booking] = await prisma.$transaction([
       prisma.bookingSlot.update({
         where: { id: slot.id },
@@ -120,6 +122,7 @@ export async function createBooking(formData) {
           phoneNumber,
           notes,
           // ocRequest,
+          bookingType,
           serviceName,
           providerName,
           nhsService,
@@ -236,6 +239,7 @@ export async function createBookingOrder(formData) {
 
     // ✅ SINGLE source of truth for date & time
     const now = new Date();
+    const bookingType = "Order";
 
     const booking = await prisma.booking.create({
       data: {
@@ -249,6 +253,7 @@ export async function createBookingOrder(formData) {
         providerName,
         nhsService,
         appointment: now, // ✅ KEEP using now
+        bookingType,
       },
     });
 

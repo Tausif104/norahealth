@@ -132,10 +132,17 @@ model Booking {
   appointmentRequest Boolean? @default(false)
   createdAt          DateTime @default(now())
 
+  bookingType BookingType? @default(Booking)
+
   slotId Int?
   slot   BookingSlot? @relation(fields: [slotId], references: [id])
 
   @@index([slotId])
+}
+
+enum BookingType {
+  Booking
+  Order
 }
 
 model Post {

@@ -18,6 +18,8 @@ export default async function AppointmentDetailsPage({ params }) {
     include: { orders: true, account: true },
   });
 
+  console.log(booking);
+
   return (
     <div className='p-6  space-y-6'>
       <h1 className='text-xl font-semibold'>Appointment Details</h1>
@@ -49,14 +51,30 @@ export default async function AppointmentDetailsPage({ params }) {
       </section>
 
       {/* Slot Info */}
-      {booking.slot && (
-        <section className=' p-4 space-y-2'>
+      {booking.bookingType === "Booking" && booking.slot && (
+        <section className='p-4 space-y-2'>
           <h2 className='font-bold text-xl'>Slot Info</h2>
           <p>
             <b>Date:</b> {formatDate(booking.slot.slotDate)}
           </p>
           <p>
             <b>Time:</b> {booking.slot.startTime} – {booking.slot.endTime}
+          </p>
+        </section>
+      )}
+
+      {booking.bookingType === "Order" && (
+        <section className='p-4 space-y-2'>
+          <h2 className='font-bold text-xl'>Order Appointment Info</h2>
+          <p>
+            <b>NHS Service:</b> {booking.nhsService}
+          </p>
+          <p>
+            <b>Appointment Requested:</b>{" "}
+            {booking.appointmentRequest ? "Yes" : "No"}
+          </p>
+          <p>
+            <b>Requested Date:</b> {formatDate(booking.appointment)}
           </p>
         </section>
       )}
