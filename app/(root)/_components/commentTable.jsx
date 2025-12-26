@@ -9,16 +9,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  Badge,
-  ChevronDown,
-  MessageCircle,
-  MessageCircleMore,
-  MoreHorizontal,
-  PanelLeft,
-  Plus,
-} from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -38,35 +31,38 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogDescription,
+  AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import Link from "next/link";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { deletePost, togglePostApproval } from "@/actions/blog.actions";
-import { useProfile } from "@/lib/profileContext";
 
-export default function BlogTable({ allPost, userRole, currentUserId }) {
-  const data = allPost?.postsWithContentObj || [];
-  const isPrivileged = ["admin", "superadmin"].includes(
-    (userRole || "").toLowerCase()
-  );
-  const [deletePostId, setDeletePostId] = React.useState(null);
+import { toggleCommentApproval, deleteComment } from "@/actions/blog.actions";
 
-  console.log(data, "BlogTable");
-  const { setMenuOpen } = useProfile();
-
+export default function CommentTable({
+  comments = [],
+  postId = null,
+  postTitle = "",
+}) {
   const router = useRouter();
+
+  const [sorting, setSorting] = React.useState([]);
+  const [columnFilters, setColumnFilters] = React.useState([]);
+  const [columnVisibility, setColumnVisibility] = React.useState({});
+  const [rowSelection, setRowSelection] = React.useState({});
+
+  // details dialog state
+  const [detailsOpen, setDetailsOpen] = React.useState(false);
+  const [selectedComment, setSelectedComment] = React.useState(null);
+
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [deleteTarget, setDeleteTarget] = React.useState(null);
 
   const columns = React.useMemo(
     () => [
@@ -93,28 +89,20 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
         enableHiding: false,
       },
       {
-        accessorKey: "title",
-        header: "Title",
-
-        cell: ({ row }) => (
-          <div className='flex items-center gap-3'>
-            <Avatar className='h-7 w-7 rounded-sm'>
-              <AvatarImage src={row.original.bannerImage || ""} />
-            </Avatar>
-            <span>{row.original.title}</span>
-          </div>
-        ),
+        accessorKey: "name",
+        header: "Name",
+        cell: ({ row }) => <span>{row.original.name}</span>,
       },
       {
-        accessorKey: "author",
-        header: "Author",
-        cell: ({ row }) => (
-          <div className='flex items-center gap-3'>
-            <span>{row.original.author?.account?.firstName}</span>
-          </div>
-        ),
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => <span>{row.original.email}</span>,
       },
-
+      {
+        id: "postTitle",
+        header: "Post",
+        cell: ({ row }) => <span>{row.original?.post?.title || "-"}</span>,
+      },
       {
         accessorKey: "createdAt",
         header: ({ column }) => (
@@ -133,48 +121,28 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
           }),
       },
       {
-        accessorKey: "comments",
-        header: "Comments",
-        cell: ({ row }) => (
-          <div>
-            <span className='flex items-center gap-1'>
-              <MessageCircleMore className='mr-1 w-4 h-4' />
-              {row.original.Comment.length}
-            </span>
-          </div>
-        ),
-      },
-
-      {
-        accessorKey: "isActive",
+        id: "status",
         header: "Status",
-        cell: ({ row }) => (
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${
-              row.original.isActive
-                ? "bg-green-100 text-green-700"
-                : "bg-yellow-100 text-yellow-700"
-            }`}
-          >
-            {row.original.isActive ? "Approved" : "Pending"}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const approved = !!row.original.approved;
+          return (
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                approved
+                  ? "bg-green-100 text-green-700"
+                  : "bg-yellow-100 text-yellow-700"
+              }`}
+            >
+              {approved ? "Approved" : "Pending"}
+            </span>
+          );
+        },
       },
-
       {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-          // adjust these depending on your data shape:
-          const postAuthorId =
-            row.original.authorId ||
-            row.original.author?.id ||
-            row.original.author?.account?.id;
-
-          const isOwnPost =
-            postAuthorId && currentUserId && postAuthorId === currentUserId;
-
-          const canToggleApproval = isPrivileged && !isOwnPost;
+          const approved = !!row.original.approved;
 
           return (
             <DropdownMenu>
@@ -185,61 +153,56 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align='end'>
-                {/* APPROVE / DISAPPROVE */}
                 <DropdownMenuItem
-                  disabled={!canToggleApproval}
                   onClick={async () => {
-                    if (!canToggleApproval) return;
-
-                    const res = await togglePostApproval(
+                    const res = await toggleCommentApproval(
                       row.original.id,
-                      !row.original.isActive
+                      true
                     );
-
                     if (res?.success) {
                       toast.success(res.msg);
                       router.refresh();
-                    } else {
-                      toast.error(res.msg);
-                    }
+                    } else toast.error(res?.msg || "Failed");
                   }}
+                  disabled={approved}
                 >
-                  {!isPrivileged
-                    ? "Approve (Admins only)"
-                    : isOwnPost
-                    ? "Approve (Not allowed on your own post)"
-                    : row.original.isActive
-                    ? "Disapprove"
-                    : "Approve"}
+                  {approved ? "Approved" : "Approve"}
                 </DropdownMenuItem>
 
-                {/* EDIT */}
-                <DropdownMenuItem asChild>
-                  <Link href={`/${userRole}/blog/edit-blog/${row.original.id}`}>
-                    Edit
-                  </Link>
-                </DropdownMenuItem>
-                {/* Comments*/}
-                {userRole === "admin" || userRole === "superadmin" ? (
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href={`/${userRole}/blog/comments?postId=${row.original.id}`}
-                    >
-                      Comments
-                    </Link>
-                  </DropdownMenuItem>
-                ) : null}
-
-                {/* DELETE */}
                 <DropdownMenuItem
                   className='text-red-600'
                   onClick={async () => {
-                    const res = await deletePost(row.original.id);
-                    if (res?.success) toast.success(res.msg);
-                    else toast.error(res.msg);
+                    const res = await toggleCommentApproval(
+                      row.original.id,
+                      false
+                    );
+                    if (res?.success) {
+                      toast.success(res.msg);
+                      router.refresh();
+                    } else toast.error(res?.msg || "Failed");
+                  }}
+                  disabled={!approved && row.original.approved === false}
+                >
+                  Reject
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  className='text-red-600'
+                  onClick={() => {
+                    setDeleteTarget(row.original);
+                    setDeleteOpen(true);
                   }}
                 >
                   Delete
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedComment(row.original);
+                    setDetailsOpen(true);
+                  }}
+                >
+                  View details
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -247,16 +210,11 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
         },
       },
     ],
-    [router, userRole, currentUserId, isPrivileged]
+    [router]
   );
 
-  const [sorting, setSorting] = React.useState([]);
-  const [columnFilters, setColumnFilters] = React.useState([]);
-  const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
   const table = useReactTable({
-    data,
+    data: comments,
     columns,
     state: {
       sorting,
@@ -276,34 +234,28 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
 
   return (
     <div className='w-full'>
-      <div className='flex justify-between mb-4'>
-        {/* HEADER */}
-        <div className='flex items-center gap-4 mb-4'>
-          <button
-            onClick={() => setMenuOpen(true)}
-            className='lg:hidden w-[40px] h-[40px] bg-[#d67b0e] text-white flex justify-center items-center rounded-full'
-          >
-            <PanelLeft />
-          </button>
-          <h2 className='text-xl font-semibold'> Blogs </h2>
+      <div className='flex items-center justify-between mb-4'>
+        <div>
+          <h2 className='text-xl font-semibold'>Comments</h2>
+          {postId ? (
+            <p className='text-sm text-muted-foreground'>
+              Showing comments for post:{" "}
+              <span className='font-mono'>{postTitle}</span>
+            </p>
+          ) : null}
         </div>
-        <Link
-          href={`/${userRole}/blog/add-blog`}
-          className='text-[#fff] flex items-center gap-2 transition rounded-[10px] text-[16px] bg-[#d67b0e] md:py-[10px] px-[25px] hover:bg-[#000]'
-        >
-          <Plus /> Add Blog
-        </Link>
       </div>
 
-      <div className='flex items-center py-4'>
+      <div className='flex items-center py-4 gap-3'>
         <Input
-          placeholder='Filter title...'
-          value={table.getColumn("title")?.getFilterValue() || ""}
+          placeholder='Filter name...'
+          value={table.getColumn("name")?.getFilterValue() || ""}
           onChange={(e) =>
-            table.getColumn("title")?.setFilterValue(e.target.value)
+            table.getColumn("name")?.setFilterValue(e.target.value)
           }
           className='max-w-sm'
         />
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='ml-auto'>
@@ -328,7 +280,7 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
         </DropdownMenu>
       </div>
 
-      <div className='overflow-hidden rounded-md border'>
+      <div className='overflow-hidden rounded-md border w-full'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -346,6 +298,7 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
@@ -399,6 +352,94 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
           Next
         </Button>
       </div>
+
+      {/* DETAILS DIALOG */}
+      <AlertDialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Comment details</AlertDialogTitle>
+          </AlertDialogHeader>
+
+          <div className='space-y-2 text-sm'>
+            <div>
+              <span className='font-semibold'>Name:</span>{" "}
+              {selectedComment?.name || "-"}
+            </div>
+            <div>
+              <span className='font-semibold'>Email:</span>{" "}
+              {selectedComment?.email || "-"}
+            </div>
+            <div>
+              <span className='font-semibold'>Post:</span>{" "}
+              {selectedComment?.post?.title || "-"}
+            </div>
+            <div>
+              <span className='font-semibold'>Status:</span>{" "}
+              {selectedComment?.approved ? "Approved" : "Pending"}
+            </div>
+            <div>
+              <span className='font-semibold'>Comment:</span>
+              <div className='mt-1 p-3 rounded-md border bg-muted/30 whitespace-pre-wrap'>
+                {selectedComment?.content || "-"}
+              </div>
+            </div>
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* DELETE CONFIRM DIALOG */}
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this comment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The comment will be permanently
+              removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className='text-sm space-y-1'>
+            <div>
+              <span className='font-semibold'>Name:</span>{" "}
+              {deleteTarget?.name || "-"}
+            </div>
+            <div className='truncate'>
+              <span className='font-semibold'>Email:</span>{" "}
+              {deleteTarget?.email || "-"}
+            </div>
+            <div className='line-clamp-2'>
+              <span className='font-semibold'>Content:</span>{" "}
+              {deleteTarget?.content || "-"}
+            </div>
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!deleteTarget?.id) return;
+
+                const res = await deleteComment(deleteTarget.id);
+
+                if (res?.success) {
+                  toast.success(res.msg);
+                  setDeleteOpen(false);
+                  setDeleteTarget(null);
+                  router.refresh();
+                } else {
+                  toast.error(res?.msg || "Delete failed");
+                }
+              }}
+            >
+              Yes, delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

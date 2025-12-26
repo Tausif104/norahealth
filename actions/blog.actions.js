@@ -541,14 +541,96 @@ export async function approveComment(commentId) {
 }
 
 // delete Comment
+// delete Comment
 export async function deleteComment(commentId) {
   try {
+    // (optional but recommended) auth check
+    const user = await loggedInUserAction();
+    if (!user?.payload?.id) return { success: false, msg: "Unauthorized" };
+
     await prisma.comment.delete({
       where: { id: commentId },
     });
 
+    const role = (user?.payload?.role || "").toUpperCase();
+    const basePath =
+      role === "ADMIN" || role === "SUPERADMIN" ? "/admin" : "/author";
+
+    // revalidate comments page + blogs page
+    revalidatePath(`${basePath}/blog/comments`);
+    revalidatePath(`${basePath}/blog`);
+
     return { success: true, msg: "Comment deleted" };
   } catch (error) {
+    console.error("deleteComment error:", error);
     return { success: false, msg: "Delete failed" };
+  }
+}
+
+export async function commentList({ postId } = {}) {
+  try {
+    const user = await loggedInUserAction();
+    if (!user?.payload?.id) return { success: false, msg: "Unauthorized" };
+
+    const { id, role } = user.payload;
+    const isAdmin = role === "ADMIN" || role === "SUPERADMIN";
+
+    const where = {};
+
+    // filter by postId if provided
+    if (postId) where.postId = postId;
+
+    // if not admin, only allow comments of own posts
+    if (!isAdmin) {
+      where.post = { authorId: Number(id) };
+    }
+
+    const comments = await prisma.comment.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      include: {
+        post: {
+          select: {
+            id: true,
+            title: true,
+            postSlug: true,
+            authorId: true,
+          },
+        },
+      },
+    });
+
+    return { success: true, comments };
+  } catch (error) {
+    console.error("commentList error:", error);
+    return { success: false, msg: "Failed to fetch comments" };
+  }
+}
+
+export async function toggleCommentApproval(commentId, approved) {
+  try {
+    const user = await loggedInUserAction();
+    if (!user?.payload?.id) return { success: false, msg: "Unauthorized" };
+
+    await prisma.comment.update({
+      where: { id: commentId },
+      data: { approved: !!approved },
+    });
+
+    const role = (user?.payload?.role || "").toUpperCase();
+    const basePath =
+      role === "ADMIN" || role === "SUPERADMIN" ? "/admin" : "/author";
+
+    // revalidate comments page (and blogs list page if you want)
+    revalidatePath(`${basePath}/blog/comments`);
+    revalidatePath(`${basePath}/blog`);
+
+    return {
+      success: true,
+      msg: approved ? "Comment approved" : "Comment rejected",
+    };
+  } catch (error) {
+    console.error("toggleCommentApproval error:", error);
+    return { success: false, msg: "Failed to update comment status" };
   }
 }

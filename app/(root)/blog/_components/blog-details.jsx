@@ -22,6 +22,19 @@ const BlogDetails = ({ post }) => {
   }, [state]);
 
   /* ---------------- EditorJS Renderer ---------------- */
+
+  const renderListItemContent = (item) => {
+    if (typeof item === "string") {
+      return <span dangerouslySetInnerHTML={{ __html: item }} />;
+    }
+
+    if (item && typeof item === "object") {
+      const html = item.content ?? item.text ?? "";
+      return html ? <span dangerouslySetInnerHTML={{ __html: html }} /> : null;
+    }
+
+    return <span>{String(item)}</span>;
+  };
   const renderNestedList = (items, style, keyPrefix = "li") => {
     const ListTag = style === "ordered" ? "ol" : "ul";
 
@@ -135,7 +148,7 @@ const BlogDetails = ({ post }) => {
     <section className='section-padding'>
       <div className='container custom-container mx-auto'>
         {/* HERO */}
-        <div className='relative h-[420px] w-full max-w-[1100px] mx-auto rounded-xl overflow-hidden'>
+        <div className='relative w-full max-w-[1024px] mx-auto rounded-xl overflow-hidden aspect-[16/9]'>
           <img
             src={post.bannerImage}
             alt={post.title}
@@ -164,9 +177,9 @@ const BlogDetails = ({ post }) => {
               alt='Author'
             />
             <span className='font-medium text-gray-800'>
-              {post.author?.name}
+              {post.author?.account?.firstName}
             </span>
-            <span>•</span>
+            <span>Published at</span>
             <span>
               {new Date(post.createdAt).toLocaleDateString("en-US", {
                 month: "long",
@@ -183,39 +196,6 @@ const BlogDetails = ({ post }) => {
 
           {/* COMMENTS */}
           <div className='mt-16'>
-            <h3 className='text-xl font-semibold mb-6'>Leave a Reply</h3>
-
-            <form action={formAction} className='space-y-4 mb-10'>
-              <input type='hidden' name='postId' value={post.id} />
-
-              <div className='grid md:grid-cols-2 gap-4'>
-                <input
-                  name='name'
-                  placeholder='Full Name'
-                  className='border rounded-lg px-4 py-3'
-                />
-                <input
-                  name='email'
-                  placeholder='Email Address'
-                  className='border rounded-lg px-4 py-3'
-                />
-              </div>
-
-              <textarea
-                name='content'
-                rows='4'
-                placeholder='Write your comment'
-                className='border rounded-lg px-4 py-3 w-full'
-              />
-
-              <button
-                disabled={isLoading}
-                className='bg-[#CD8936] cursor-pointer text-white px-6 py-3 rounded-lg hover:bg-black transition'
-              >
-                {isLoading ? "Submitting..." : "Submit Comment"}
-              </button>
-            </form>
-
             {/* COMMENTS LIST */}
             {approvedComments.length > 0 && (
               <>
@@ -249,6 +229,38 @@ const BlogDetails = ({ post }) => {
                 )}
               </>
             )}
+            <h3 className='text-xl font-semibold mb-6 mt-6'>Leave a Reply</h3>
+
+            <form action={formAction} className='space-y-4 mb-10'>
+              <input type='hidden' name='postId' value={post.id} />
+
+              <div className='grid md:grid-cols-2 gap-4'>
+                <input
+                  name='name'
+                  placeholder='Full Name'
+                  className='border rounded-lg px-4 py-3'
+                />
+                <input
+                  name='email'
+                  placeholder='Email Address'
+                  className='border rounded-lg px-4 py-3'
+                />
+              </div>
+
+              <textarea
+                name='content'
+                rows='4'
+                placeholder='Write your comment'
+                className='border rounded-lg px-4 py-3 w-full'
+              />
+
+              <button
+                disabled={isLoading}
+                className='bg-[#CD8936] cursor-pointer text-white px-6 py-3 rounded-lg hover:bg-black transition'
+              >
+                {isLoading ? "Submitting..." : "Submit Comment"}
+              </button>
+            </form>
           </div>
         </div>
       </div>

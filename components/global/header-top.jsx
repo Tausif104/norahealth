@@ -18,7 +18,6 @@ const LANGS = [
 const HeaderTop = () => {
   const router = useRouter();
   const [currentLang, setCurrentLang] = useState("en");
-  console.log(currentLang, "hj");
 
   const applyTranslateWhenReady = (lang) => {
     let tries = 0;
