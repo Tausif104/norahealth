@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { loggedInUserAction, logoutAction } from "@/actions/user.action";
+import LogoutMenuItem from "@/app/(root)/_components/LogoutMenuItem";
 
 const Navigation = async () => {
   const payload = await loggedInUserAction();
@@ -64,14 +65,15 @@ const Navigation = async () => {
               )}
 
               <form action={logoutAction}>
-                <DropdownMenuItem>
+                {/* <DropdownMenuItem>
                   <button
                     type='submit'
                     className='w-full text-left cursor-pointer'
                   >
                     Log Out
                   </button>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
+                <LogoutMenuItem />
               </form>
             </DropdownMenuContent>
           </DropdownMenu>

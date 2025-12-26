@@ -22,7 +22,51 @@ const BlogDetails = ({ post }) => {
   }, [state]);
 
   /* ---------------- EditorJS Renderer ---------------- */
+  const renderNestedList = (items, style, keyPrefix = "li") => {
+    const ListTag = style === "ordered" ? "ol" : "ul";
 
+    return (
+      <ListTag
+        className={`pl-6 space-y-2 ${
+          style === "ordered" ? "list-decimal" : "list-disc"
+        }`}
+      >
+        {items.map((item, idx) => {
+          const key = `${keyPrefix}-${idx}`;
+          const children =
+            item && typeof item === "object" && Array.isArray(item.items)
+              ? item.items
+              : null;
+
+          const checked =
+            style === "checklist"
+              ? item?.meta?.checked ?? item?.checked ?? false
+              : false;
+
+          return (
+            <li key={key}>
+              <div className='flex gap-2 text-gray-700'>
+                {style === "checklist" ? (
+                  <input
+                    type='checkbox'
+                    checked={checked}
+                    readOnly
+                    className='mt-1 w-4 h-4'
+                  />
+                ) : style === "ordered" ? null : (
+                  <CircleCheckBig size={16} className='mt-1' />
+                )}
+
+                <div>{renderListItemContent(item)}</div>
+              </div>
+
+              {children?.length ? renderNestedList(children, style, key) : null}
+            </li>
+          );
+        })}
+      </ListTag>
+    );
+  };
   const renderBlock = (block, i) => {
     if (!block?.type || !block?.data) return null;
 
@@ -48,17 +92,15 @@ const BlogDetails = ({ post }) => {
           />
         );
 
-      case "list":
+      case "list": {
+        const style = block.data?.style || "unordered";
+        const items = block.data?.items || [];
         return (
-          <ul key={i} className='space-y-2 mb-5'>
-            {block.data.items.map((item, idx) => (
-              <li key={idx} className='flex gap-2 text-gray-700'>
-                <CircleCheckBig size={16} className='mt-1 text-green-600' />
-                {item}
-              </li>
-            ))}
-          </ul>
+          <div key={i} className='mb-5'>
+            {renderNestedList(items, style, `list-${i}`)}
+          </div>
         );
+      }
 
       case "image":
         return (

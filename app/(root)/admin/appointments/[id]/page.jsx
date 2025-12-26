@@ -43,7 +43,8 @@ export default async function AppointmentDetailsPage({ params }) {
           <b>Provider:</b> {booking.providerName}
         </p>
         <p>
-          <b>Appointment:</b> {formatDate(booking.appointment)}
+          <b>Appointment:</b> {formatDate(booking.appointment)}{" "}
+          {booking.slot ? `at ${booking.slot.startTime}` : ""}
         </p>
         <p>
           <b>Notes:</b> {booking.notes || "—"}

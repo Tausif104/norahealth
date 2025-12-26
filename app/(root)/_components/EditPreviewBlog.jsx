@@ -31,120 +31,61 @@ const EditSeeBlog = () => {
     return String(item);
   };
 
-  const renderBlock = (block, index) => {
+  const renderBlock = (block, i) => {
     if (!block?.type || !block?.data) return null;
 
     switch (block.type) {
       case "header": {
-        const HeaderTag = `h${block.data.level || 2}`;
+        const Tag = `h${block.data.level || 2}`;
         return (
-          <HeaderTag key={index} className='my-4 font-bold text-black'>
+          <Tag
+            key={i}
+            className='mt-8 mb-3 text-xl font-semibold text-gray-900'
+          >
             {block.data.text}
-          </HeaderTag>
+          </Tag>
         );
       }
 
       case "paragraph":
         return (
-          <p key={index} className='my-2 text-gray-800 leading-relaxed'>
-            {block.data.text}
-          </p>
+          <p
+            key={i}
+            className='text-gray-700 leading-relaxed mb-4'
+            dangerouslySetInnerHTML={{ __html: block.data.text }}
+          />
         );
 
-      case "list": {
-        const items = block.data?.items || [];
-
-        if (block.data.style === "ordered") {
-          return (
-            <ol key={index} className='list-decimal my-2'>
-              {items.map((item, i) => (
-                <li key={i}>{renderItem(item)}</li>
-              ))}
-            </ol>
-          );
-        } else if (block.data.style === "checklist") {
-          return (
-            <ul key={index} className='my-2'>
-              {items.map((item, i) => (
-                <li key={i} className='flex items-center gap-2'>
-                  <input
-                    type='checkbox'
-                    checked={item?.meta?.checked ?? false}
-                    readOnly
-                    className='w-4 h-4'
-                  />
-                  <span>{renderItem(item)}</span>
-                </li>
-              ))}
-            </ul>
-          );
-        } else {
-          return (
-            <ul key={index} className='my-2'>
-              {items.map((item, i) => (
-                <li key={i} className='flex mt-4 gap-2'>
-                  <CircleCheckBig /> {renderItem(item)}
-                </li>
-              ))}
-            </ul>
-          );
-        }
-      }
+      case "list":
+        return (
+          <ul key={i} className='space-y-2 mb-5'>
+            {block.data.items.map((item, idx) => (
+              <li key={idx} className='flex gap-2 text-gray-700'>
+                <CircleCheckBig size={16} className='mt-1 text-green-600' />
+                {item}
+              </li>
+            ))}
+          </ul>
+        );
 
       case "image":
-        return block.data?.file?.url ? (
-          <div key={index} className='my-4'>
+        return (
+          <div key={i} className='my-6 rounded-xl overflow-hidden'>
             <img
-              src={block.data.file.url}
-              alt={block.data.caption || "Blog Image"}
-              className='w-full rounded-md object-cover'
+              src={block.data.file?.url}
+              alt={block.data.caption || "Blog image"}
+              className='w-full object-cover'
             />
-            {block.data.caption && (
-              <p className='text-sm text-white mt-2'>{block.data.caption}</p>
-            )}
           </div>
-        ) : null;
+        );
 
       case "quote":
         return (
           <blockquote
-            key={index}
-            className='border-l-4 border-gray-300 pl-4 italic my-4'
-          >
-            {block.data.text}
-            {block.data.caption && (
-              <cite className='block mt-1'>— {block.data.caption}</cite>
-            )}
-          </blockquote>
-        );
-
-      case "code":
-        return (
-          <pre
-            key={index}
-            className='bg-gray-100 rounded p-3 overflow-x-auto my-4 font-mono text-sm'
-          >
-            {block.data.code}
-          </pre>
-        );
-
-      case "table":
-        return (
-          <div key={index} className='overflow-x-auto my-4'>
-            <table className='table-auto border-collapse border border-gray-300 w-full'>
-              <tbody>
-                {block.data?.content?.map((row, rIdx) => (
-                  <tr key={rIdx}>
-                    {row.map((cell, cIdx) => (
-                      <td key={cIdx} className='border border-gray-300 p-2'>
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+            key={i}
+            className='border-l-4 border-orange-500 pl-4 italic text-gray-600 my-6'
+            dangerouslySetInnerHTML={{ __html: block.data.text }}
+          />
         );
 
       default:

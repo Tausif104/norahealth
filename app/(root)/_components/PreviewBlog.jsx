@@ -32,126 +32,185 @@ const SeeBlog = () => {
     return String(item);
   };
 
-  const renderBlock = (block, index) => {
-    if (!block?.type || !block?.data) return null;
+  const renderListItemContent = (item) => {
+    if (typeof item === "string") {
+      return <span dangerouslySetInnerHTML={{ __html: item }} />;
+    }
 
-    switch (block.type) {
-      case "header": {
-        const HeaderTag = `h${block.data.level || 2}`;
-        return (
-          <HeaderTag key={index} className='my-4 font-bold text-black'>
-            {block.data.text}
-          </HeaderTag>
-        );
-      }
+    if (item && typeof item === "object") {
+      const html = item.content ?? item.text ?? "";
+      return html ? <span dangerouslySetInnerHTML={{ __html: html }} /> : null;
+    }
 
-      case "paragraph":
-        return (
-          <p key={index} className='my-2 text-gray-800 leading-relaxed'>
-            {block.data.text}
-          </p>
-        );
+    return <span>{String(item)}</span>;
+  };
 
-      case "list": {
-        const items = block.data?.items || [];
+  const renderNestedList = (items, style, keyPrefix = "li") => {
+    const ListTag = style === "ordered" ? "ol" : "ul";
 
-        if (block.data.style === "ordered") {
+    return (
+      <ListTag
+        className={`pl-6 space-y-2 ${
+          style === "ordered" ? "list-decimal" : "list-disc"
+        }`}
+      >
+        {items.map((item, idx) => {
+          const key = `${keyPrefix}-${idx}`;
+          const children =
+            item && typeof item === "object" && Array.isArray(item.items)
+              ? item.items
+              : null;
+
+          const checked =
+            style === "checklist"
+              ? item?.meta?.checked ?? item?.checked ?? false
+              : false;
+
           return (
-            <ol key={index} className='list-decimal my-2'>
-              {items.map((item, i) => (
-                <li key={i}>{renderItem(item)}</li>
-              ))}
-            </ol>
-          );
-        } else if (block.data.style === "checklist") {
-          return (
-            <ul key={index} className='my-2'>
-              {items.map((item, i) => (
-                <li key={i} className='flex items-center gap-2'>
+            <li key={key}>
+              <div className='flex gap-2 text-gray-700'>
+                {style === "checklist" ? (
                   <input
                     type='checkbox'
-                    checked={item?.meta?.checked ?? false}
+                    checked={checked}
                     readOnly
-                    className='w-4 h-4'
+                    className='mt-1 w-4 h-4'
                   />
-                  <span>{renderItem(item)}</span>
-                </li>
-              ))}
-            </ul>
+                ) : style === "ordered" ? null : (
+                  <CircleCheckBig size={16} className='mt-1' />
+                )}
+
+                <div>{renderListItemContent(item)}</div>
+              </div>
+
+              {children?.length ? renderNestedList(children, style, key) : null}
+            </li>
           );
-        } else {
-          return (
-            <ul key={index} className='my-2'>
-              {items.map((item, i) => (
-                <li key={i} className='flex mt-4 gap-2'>
-                  <CircleCheckBig /> {renderItem(item)}
-                </li>
-              ))}
-            </ul>
-          );
-        }
-      }
-
-      case "image":
-        return block.data?.file?.url ? (
-          <div key={index} className='my-4'>
-            <img
-              src={block.data.file.url}
-              alt={block.data.caption || "Blog Image"}
-              className='w-full rounded-md object-cover'
-            />
-            {block.data.caption && (
-              <p className='text-sm text-white mt-2'>{block.data.caption}</p>
-            )}
-          </div>
-        ) : null;
-
-      case "quote":
-        return (
-          <blockquote
-            key={index}
-            className='border-l-4 border-gray-300 pl-4 italic my-4'
-          >
-            {block.data.text}
-            {block.data.caption && (
-              <cite className='block mt-1'>— {block.data.caption}</cite>
-            )}
-          </blockquote>
-        );
-
-      case "code":
-        return (
-          <pre
-            key={index}
-            className='bg-gray-100 rounded p-3 overflow-x-auto my-4 font-mono text-sm'
-          >
-            {block.data.code}
-          </pre>
-        );
-
-      case "table":
-        return (
-          <div key={index} className='overflow-x-auto my-4'>
-            <table className='table-auto border-collapse border border-gray-300 w-full'>
-              <tbody>
-                {block.data?.content?.map((row, rIdx) => (
-                  <tr key={rIdx}>
-                    {row.map((cell, cIdx) => (
-                      <td key={cIdx} className='border border-gray-300 p-2'>
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-
-      default:
-        return null;
-    }
+        })}
+      </ListTag>
+    );
   };
+
+  // const renderBlock = (block, index) => {
+  //   if (!block?.type || !block?.data) return null;
+
+  //   switch (block.type) {
+  //     case "header": {
+  //       const HeaderTag = `h${block.data.level || 2}`;
+  //       return (
+  //         <HeaderTag key={index} className='my-4 font-bold text-black'>
+  //           {block.data.text}
+  //         </HeaderTag>
+  //       );
+  //     }
+
+  //     case "paragraph":
+  //       return (
+  //         <p key={index} className='my-2 text-gray-800 leading-relaxed'>
+  //           {block.data.text}
+  //         </p>
+  //       );
+
+  //     case "list": {
+  //       const items = block.data?.items || [];
+
+  //       if (block.data.style === "ordered") {
+  //         return (
+  //           <ol key={index} className='list-decimal my-2'>
+  //             {items.map((item, i) => (
+  //               <li key={i}>{renderItem(item)}</li>
+  //             ))}
+  //           </ol>
+  //         );
+  //       } else if (block.data.style === "checklist") {
+  //         return (
+  //           <ul key={index} className='my-2'>
+  //             {items.map((item, i) => (
+  //               <li key={i} className='flex items-center gap-2'>
+  //                 <input
+  //                   type='checkbox'
+  //                   checked={item?.meta?.checked ?? false}
+  //                   readOnly
+  //                   className='w-4 h-4'
+  //                 />
+  //                 <span>{renderItem(item)}</span>
+  //               </li>
+  //             ))}
+  //           </ul>
+  //         );
+  //       } else {
+  //         return (
+  //           <ul key={index} className='my-2'>
+  //             {items.map((item, i) => (
+  //               <li key={i} className='flex mt-4 gap-2'>
+  //                 <CircleCheckBig /> {renderItem(item)}
+  //               </li>
+  //             ))}
+  //           </ul>
+  //         );
+  //       }
+  //     }
+
+  //     case "image":
+  //       return block.data?.file?.url ? (
+  //         <div key={index} className='my-4'>
+  //           <img
+  //             src={block.data.file.url}
+  //             alt={block.data.caption || "Blog Image"}
+  //             className='w-full rounded-md object-cover'
+  //           />
+  //           {block.data.caption && (
+  //             <p className='text-sm text-white mt-2'>{block.data.caption}</p>
+  //           )}
+  //         </div>
+  //       ) : null;
+
+  //     case "quote":
+  //       return (
+  //         <blockquote
+  //           key={index}
+  //           className='border-l-4 border-gray-300 pl-4 italic my-4'
+  //         >
+  //           {block.data.text}
+  //           {block.data.caption && (
+  //             <cite className='block mt-1'>— {block.data.caption}</cite>
+  //           )}
+  //         </blockquote>
+  //       );
+
+  //     case "code":
+  //       return (
+  //         <pre
+  //           key={index}
+  //           className='bg-gray-100 rounded p-3 overflow-x-auto my-4 font-mono text-sm'
+  //         >
+  //           {block.data.code}
+  //         </pre>
+  //       );
+
+  //     case "table":
+  //       return (
+  //         <div key={index} className='overflow-x-auto my-4'>
+  //           <table className='table-auto border-collapse border border-gray-300 w-full'>
+  //             <tbody>
+  //               {block.data?.content?.map((row, rIdx) => (
+  //                 <tr key={rIdx}>
+  //                   {row.map((cell, cIdx) => (
+  //                     <td key={cIdx} className='border border-gray-300 p-2'>
+  //                       {cell}
+  //                     </td>
+  //                   ))}
+  //                 </tr>
+  //               ))}
+  //             </tbody>
+  //           </table>
+  //         </div>
+  //       );
+
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   // const handlePublish = (e) => {
   //   e.preventDefault();
@@ -175,7 +234,62 @@ const SeeBlog = () => {
   //     categories: [],
   //   });
   // };
+  const renderBlock = (block, i) => {
+    if (!block?.type || !block?.data) return null;
 
+    switch (block.type) {
+      case "header": {
+        const Tag = `h${block.data.level || 2}`;
+        return (
+          <Tag key={i} className='mt-8 mb-3 text-xl font-bold  text-gray-900'>
+            {block.data.text}
+          </Tag>
+        );
+      }
+
+      case "paragraph":
+        return (
+          <p
+            key={i}
+            className='text-gray-700 leading-relaxed mb-4'
+            dangerouslySetInnerHTML={{ __html: block.data.text }}
+          />
+        );
+
+      case "list": {
+        const style = block.data?.style || "unordered";
+        const items = block.data?.items || [];
+        return (
+          <div key={i} className='mb-5'>
+            {renderNestedList(items, style, `list-${i}`)}
+          </div>
+        );
+      }
+
+      case "image":
+        return (
+          <div key={i} className='my-6 rounded-xl overflow-hidden'>
+            <img
+              src={block.data.file?.url}
+              alt={block.data.caption || "Blog image"}
+              className='w-full object-cover'
+            />
+          </div>
+        );
+
+      case "quote":
+        return (
+          <blockquote
+            key={i}
+            className='border-l-4 border-orange-500 pl-4 italic text-gray-600 my-6'
+            dangerouslySetInnerHTML={{ __html: block.data.text }}
+          />
+        );
+
+      default:
+        return null;
+    }
+  };
   const [user, setUser] = useState(null);
 
   useEffect(() => {

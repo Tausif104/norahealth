@@ -56,8 +56,11 @@ import { useRouter } from "next/navigation";
 import { deletePost, togglePostApproval } from "@/actions/blog.actions";
 import { useProfile } from "@/lib/profileContext";
 
-export default function BlogTable({ allPost, userRole }) {
+export default function BlogTable({ allPost, userRole, currentUserId }) {
   const data = allPost?.postsWithContentObj || [];
+  const isPrivileged = ["admin", "superadmin"].includes(
+    (userRole || "").toLowerCase()
+  );
   const [deletePostId, setDeletePostId] = React.useState(null);
 
   console.log(data, "BlogTable");
@@ -161,8 +164,19 @@ export default function BlogTable({ allPost, userRole }) {
       {
         id: "actions",
         enableHiding: false,
-        cell: ({ row }) => (
-          <>
+        cell: ({ row }) => {
+          // adjust these depending on your data shape:
+          const postAuthorId =
+            row.original.authorId ||
+            row.original.author?.id ||
+            row.original.author?.account?.id;
+
+          const isOwnPost =
+            postAuthorId && currentUserId && postAuthorId === currentUserId;
+
+          const canToggleApproval = isPrivileged && !isOwnPost;
+
+          return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant='ghost' className='h-8 w-8 p-0'>
@@ -171,9 +185,12 @@ export default function BlogTable({ allPost, userRole }) {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align='end'>
-                {/* APPROVE */}
+                {/* APPROVE / DISAPPROVE */}
                 <DropdownMenuItem
+                  disabled={!canToggleApproval}
                   onClick={async () => {
+                    if (!canToggleApproval) return;
+
                     const res = await togglePostApproval(
                       row.original.id,
                       !row.original.isActive
@@ -187,7 +204,13 @@ export default function BlogTable({ allPost, userRole }) {
                     }
                   }}
                 >
-                  {row.original.isActive ? "Disapprove" : "Approve"}
+                  {!isPrivileged
+                    ? "Approve (Admins only)"
+                    : isOwnPost
+                    ? "Approve (Not allowed on your own post)"
+                    : row.original.isActive
+                    ? "Disapprove"
+                    : "Approve"}
                 </DropdownMenuItem>
 
                 {/* EDIT */}
@@ -197,25 +220,21 @@ export default function BlogTable({ allPost, userRole }) {
                   </Link>
                 </DropdownMenuItem>
 
-                {/* DELETE (no dialog here) */}
+                {/* DELETE */}
                 <DropdownMenuItem
                   className='text-red-600'
                   onClick={async () => {
                     const res = await deletePost(row.original.id);
-
-                    if (res?.success) {
-                      toast.success(res.msg);
-                    } else {
-                      toast.error(res.msg);
-                    }
+                    if (res?.success) toast.success(res.msg);
+                    else toast.error(res.msg);
                   }}
                 >
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </>
-        ),
+          );
+        },
       },
     ],
     [router]

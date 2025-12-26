@@ -2,6 +2,7 @@ import Footer from "@/components/global/footer";
 import Header from "@/components/global/header";
 import { BlogProvider } from "@/lib/BlogContext";
 import "react-datepicker/dist/react-datepicker.css";
+import GoogleTranslate from "./_components/GoogleTranslate";
 
 export const metadata = {
   title: "Home",
@@ -11,6 +12,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <BlogProvider>
+      <GoogleTranslate />
       <Header />
       <main>{children}</main>
       <Footer />

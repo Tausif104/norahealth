@@ -175,7 +175,7 @@ const ConfirmBooking = ({ userDetails }) => {
                   name='notes'
                   rows={6}
                   placeholder='Please indicate which contraceptive medicine you are currently on'
-                  className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
+                  className='bg-white border border-[#EEE0CF] text-black w-full py-4.25 px-4 rounded-[6px]'
                 />
               </div>
 
@@ -230,7 +230,7 @@ const ConfirmBooking = ({ userDetails }) => {
                 width={370}
                 height={200}
                 alt='booking'
-                className='rounded-2xl object-cover w-full max-h-[200px]'
+                className='rounded-2xl object-cover w-full max-h-50'
               />
               <div className='bg-[#F4E7E1] rounded-2xl p-[30px_24px]'>
                 <h2 className=' text-[#0D060C] text-[18px] md:text-[24px] font-medium pb-5 border-b border-[#CE893646] mb-5'>

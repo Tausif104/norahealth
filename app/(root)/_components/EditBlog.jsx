@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useContext, useRef } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
@@ -21,7 +21,7 @@ const EditBlogEditor = dynamic(() => import("./EditBlogEditor"), {
   ssr: false,
 });
 
-export default function EditBlog() {
+export default function EditBlog({ id, user }) {
   const { blogData, setBlogData } = useContext(BlogContext);
 
   const [title, setTitle] = useState(blogData.title || "");
@@ -127,7 +127,7 @@ export default function EditBlog() {
     setBlogData((prev) => ({ ...prev, canonicalUrl: value }));
   };
 
-  console.log(blogData, "blogData add");
+  console.log(blogData, user, "blogData edit");
 
   return (
     <div className=' transition-colors duration-300'>
@@ -278,7 +278,16 @@ export default function EditBlog() {
       <EditBlogEditor preview={preview} />
 
       <div className='mt-6 flex justify-end'>
-        <Link href='/author/blog/edit-preview-blog'>
+        <Link
+          // href='/author/blog/edit-preview-blog'
+          href={
+            user?.role === "AUTHOR"
+              ? "/author/blog/edit-preview-blog"
+              : user?.role === "ADMIN" || user?.role === "SUPERADMIN"
+              ? "/admin/blog/edit-preview-blog"
+              : "/"
+          }
+        >
           <Button
             type='submit'
             className='w-full !text-white !cursor-pointer'
