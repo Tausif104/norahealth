@@ -138,6 +138,7 @@ const ConfirmOrder = ({ userDetails }) => {
                   value={form.notes}
                   onChange={handleChange}
                   className='w-full border rounded p-3'
+                  placeholder='Please indicate which contraceptive medicine you are currently on'
                 />
               </div>
             </div>

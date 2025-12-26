@@ -187,7 +187,7 @@ export default function BlogTable({ allPost, userRole }) {
                     }
                   }}
                 >
-                  {row.original.isActive ? "Unapprove" : "Approve"}
+                  {row.original.isActive ? "Disapprove" : "Approve"}
                 </DropdownMenuItem>
 
                 {/* EDIT */}
@@ -200,7 +200,15 @@ export default function BlogTable({ allPost, userRole }) {
                 {/* DELETE (no dialog here) */}
                 <DropdownMenuItem
                   className='text-red-600'
-                  onClick={() => setDeletePostId(row.original.id)}
+                  onClick={async () => {
+                    const res = await deletePost(row.original.id);
+
+                    if (res?.success) {
+                      toast.success(res.msg);
+                    } else {
+                      toast.error(res.msg);
+                    }
+                  }}
                 >
                   Delete
                 </DropdownMenuItem>

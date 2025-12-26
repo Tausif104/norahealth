@@ -374,7 +374,15 @@ export const deletePost = async (id) => {
       },
     });
 
-    revalidatePath("/author/blog");
+    const payload = loggedInUserAction();
+
+    if (payload?.role === "SUPERADMIN" || payload?.role === "ADMIN") {
+      // revalidate admin blog path
+      revalidatePath("/admin/blog");
+    } else {
+      // revalidate author blog path
+      revalidatePath("/author/blog");
+    }
 
     return {
       success: true,

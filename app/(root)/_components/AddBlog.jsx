@@ -30,7 +30,9 @@ export default function AddBlog() {
 
   const [title, setTitle] = useState(blogData.title || "");
   const [slug, setSlug] = useState(blogData.postSlug || "");
-  const [preview, setPreview] = useState(blogData.image || "/banner.png");
+  const [preview, setPreview] = useState(
+    blogData.image || "/images/blog-banner.png"
+  );
   const [uploading, setUploading] = useState(false);
   const [bannerAlt, setBannerAlt] = useState(blogData.bannerAltText || "");
   const [metaTitle, setMetaTitle] = useState(blogData.metaTitle || "");
