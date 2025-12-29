@@ -8,8 +8,12 @@ function applyGoogleTranslateLang(lang) {
     const combo = document.querySelector(".goog-te-combo");
     if (!combo) return false;
 
+    // Only apply if option exists
+    const hasOption = Array.from(combo.options).some((o) => o.value === lang);
+    if (!hasOption) return false;
+
     combo.value = lang;
-    combo.dispatchEvent(new Event("change", { bubbles: true })); // ✅ important
+    combo.dispatchEvent(new Event("change", { bubbles: true }));
     return true;
   };
 
@@ -18,7 +22,7 @@ function applyGoogleTranslateLang(lang) {
   let attempts = 0;
   const t = setInterval(() => {
     attempts += 1;
-    if (tryApply() || attempts > 40) clearInterval(t); // ✅ more retries
+    if (tryApply() || attempts > 80) clearInterval(t); // try longer
   }, 150);
 }
 
@@ -28,7 +32,7 @@ const GoogleTranslate = () => {
       new window.google.translate.TranslateElement(
         {
           pageLanguage: "en", // your original site language
-          includedLanguages: "en,fr", // ONLY English + French
+          includedLanguages: "en,fr,es,pt", // ONLY English + French + Spanish + Portuguese
           autoDisplay: false,
         },
         "google_translate_element"
@@ -61,9 +65,13 @@ const GoogleTranslate = () => {
       const lang = e.detail || "en";
 
       Cookies.set("userLang", lang, { expires: 7, path: "/" });
+
+      // ✅ set both formats
+      Cookies.set("googtrans", `/auto/${lang}`, { expires: 7, path: "/" });
       Cookies.set("googtrans", `/en/${lang}`, { expires: 7, path: "/" });
 
       applyGoogleTranslateLang(lang);
+      setTimeout(() => applyGoogleTranslateLang(lang), 700);
     };
 
     window.addEventListener("userLangChange", onLangChange);

@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const Hero = () => {
   return (
-    <section className='bg-[#F4EBE9] relative xl:pb-0 lg:pb-[60px] pb-[60px]'>
+    <section className='bg-[#F4EBE9] relative xl:pb-0 lg:pb-[60px] pb-0'>
       <Image
         src='/images/shape.svg'
         width={500}
@@ -21,7 +21,7 @@ const Hero = () => {
       />
       <div className='container custom-container mx-auto'>
         <div className='grid 2xl:grid-cols-5 xl:grid-cols-5 lg:grid-cols-5 md:grid-cols-1 items-center 2xl:order-first xl:order-first lg:order-first md:order-last sm:order-last order-last'>
-          <div className='2xl:col-span-3 xl:col-span-3 lg:col-span-3 sm:px-0 px-[24px] lg:-mt-8 2xl:mt-0'>
+          <div className='2xl:col-span-3 xl:col-span-3 lg:col-span-3 sm:px-0 px-[24px] mt-8 2xl:mt-0'>
             <h1 className='text-theme 2xl:text-[72px]  lg:text-[52px] text-[30px] font-semibold leading-[1.2] '>
               Free Oral <br /> Contraception, <br />
               <span className='text-[#D6866B]'>Delivered to Your Door</span>
@@ -37,7 +37,7 @@ const Hero = () => {
             </div>
           </div>
 
-          <div className='2xl:col-span-2 lg:col-span-2 md:col-span-2 2xl:mt-25 xl:mt-[0px]  mt-0 2xl:order-last xl:order-last lg:order-last md:order-first sm:order-first order-first text-center '>
+          <div className='2xl:col-span-2 lg:col-span-2 md:col-span-2 2xl:mt-25 xl:mt-[0px]  mt-4  text-center '>
             <Image
               src='/images/woman.svg'
               width={615}
@@ -50,7 +50,7 @@ const Hero = () => {
               width={615}
               height={800}
               alt='Woman'
-              className='relative z-10 md:mx-auto mx-auto w-full md:hidden sm:block block mb-[54px]'
+              className='relative z-10 md:mx-auto mx-auto w-full md:hidden sm:block block 2xl:mb-[54px]'
             />
           </div>
         </div>
