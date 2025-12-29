@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -9,6 +9,9 @@ import { createBookingOrder } from "@/actions/booking.action";
 import { toast } from "sonner";
 
 const ConfirmOrder = ({ userDetails }) => {
+  const originalSubmitWrapRef = useRef(null);
+  const formRef = useRef(null);
+  const [showStickySubmit, setShowStickySubmit] = useState(false);
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -75,6 +78,54 @@ const ConfirmOrder = ({ userDetails }) => {
     }
   }
 
+  useEffect(() => {
+    // Only for < 1024px
+    const mql = window.matchMedia("(max-width: 1023px)");
+
+    const setupObserver = () => {
+      // On desktop, never show sticky
+      if (!mql.matches) {
+        setShowStickySubmit(false);
+        return;
+      }
+
+      const target = originalSubmitWrapRef.current;
+      if (!target) return;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          // If original submit is visible -> hide sticky
+          // If not visible -> show sticky
+          setShowStickySubmit(!entry.isIntersecting);
+        },
+        {
+          // Adjust if you want it to hide a bit earlier/later
+          threshold: 0.1,
+        }
+      );
+
+      observer.observe(target);
+      return () => observer.disconnect();
+    };
+
+    let cleanup = setupObserver();
+
+    const onResizeChange = () => {
+      if (cleanup) cleanup();
+      cleanup = setupObserver();
+    };
+
+    // modern browser support
+    mql.addEventListener?.("change", onResizeChange);
+    window.addEventListener("resize", onResizeChange);
+
+    return () => {
+      if (cleanup) cleanup();
+      mql.removeEventListener?.("change", onResizeChange);
+      window.removeEventListener("resize", onResizeChange);
+    };
+  }, []);
+
   return (
     <section className='py-8'>
       <div className='container custom-container mx-auto px-6'>
@@ -82,7 +133,7 @@ const ConfirmOrder = ({ userDetails }) => {
           <ArrowLeft /> Back
         </Link> */}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} ref={formRef}>
           <div className='grid lg:grid-cols-3 gap-8 bg-[#FAF9F8] p-4 2xl:p-8 rounded-2xl'>
             {/* LEFT */}
             <div className='lg:col-span-2 space-y-5'>
@@ -194,14 +245,46 @@ const ConfirmOrder = ({ userDetails }) => {
                   <strong>NHS Service:</strong> NHS Service
                 </p> */}
 
-                <button
+                {/* <button
                   type='submit'
                   disabled={submitting}
                   className='mt-4 w-full bg-theme text-white py-4 rounded-full flex justify-center items-center gap-2'
                 >
                   {submitting ? "Processing..." : "Order Contraception"}
                   {submitting ? "" : <ArrowRight />}
-                </button>
+                </button> */}
+                <div ref={originalSubmitWrapRef}>
+                  <button
+                    type='submit'
+                    disabled={submitting}
+                    className='mt-4 text-white cursor-pointer inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 w-full disabled:opacity-60 disabled:cursor-not-allowed'
+                  >
+                    <span className='flex items-center justify-center'>
+                      <span>
+                        {submitting ? "Confirming..." : "Confirm Booking"}
+                      </span>
+                      <span className='ml-2 -rotate-45 group-hover:rotate-0 transition duration-300'>
+                        {submitting ? "" : <ArrowRight />}
+                      </span>
+                    </span>
+                  </button>
+                </div>
+                {/* Mobile sticky submit (shows only when original submit is NOT visible) */}
+                <div
+                  className={[
+                    "lg:hidden fixed left-0 right-0 bottom-20 sm:bottom-5 z-50 p-3 px-[44px]",
+                    "container custom-container mx-auto",
+                    showStickySubmit ? "block" : "hidden",
+                  ].join(" ")}
+                >
+                  <button
+                    type='submit'
+                    disabled={submitting}
+                    className='mt-4 w-full text-white bg-theme text-[16px] font-medium py-4 rounded-full disabled:opacity-60 disabled:cursor-not-allowed'
+                  >
+                    {submitting ? "Confirming..." : "Confirm Booking"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

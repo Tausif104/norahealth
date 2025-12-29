@@ -17,7 +17,6 @@ const ConfirmBooking = ({ userDetails }) => {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const isLoggedIn = Boolean(userDetails?.account);
-  console.log(showStickySubmit, "submit");
 
   const fullNameFromAccount = userDetails?.account
     ? [userDetails.account.firstName, userDetails.account.lastName]
@@ -360,7 +359,8 @@ const ConfirmBooking = ({ userDetails }) => {
                 {/* Mobile sticky submit (shows only when original submit is NOT visible) */}
                 <div
                   className={[
-                    "lg:hidden fixed left-0 right-0 bottom-20 z-50 p-3 px-[44px]",
+                    "lg:hidden fixed left-0 right-0 bottom-20 sm:bottom-5 z-50 p-3 px-[44px]",
+                    "container custom-container mx-auto",
                     showStickySubmit ? "block" : "hidden",
                   ].join(" ")}
                 >
