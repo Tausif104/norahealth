@@ -1,9 +1,11 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { Mail, Phone } from "lucide-react";
+import { applyGoogleTranslateLang } from "@/lib/googleTranslateController";
+import { BlogContext } from "@/lib/BlogContext";
 
 const LANGS = [
   {
@@ -42,6 +44,20 @@ const LANG_VALUE_MAP = {
 const HeaderTop = () => {
   const router = useRouter();
   const [currentLang, setCurrentLang] = useState("en");
+  const { control, setControl } = useContext(BlogContext);
+  const applyTranslateWhenReady = (lang) => {
+    let tries = 0;
+    const timer = setInterval(() => {
+      const combo = document.querySelector(".goog-te-combo");
+      if (combo) {
+        combo.value = lang;
+        combo.dispatchEvent(new Event("change", { bubbles: true }));
+        clearInterval(timer);
+      }
+      tries += 1;
+      if (tries > 40) clearInterval(timer); // ~6 seconds max
+    }, 150);
+  };
 
   useEffect(() => {
     const saved = Cookies.get("userLang");
@@ -52,59 +68,34 @@ const HeaderTop = () => {
       setCurrentLang(saved);
     }
   }, []);
+  const handleLangChange = async (lang) => {
+    // Cookies.set("googtrans", `/en/${lang}`, { expires: 7, path: "/" });
 
-  const setCookieEverywhere = (name, value) => {
-    // normal
-    Cookies.set(name, value, { expires: 7, path: "/" });
-
-    // also set on root domain (helps on www / subdomains)
-    const hostParts = window.location.hostname.split(".");
-    if (hostParts.length >= 2) {
-      const rootDomain = "." + hostParts.slice(-2).join(".");
-      Cookies.set(name, value, { expires: 7, path: "/", domain: rootDomain });
-    }
-  };
-
-  const applyTranslateWhenReady = (lang) => {
-    let tries = 0;
-
-    const timer = setInterval(() => {
-      const combo = document.querySelector(".goog-te-combo");
-      if (!combo) {
-        if (++tries > 80) clearInterval(timer);
-        return;
-      }
-
-      const candidates = LANG_VALUE_MAP[lang] || [lang];
-
-      const match = candidates.find((c) =>
-        Array.from(combo.options).some((o) => o.value === c)
-      );
-
-      if (!match) {
-        if (++tries > 80) clearInterval(timer);
-        return;
-      }
-
-      combo.value = match;
-      combo.dispatchEvent(new Event("change", { bubbles: true }));
-      clearInterval(timer);
-    }, 150);
-  };
-
-  const handleLangChange = (lang) => {
-    setCookieEverywhere("userLang", lang);
-
-    // ✅ best compatibility
-    setCookieEverywhere("googtrans", `/auto/${lang}`);
-    setCookieEverywhere("googtrans", `/en/${lang}`);
-
+    setControl(!control);
     setCurrentLang(lang);
+    applyGoogleTranslateLang(lang);
 
-    applyTranslateWhenReady(lang);
-    setTimeout(() => applyTranslateWhenReady(lang), 800);
+    // if (lang === "en") {
+    //   console.log(
+    //     " 🚫 hard reset to original language (Google Translate is messy without this)"
+    //   );
 
-    window.dispatchEvent(new CustomEvent("userLangChange", { detail: lang }));
+    //   // ✅ hard reset to original language (Google Translate is messy without this)
+    //   setTimeout(async () => {
+    //     // window.location.reload();
+    //     // router.prefetch();
+    //     await applyGoogleTranslateLang(lang);
+    //   }, 50);
+    //   return;
+    // } else {
+    //   console.log(" 🌐 switching language to:", lang);
+    //   await applyGoogleTranslateLang(lang);
+    // }
+    // apply only once, waits for combo & picks correct option
+    // applyGoogleTranslateLang(lang);
+    // ✅ one call only
+
+    // router.refresh(); // keep OFF
   };
 
   return (
