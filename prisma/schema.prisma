@@ -181,4 +181,5 @@ model Comment {
 enum OcRequest {
   SAME_OC
   DIFFERENT_OC
+  MORNING_AFTER_PILL
 }

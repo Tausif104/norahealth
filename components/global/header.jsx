@@ -12,7 +12,7 @@ const Header = () => {
       <header className='lg:block hidden'>
         <HeaderTop />
         <div className='bg-[#F4E7E1] py-3'>
-          <div className='container custom-container mx-auto flex items-center justify-between'>
+          <div className='container custom-container mx-auto flex items-center justify-between px-4'>
             <div className='site-logo'>
               <Link href='/'>
                 <Image

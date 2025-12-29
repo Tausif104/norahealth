@@ -63,7 +63,7 @@ const HeaderTop = () => {
 
   return (
     <div className='bg-theme py-2'>
-      <div className='container custom-container mx-auto flex items-center justify-between'>
+      <div className='container custom-container mx-auto flex items-center justify-between px-4'>
         <div className='flex items-center gap-2'>
           <h3 className='text-white'>Language</h3>
 

@@ -46,7 +46,7 @@ const ReviewsSection = () => {
     speed: 500,
     slidesToShow: slidesToShow,
     slidesToScroll: 1,
-    autoplay: true,
+    // autoplay: true,
     arrows: false,
     rows: rows,
     speed: 1000,

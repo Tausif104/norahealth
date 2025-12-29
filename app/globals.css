@@ -222,6 +222,7 @@ ul.slick-dots .slick-active button {
   border-radius: 16px;
   padding: 50px 30px;
   border: 1px solid #ce8a3696;
+  min-height: 350px;
 }
 .react-datepicker-wrapper {
   width: 100%;
@@ -366,4 +367,9 @@ abbr[title] {
 
 body {
   top: auto !important;
+}
+@media (max-width: 1366px) and (max-height: 720px) {
+  .booking-img {
+    max-height: 130px;
+  }
 }

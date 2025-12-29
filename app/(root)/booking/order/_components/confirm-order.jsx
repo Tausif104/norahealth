@@ -76,14 +76,14 @@ const ConfirmOrder = ({ userDetails }) => {
   }
 
   return (
-    <section className='section-padding'>
-      <div className='container mx-auto px-6'>
+    <section className='py-8'>
+      <div className='container custom-container mx-auto px-6'>
         {/* <Link href='/booking' className='flex items-center gap-2 mb-6'>
           <ArrowLeft /> Back
         </Link> */}
 
         <form onSubmit={handleSubmit}>
-          <div className='grid lg:grid-cols-3 gap-8 bg-[#FAF9F8] p-8 rounded-2xl'>
+          <div className='grid lg:grid-cols-3 gap-8 bg-[#FAF9F8] p-4 2xl:p-8 rounded-2xl'>
             {/* LEFT */}
             <div className='lg:col-span-2 space-y-5'>
               <Input
@@ -115,6 +115,7 @@ const ConfirmOrder = ({ userDetails }) => {
                 options={[
                   { label: "Same OC", value: "SAME_OC" },
                   { label: "Different OC", value: "DIFFERENT_OC" },
+                  { label: "Morning After Pill", value: "MORNING_AFTER_PILL" },
                 ]}
               />
 
@@ -145,16 +146,36 @@ const ConfirmOrder = ({ userDetails }) => {
 
             {/* RIGHT */}
             <div className='space-y-5'>
-              <Image
-                src='/images/booking.png'
-                width={370}
-                height={200}
-                alt='booking'
-                className='rounded-2xl w-full'
-              />
+              <div className='booking-img max-[1367px]:max-h-40  overflow-hidden rounded-2xl'>
+                <Image
+                  src='/images/booking.png'
+                  width={370}
+                  height={200}
+                  alt='booking'
+                  className='rounded-2xl w-full'
+                />
+              </div>
 
-              <div className='bg-[#F4E7E1] p-6 rounded-2xl'>
-                <h3 className='text-xl font-medium mb-4'>Oral Contraception</h3>
+              <div className='bg-[#F4E7E1] p-4 rounded-2xl'>
+                <div className='space-y-1'>
+                  <p className='text-sm'>
+                    Once your order has been placed, your contraception tablets
+                    will be securely and discreetly dispatched, and should
+                    arrive within 3–5 working days.
+                  </p>
+                  <p className='text-sm'>
+                    If you require your medication sooner, please contact us and
+                    we will do our best to accommodate your request.
+                  </p>
+                  <p className='text-sm'>
+                    If you are due for your annual review, we may be able to
+                    complete this promptly and conveniently over the phone
+                    without delaying your tablets.
+                  </p>
+                </div>
+                {/* <h3 className='text-xl font-medium mb-2'>
+                  Order Contraception
+                </h3>
 
                 <p>
                   <strong>Date:</strong>{" "}
@@ -171,14 +192,14 @@ const ConfirmOrder = ({ userDetails }) => {
 
                 <p>
                   <strong>NHS Service:</strong> NHS Service
-                </p>
+                </p> */}
 
                 <button
                   type='submit'
                   disabled={submitting}
-                  className='mt-6 w-full bg-theme text-white py-4 rounded-full flex justify-center items-center gap-2'
+                  className='mt-4 w-full bg-theme text-white py-4 rounded-full flex justify-center items-center gap-2'
                 >
-                  {submitting ? "Processing..." : "Order Contraceptives"}
+                  {submitting ? "Processing..." : "Order Contraception"}
                   {submitting ? "" : <ArrowRight />}
                 </button>
               </div>

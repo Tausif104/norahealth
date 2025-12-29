@@ -6,6 +6,7 @@ import "react-calendar/dist/Calendar.css"; // basic calendar styling (you can ov
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createBookingSlots } from "@/actions/booking.action";
+import { toast } from "sonner";
 
 export default function CreateSlotsPanel({ defaultInterval = 10 }) {
   const [date, setDate] = useState(new Date()); // selected date (Date object)
@@ -78,6 +79,7 @@ export default function CreateSlotsPanel({ defaultInterval = 10 }) {
       // call server action (project style used earlier)
       const res = await createBookingSlots(payload);
       setResult(res);
+      toast.success("Slots created successfully");
       // optionally refresh or clear
       setRanges([{ id: Date.now(), startTime: "09:00", endTime: "10:00" }]);
     } catch (err) {
@@ -94,7 +96,6 @@ export default function CreateSlotsPanel({ defaultInterval = 10 }) {
       <div className='col-span-7'>
         <h3 className='text-lg font-medium mb-3'>Select date</h3>
         <Calendar
-          showNeighboringMonth={false}
           tileDisabled={tileDisabled}
           onChange={setDate}
           value={date}

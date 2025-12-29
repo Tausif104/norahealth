@@ -36,7 +36,7 @@ const ChoicesSection = () => {
               <div className='bg-[#FFF4EF] w-full text-center p-[10px] rounded-[8px] group-hover:bg-[#CD8936] transition duration-300'>
                 <Link href='/contraception-choices/outcomes/only'>
                   <h3 className='md:text-[24px] text-[16px] font-semibold group-hover:text-white transition duration-300'>
-                    Progestogen-Only Pills
+                    Progesterone-Only Pills
                   </h3>
                 </Link>
               </div>
