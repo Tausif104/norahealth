@@ -1,17 +1,17 @@
-import DecorativeBanner from '../../_components/decorative-banner'
-import PrimaryBtn from '@/components/global/primary-btn'
-import Image from 'next/image'
+import DecorativeBanner from "../../_components/decorative-banner";
+import PrimaryBtn from "@/components/global/primary-btn";
+import Image from "next/image";
 
 export default function CondomsSection() {
   return (
     <section className=' p-6 sm:p-10'>
       <div className='container custom-container mx-auto'>
-        <DecorativeBanner image='/images/results/condoms.png' />
         {/* Main content card */}
         <div className='bg-[#FFF8EF]   overflow-hidden'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6 p-6 md:p-10'>
             {/* Left column */}
             <div className='space-y-6 relative before:content-none lg:before:content-[""]  before:absolute before:bg-[#CE8936] before:w-[1px] before:h-full before:top-0 before:right-0 pr-5'>
+              <DecorativeBanner image='/images/results/condoms.png' />
               <h3 className='text-xl lg:text-2xl font-semibold'>
                 How Do Condoms Work?
               </h3>
@@ -195,9 +195,9 @@ export default function CondomsSection() {
         </div>
         {/* Bottom CTA */}
         <div className='pt-14  flex justify-center'>
-          <PrimaryBtn label='Book a Free Call' url='/' />
+          <PrimaryBtn label='Book a Free Call' url='/booking' />
         </div>
       </div>
     </section>
-  )
+  );
 }

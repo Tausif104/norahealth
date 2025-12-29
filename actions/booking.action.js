@@ -206,8 +206,6 @@ export async function createBookingOrder(formData) {
     const notes = formData.get("notes")?.toString().trim() || null;
 
     const ocRequest = formData.get("ocRequest")?.toString();
-
-    // ✅ boolean
     const appointmentRequest = formData.get("appointmentRequest") === "true";
 
     const serviceName = formData.get("serviceName")?.toString().trim();
@@ -229,18 +227,61 @@ export async function createBookingOrder(formData) {
       };
     }
 
-    if (!["SAME_OC", "DIFFERENT_OC"].includes(ocRequest)) {
+    if (
+      !["SAME_OC", "DIFFERENT_OC", "MORNING_AFTER_PILL"].includes(ocRequest)
+    ) {
+      return { success: false, msg: "Invalid OC request value.", data: null };
+    }
+
+    // ✅ Find user (needed for Order.userId)
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+
+    // If orders must be tied to a user, stop here if user not found
+    if (!user) {
       return {
         success: false,
-        msg: "Invalid OC request value.",
+        msg: "No account found with this email. Please login or use your registered email.",
         data: null,
       };
     }
 
-    // ✅ SINGLE source of truth for date & time
+    let recreatedOrder = null;
+
+    // ✅ If SAME_OC -> recreate last order under clinicalreview
+    if (ocRequest === "SAME_OC") {
+      const lastOrder = await prisma.order.findFirst({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          medicineName: true,
+        },
+      });
+
+      if (!lastOrder) {
+        return {
+          success: false,
+          msg: "You have no previous order to repeat.",
+          data: null,
+        };
+      }
+
+      recreatedOrder = await prisma.order.create({
+        data: {
+          userId: user.id,
+          medicineName: lastOrder.medicineName,
+          trackingId: crypto.randomUUID(), // or your tracking generator
+          status: "clinicalreview", // ✅ force review
+        },
+      });
+    }
+
+    // ✅ Your existing booking creation (optional: always create booking)
     const now = new Date();
     const bookingType = "Order";
-
     const booking = await prisma.booking.create({
       data: {
         fullName,
@@ -252,58 +293,20 @@ export async function createBookingOrder(formData) {
         serviceName,
         providerName,
         nhsService,
-        appointment: now, // ✅ KEEP using now
+        appointment: now,
         bookingType,
       },
     });
 
-    // ✅ Calendar only if appointment requested
-    if (appointmentRequest) {
-      try {
-        const calendarId = process.env.GOOGLE_CALENDAR_ID;
-
-        if (calendarId) {
-          await createCalendarEvent({
-            calendarId,
-            start: now,
-            end: new Date(now.getTime() + 10 * 60 * 1000),
-            summary: `${serviceName} - ${fullName}`,
-            description: [
-              `Provider: ${providerName}`,
-              `NHS Service: ${nhsService}`,
-              `Phone: ${phoneNumber}`,
-              `OC Request: ${ocRequest}`,
-              notes ? `Notes: ${notes}` : null,
-            ]
-              .filter(Boolean)
-              .join("\n"),
-            location: "Manor Chemist & Clinic",
-            email,
-            name: fullName,
-          });
-        }
-      } catch (err) {
-        console.error("Calendar creation failed:", err);
-      }
-    }
-
-    sendBookingConfirmationEmail({
-      to: email,
-      fullName,
-      serviceName,
-      providerName,
-      nhsService,
-      appointment: appointmentRequest ? now : null,
-      notes,
-    });
-
     return {
       success: true,
-      msg: "Contraceptive order placed successfully.",
+      msg:
+        ocRequest === "SAME_OC"
+          ? "Previous order repeated successfully (under clinical review)."
+          : "Contraceptive order placed successfully.",
       data: {
         bookingId: booking.id,
-        appointmentRequest,
-        appointment: now,
+        recreatedOrderId: recreatedOrder?.id || null,
       },
     };
   } catch (error) {
