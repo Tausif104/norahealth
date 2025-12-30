@@ -371,6 +371,35 @@ export async function createBookingOrder(formData) {
 // }
 export async function getAllBookingsAction({ year, month, day } = {}) {
   let bookings = await prisma.booking.findMany({
+    where: { bookingType: "Booking" },
+    orderBy: { createdAt: "desc" }, // ✅ newest first
+  });
+
+  const y = year ? Number(year) : null;
+  const m = month ? Number(month) : null;
+  const d = day ? Number(day) : null;
+
+  bookings = bookings.filter((b) => {
+    const dt = new Date(b.appointment);
+    const by = dt.getFullYear();
+    const bm = dt.getMonth() + 1;
+    const bd = dt.getDate();
+
+    if (y && m && d) return by === y && bm === m && bd === d;
+    if (y && m && !d) return by === y && bm === m;
+    if (y && !m && !d) return by === y;
+    if (!y && m && !d) return bm === m;
+    if (!y && !m && d) return bd === d;
+    if (!y && m && d) return bm === m && bd === d;
+
+    return true;
+  });
+
+  return { success: true, msg: "OK", bookings };
+}
+export async function getAllBookingOrdersAction({ year, month, day } = {}) {
+  let bookings = await prisma.booking.findMany({
+    where: { bookingType: "Order" },
     orderBy: { createdAt: "desc" }, // ✅ newest first
   });
 

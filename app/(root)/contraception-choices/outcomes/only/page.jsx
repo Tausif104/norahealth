@@ -214,7 +214,10 @@ export default function OnlySection() {
                   </li>
                 </ul>
               </div>
+            </div>
 
+            {/* Right column (FAQ) */}
+            <div className='md:pl-8 space-y-6'>
               <h3 className='text-xl lg:text-2xl font-semibold'>
                 Possible Side Effects
               </h3>
@@ -294,10 +297,6 @@ export default function OnlySection() {
                 consultations before starting POCs—click here to book a
                 consultation.
               </p>
-            </div>
-
-            {/* Right column (FAQ) */}
-            <div className='md:pl-8 space-y-6'>
               <h3 className='text-xl lg:text-2xl font-semibold'>
                 Who Should Not Use POCs?
               </h3>

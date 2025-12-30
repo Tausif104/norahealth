@@ -59,63 +59,62 @@ export default function CondomsSection() {
                   effective. Using condoms correctly every time you have sex is
                   the best way to maximize their effectiveness.
                 </p>
-
-                <h3 className='text-xl lg:text-2xl font-semibold mt-3'>
-                  Benefits
-                </h3>
-                <ul className='text-base list-inside space-y-1 text-[#3A3D42]'>
-                  <li className='flex items-start gap-2'>
-                    <span className='mt-[3px]'>
-                      <Image
-                        src='/images/results/arrow-narrow-right.png'
-                        alt='faq'
-                        width={18}
-                        height={18}
-                      />
-                    </span>
-                    Helps prevent the transmission of sexually transmitted
-                    infections (STIs), including HIV
-                  </li>
-                  <li className='flex items-start gap-2'>
-                    <span className='mt-[3px]'>
-                      <Image
-                        src='/images/results/arrow-narrow-right.png'
-                        alt='faq'
-                        width={18}
-                        height={18}
-                      />
-                    </span>
-                    Available without prescription and easy to use
-                  </li>
-                  <li className='flex items-start gap-2'>
-                    <span className='mt-[3px]'>
-                      <Image
-                        src='/images/results/arrow-narrow-right.png'
-                        alt='faq'
-                        width={18}
-                        height={18}
-                      />
-                    </span>
-                    No hormones—few or no hormone-related side effects
-                  </li>
-                  <li className='flex items-start gap-2'>
-                    <span className='mt-[3px]'>
-                      <Image
-                        src='/images/results/arrow-narrow-right.png'
-                        alt='faq'
-                        width={18}
-                        height={18}
-                      />
-                    </span>
-                    Can be used along with other birth control methods for extra
-                    protection
-                  </li>
-                </ul>
               </div>
             </div>
 
             {/* Right column (FAQ) */}
             <div className='md:pl-8'>
+              <h3 className='text-xl lg:text-2xl font-semibold mt-3'>
+                Benefits
+              </h3>
+              <ul className='text-base list-inside space-y-1 text-[#3A3D42]'>
+                <li className='flex items-start gap-2'>
+                  <span className='mt-[3px]'>
+                    <Image
+                      src='/images/results/arrow-narrow-right.png'
+                      alt='faq'
+                      width={18}
+                      height={18}
+                    />
+                  </span>
+                  Helps prevent the transmission of sexually transmitted
+                  infections (STIs), including HIV
+                </li>
+                <li className='flex items-start gap-2'>
+                  <span className='mt-[3px]'>
+                    <Image
+                      src='/images/results/arrow-narrow-right.png'
+                      alt='faq'
+                      width={18}
+                      height={18}
+                    />
+                  </span>
+                  Available without prescription and easy to use
+                </li>
+                <li className='flex items-start gap-2'>
+                  <span className='mt-[3px]'>
+                    <Image
+                      src='/images/results/arrow-narrow-right.png'
+                      alt='faq'
+                      width={18}
+                      height={18}
+                    />
+                  </span>
+                  No hormones—few or no hormone-related side effects
+                </li>
+                <li className='flex items-start gap-2'>
+                  <span className='mt-[3px]'>
+                    <Image
+                      src='/images/results/arrow-narrow-right.png'
+                      alt='faq'
+                      width={18}
+                      height={18}
+                    />
+                  </span>
+                  Can be used along with other birth control methods for extra
+                  protection
+                </li>
+              </ul>
               <h3 className='text-xl lg:text-2xl font-semibold'>
                 Frequently Asked Questions
               </h3>

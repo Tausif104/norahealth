@@ -103,6 +103,11 @@ export function UserTable({ users, admin }) {
     {
       accessorKey: "email",
       header: "Email",
+      filterFn: (row, id, value) => {
+        const v = (value ?? "").toString().toLowerCase();
+        const cell = (row.getValue(id) ?? "").toString().toLowerCase();
+        return cell.includes(v);
+      },
       cell: ({ row }) => (
         <div>
           <Link href='/' className='hover:underline'>
@@ -111,6 +116,7 @@ export function UserTable({ users, admin }) {
         </div>
       ),
     },
+
     // {
     //   accessorKey: "role",
     //   header: "Role",
@@ -349,6 +355,16 @@ export function UserTable({ users, admin }) {
       </div>
       <div className='flex items-center py-4'>
         <CreateUserForm />
+        <div className='flex items-center py-4 w-full max-w-sm ml-4'>
+          <input
+            value={table.getColumn("email")?.getFilterValue() ?? ""}
+            onChange={(e) =>
+              table.getColumn("email")?.setFilterValue(e.target.value)
+            }
+            placeholder='Search by email...'
+            className='w-[260px] bg-white rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-200'
+          />
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='ml-auto'>

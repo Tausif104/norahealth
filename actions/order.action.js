@@ -117,6 +117,7 @@ export const getRecentOrderByUser = async () => {
 export const updateOrderStatus = async (formData) => {
   const orderId = formData.get("orderId");
   const status = formData.get("status");
+  const trackingId = formData.get("trackingId");
   const adminUser = await getAdminUser();
   if (!adminUser?.admin?.isAdmin) {
     return { success: false, msg: "Unauthorized. Not an admin." };
@@ -124,7 +125,7 @@ export const updateOrderStatus = async (formData) => {
 
   const order = await prisma.order.update({
     where: { id: Number(orderId) },
-    data: { status },
+    data: { status, trackingId },
   });
 
   if (!order) {

@@ -63,7 +63,7 @@ import { formatDate } from "@/lib/utils";
 import {
   createOrderFromBooking,
   deleteBooking,
-  getAllBookingsAction,
+  getAllBookingOrdersAction,
 } from "@/actions/booking.action";
 import { useAdmin } from "@/lib/adminContext";
 import { toast } from "sonner";
@@ -231,7 +231,7 @@ export default function AppointmentOrderTable() {
   async function fetchBookings() {
     setLoading(true);
     try {
-      const res = await getAllBookingsAction({
+      const res = await getAllBookingOrdersAction({
         year: year || undefined,
         month: month || undefined,
         day: day || undefined,

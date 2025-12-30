@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { prisma } from "@/lib/client/prisma";
 
-export default async function AppointmentDetailsPage({ params }) {
+export default async function AppointmentOrderDetailsPage({ params }) {
   const param = await params;
   const booking = await prisma.booking.findUnique({
     where: { id: Number(param.id) },
@@ -18,11 +18,11 @@ export default async function AppointmentDetailsPage({ params }) {
     include: { orders: true, account: true },
   });
 
-  console.log(user);
+  console.log(booking, user);
 
   return (
     <div className='p-6  space-y-6'>
-      <h1 className='text-xl font-semibold'>Appointment Details</h1>
+      <h1 className='text-xl font-semibold'>Appointment Order Details</h1>
 
       {/* Booking Info */}
       <section className=' p-4 space-y-2'>
@@ -66,7 +66,7 @@ export default async function AppointmentDetailsPage({ params }) {
 
       {booking.bookingType === "Order" && (
         <section className='p-4 space-y-2'>
-          <h2 className='font-bold text-xl'>Order Appointment Info</h2>
+          <h2 className='font-bold text-xl'>Appointment Order Info</h2>
           <p>
             <b>NHS Service:</b> {booking.nhsService}
           </p>
@@ -92,6 +92,12 @@ export default async function AppointmentDetailsPage({ params }) {
           </p>
           <p>
             <b>Name:</b> {user?.account?.firstName} {user?.account?.lastName}
+          </p>
+          <p>
+            <b>Date of Birth:</b>{" "}
+            {user?.account?.dob
+              ? new Date(user.account.dob).toISOString().split("T")[0]
+              : "N/A"}
           </p>
           <p>
             <b>Role:</b> {user.role}

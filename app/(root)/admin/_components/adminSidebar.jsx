@@ -49,11 +49,25 @@ const AdminSidebar = () => {
         <Link
           href='/admin/appointments'
           className={`${baseClasses} ${
-            pathname === "/admin/appointments" ? activeClasses : inactiveClasses
+            pathname.startsWith("/admin/appointments") &&
+            !pathname.startsWith("/admin/appointments-order")
+              ? activeClasses
+              : inactiveClasses
           }`}
         >
           <ClipboardClock className='w-4 h-4' />
           <span>Appointments</span>
+        </Link>
+        <Link
+          href='/admin/appointments-order'
+          className={`${baseClasses} ${
+            pathname.startsWith("/admin/appointments-order")
+              ? activeClasses
+              : inactiveClasses
+          }`}
+        >
+          <ClipboardClock className='w-4 h-4' />
+          <span>Appointments Order</span>
         </Link>
         {/* Booking Slot */}
         <Link
