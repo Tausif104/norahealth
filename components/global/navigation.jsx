@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import Cookies from "js-cookie";
 import { User, LogInIcon } from "lucide-react";
 import { menuItems } from "@/data/menu";
 import {
@@ -9,24 +11,34 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { loggedInUserAction, logoutAction } from "@/actions/user.action";
+
 import LogoutMenuItem from "@/app/(root)/_components/LogoutMenuItem";
+import { useContext, useEffect, useState } from "react";
+import { BlogContext } from "@/lib/BlogContext";
 
-const Navigation = async () => {
-  const payload = await loggedInUserAction();
-
-  const isAdmin =
-    payload?.payload?.role === "ADMIN" ||
-    payload?.payload?.role === "SUPERADMIN";
-  const isAuthor = payload?.payload?.role === "AUTHOR";
-
+const Navigation = ({ isAdmin, payload, isAuthor, logoutAction }) => {
+  const [currentLang, setCurrentLang] = useState("en");
+  const { control, setControl } = useContext(BlogContext);
+  useEffect(() => {
+    const saved = Cookies.get("userLang");
+    if (!saved) {
+      Cookies.set("userLang", "en", { expires: 7 });
+      setCurrentLang("en");
+    } else {
+      setCurrentLang(saved);
+    }
+  }, [control]);
   return (
     <nav className='flex items-center gap-6'>
       <ul className='flex items-center gap-6'>
         {menuItems.map((item) => (
           <li key={item.id}>
             <Link
-              className='font-medium xl:text-[16px] lg:text-[14px] text-[16px]'
+              className={`font-medium   text-[16px] ${
+                currentLang === "en"
+                  ? "xl:text-[16px] lg:text-[13px]"
+                  : "2xl:text-[15px] xl:text-[14px] lg:text-[12px]"
+              }`}
               href={item.link}
             >
               {item.label}

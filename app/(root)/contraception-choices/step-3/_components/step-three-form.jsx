@@ -1,5 +1,6 @@
 import ChoiceCheckBox from "@/components/global/choice-check";
 import OutlineBtn from "@/components/global/outline-btn";
+import PrimaryBtn from "@/components/global/primary-btn";
 import { myHealth } from "@/data/contraception";
 import { ArrowRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";

@@ -95,9 +95,7 @@ export default async function AppointmentOrderDetailsPage({ params }) {
           </p>
           <p>
             <b>Date of Birth:</b>{" "}
-            {user?.account?.dob
-              ? new Date(user.account.dob).toISOString().split("T")[0]
-              : "N/A"}
+            {user?.account?.dob ? formatDate(user.account.dob) : "N/A"}
           </p>
           <p>
             <b>Role:</b> {user.role}

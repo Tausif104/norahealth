@@ -328,7 +328,7 @@ export default function AppointmentOrderTable() {
         <div>
           <label className='block text-xs text-gray-600 mb-1'>Year</label>
           <Select value={year} onValueChange={setYear}>
-            <SelectTrigger className='w-[120px]'>
+            <SelectTrigger className='w-[120px] bg-white/40'>
               <SelectValue placeholder='Year' />
             </SelectTrigger>
             <SelectContent>
@@ -344,7 +344,7 @@ export default function AppointmentOrderTable() {
         <div>
           <label className='block text-xs text-gray-600 mb-1'>Month</label>
           <Select value={month} onValueChange={setMonth}>
-            <SelectTrigger className='w-[120px]'>
+            <SelectTrigger className='w-[120px] bg-white/40'>
               <SelectValue placeholder='Month' />
             </SelectTrigger>
             <SelectContent>
@@ -360,7 +360,7 @@ export default function AppointmentOrderTable() {
         <div>
           <label className='block text-xs text-gray-600 mb-1'>Day</label>
           <Select value={day} onValueChange={setDay}>
-            <SelectTrigger className='w-[80px]'>
+            <SelectTrigger className='w-[80px] bg-white/40'>
               <SelectValue placeholder='Day' />
             </SelectTrigger>
             <SelectContent>
@@ -394,7 +394,7 @@ export default function AppointmentOrderTable() {
             table.getColumn("email")?.setFilterValue(e.target.value)
           }
           placeholder='Search by email...'
-          className='w-[260px] bg-white rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-200'
+          className='w-[260px] bg-white/40 rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-200'
         />
       </div>
 

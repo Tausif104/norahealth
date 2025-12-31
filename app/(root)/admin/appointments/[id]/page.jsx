@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { prisma } from "@/lib/client/prisma";
+import OrdersTable from "../../_components/orders-table";
 
 export default async function AppointmentDetailsPage({ params }) {
   const param = await params;
@@ -94,16 +95,23 @@ export default async function AppointmentDetailsPage({ params }) {
             <b>Name:</b> {user?.account?.firstName} {user?.account?.lastName}
           </p>
           <p>
+            <b>Date of Birth:</b>{" "}
+            {user?.account?.dob ? formatDate(user.account.dob) : "N/A"}
+          </p>
+          <p>
             <b>Role:</b> {user.role}
           </p>
 
           <h3 className='mt-3 font-bold text-xl'>Orders</h3>
           {user.orders.length ? (
-            user.orders.map((o) => (
-              <div key={o.id} className='text-sm'>
-                {o.medicineName} — {o.status} — {formatDate(o.createdAt)}
-              </div>
-            ))
+            <OrdersTable
+              data={user.orders.map((o) => ({
+                id: o.id,
+                medicineName: o.medicineName,
+                status: o.status,
+                createdAt: o.createdAt,
+              }))}
+            />
           ) : (
             <p>No orders yet.</p>
           )}

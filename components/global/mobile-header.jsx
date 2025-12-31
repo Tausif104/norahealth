@@ -10,10 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { loggedInUserAction, logoutAction } from "@/actions/user.action";
 
-const MobileHeader = async () => {
-  const payload = await loggedInUserAction();
+const MobileHeader = ({ payload, logoutAction }) => {
   const isAdmin = payload?.payload?.isAdmin;
   return (
     <header className='block lg:hidden'>
