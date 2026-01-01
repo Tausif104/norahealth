@@ -30,14 +30,14 @@ const Navigation = ({ isAdmin, payload, isAuthor, logoutAction }) => {
   }, [control]);
   return (
     <nav className='flex items-center gap-6'>
-      <ul className='flex items-center gap-6'>
+      <ul className='flex items-center gap-2.5 2xl:gap-6'>
         {menuItems.map((item) => (
           <li key={item.id}>
             <Link
               className={`font-medium   text-[16px] ${
                 currentLang === "en"
-                  ? "xl:text-[16px] lg:text-[13px]"
-                  : "2xl:text-[15px] xl:text-[14px] lg:text-[12px]"
+                  ? " lg:text-[13px] xl:text-[16px]"
+                  : "  lg:text-[12px] 2xl:text-[13px] xl:text-[14px]"
               }`}
               href={item.link}
             >

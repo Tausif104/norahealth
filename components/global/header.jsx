@@ -37,8 +37,8 @@ const Header = ({ isAdmin, isAuthor, payload, logoutAction }) => {
                   alt='Nora Health'
                   className={`max-w-[160px] ${
                     currentLang === "en"
-                      ? "xl:max-w-[256px]"
-                      : "xl:max-w-[160px]"
+                      ? "xl:max-w-[190px] 2xl:max-w-[230px]"
+                      : "lg:max-w-[130px] xl:max-w-[160px]"
                   } h-auto`}
                 />
               </Link>
