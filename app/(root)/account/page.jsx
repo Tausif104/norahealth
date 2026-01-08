@@ -5,6 +5,11 @@ import { getUserAccount } from "@/actions/account.action";
 import { redirect } from "next/navigation";
 import { loggedInUserAction } from "@/actions/user.action";
 
+export const metadata = {
+  title: "Account",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
+
 const page = async () => {
   const account = await getUserAccount();
   const payload = await loggedInUserAction();

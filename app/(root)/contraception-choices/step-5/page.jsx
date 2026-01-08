@@ -1,30 +1,30 @@
-'use client'
+"use client";
 
-import PageBanner from '@/components/global/page-banner'
-import PrimaryBtn from '@/components/global/primary-btn'
-import { useActionState, useEffect } from 'react'
-import { contraceptionStepFive } from '@/actions/contraception.action'
-import SkeletonLoading from '../_components/loading-skeleton'
-import StepFiveForm from './_components/step-five-form'
-import { toast } from 'sonner'
-import StepsCount from '../_components/steps'
+import PageBanner from "@/components/global/page-banner";
+import PrimaryBtn from "@/components/global/primary-btn";
+import { useActionState, useEffect } from "react";
+import { contraceptionStepFive } from "@/actions/contraception.action";
+import SkeletonLoading from "../_components/loading-skeleton";
+import StepFiveForm from "./_components/step-five-form";
+import { toast } from "sonner";
+import StepsCount from "../_components/steps";
 
 const StepFour = () => {
   const initialState = {
-    msg: '',
-  }
+    msg: "",
+  };
 
   const [state, action, loading] = useActionState(
     contraceptionStepFive,
     initialState
-  )
+  );
 
   useEffect(() => {
     if (state.msg) {
-      toast.warning(state.msg)
-      state.msg = ''
+      toast.warning(state.msg);
+      state.msg = "";
     }
-  }, [state.msg])
+  }, [state.msg]);
 
   return (
     <>
@@ -50,7 +50,7 @@ const StepFour = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default StepFour
+export default StepFour;

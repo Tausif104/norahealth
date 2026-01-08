@@ -2,7 +2,10 @@ import { getUserAccount } from "@/actions/account.action";
 import { redirect } from "next/navigation";
 import HealthForm from "./_components/healthForm";
 import Link from "next/link";
-
+export const metadata = {
+  title: "Health Information",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
 const HealthPage = async () => {
   const account = await getUserAccount();
 

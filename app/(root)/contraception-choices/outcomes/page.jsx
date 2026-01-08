@@ -4,31 +4,37 @@ import {
   condoms,
   rings,
   implantInjection,
-} from '@/data/contraception-strings'
-import Tool from './_components/tool'
+} from "@/data/contraception-strings";
+import Tool from "./_components/tool";
+
+export const metadata = {
+  title: "Contraception Choices",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
 
 const OutComesPage = async ({ searchParams }) => {
-  const { contraceptive, myhealthtwo, myhealth, sexhealth } = await searchParams
+  const { contraceptive, myhealthtwo, myhealth, sexhealth } =
+    await searchParams;
 
-  const sexhealthArray = sexhealth?.split(',')
-  const myhealthArray = myhealth?.split(',')
-  const myhealthtwoArray = myhealthtwo?.split(',')
-  const contraceptiveArray = contraceptive?.split(',')
+  const sexhealthArray = sexhealth?.split(",");
+  const myhealthArray = myhealth?.split(",");
+  const myhealthtwoArray = myhealthtwo?.split(",");
+  const contraceptiveArray = contraceptive?.split(",");
 
   const combinedArray = [
     ...sexhealthArray,
     ...myhealthArray,
     ...myhealthtwoArray,
     ...contraceptiveArray,
-  ]
+  ];
 
-  const excludeCondom = combinedArray.some((item) => condoms.includes(item))
-  const excludeCoc = combinedArray.some((item) => coc.includes(item))
-  const excludePop = combinedArray.some((item) => pop.includes(item))
-  const excludeRings = combinedArray.some((item) => rings.includes(item))
+  const excludeCondom = combinedArray.some((item) => condoms.includes(item));
+  const excludeCoc = combinedArray.some((item) => coc.includes(item));
+  const excludePop = combinedArray.some((item) => pop.includes(item));
+  const excludeRings = combinedArray.some((item) => rings.includes(item));
   const excludeImplantInjection = combinedArray.some((item) =>
     implantInjection.includes(item)
-  )
+  );
 
   return (
     <>
@@ -45,21 +51,21 @@ const OutComesPage = async ({ searchParams }) => {
           </p>
 
           <div className='grid xl:grid-cols-3 md:grid-cols-2 grid-cols-2 md:gap-8 gap-4 justify-center'>
-            <div className={excludeCoc ? 'hidden' : 'block'}>
+            <div className={excludeCoc ? "hidden" : "block"}>
               <Tool
                 img='/images/tools/oral.png'
                 name='Combined oral contraceptives'
                 url='/contraception-choices/outcomes/oral'
               />
             </div>
-            <div className={excludePop ? 'hidden' : 'block'}>
+            <div className={excludePop ? "hidden" : "block"}>
               <Tool
                 img='/images/tools/only.png'
                 name='Progesterone only contraceptives'
                 url='/contraception-choices/outcomes/only'
               />
             </div>
-            <div className={excludeCondom ? 'hidden' : 'block'}>
+            <div className={excludeCondom ? "hidden" : "block"}>
               <Tool
                 img='/images/tools/condoms.png'
                 name='Condoms'
@@ -71,21 +77,21 @@ const OutComesPage = async ({ searchParams }) => {
               name='Copper IUD'
               url='/contraception-choices/outcomes/copper-iud'
             />
-            <div className={excludeImplantInjection ? 'hidden' : 'block'}>
+            <div className={excludeImplantInjection ? "hidden" : "block"}>
               <Tool
                 img='/images/tools/implants.png'
                 name='Implants'
                 url='/contraception-choices/outcomes/implants'
               />
             </div>
-            <div className={excludeImplantInjection ? 'hidden' : 'block'}>
+            <div className={excludeImplantInjection ? "hidden" : "block"}>
               <Tool
                 img='/images/tools/injection.png'
                 name='Injections'
                 url='/contraception-choices/outcomes/injection'
               />
             </div>
-            <div className={excludeRings ? 'hidden' : 'block'}>
+            <div className={excludeRings ? "hidden" : "block"}>
               <Tool
                 img='/images/tools/rings.png'
                 name='Rings'
@@ -94,7 +100,7 @@ const OutComesPage = async ({ searchParams }) => {
             </div>
           </div>
 
-          {myhealthtwo.includes('Current or recent breast cancer') && (
+          {myhealthtwo.includes("Current or recent breast cancer") && (
             <div className='text-center border border-[#D6866B] bg-[#FFF8EF] p-5 rounded-2xl mt-20'>
               <p className='font-semibold'>
                 You have indicated that you have breast cancer and therefore we
@@ -106,7 +112,7 @@ const OutComesPage = async ({ searchParams }) => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default OutComesPage
+export default OutComesPage;

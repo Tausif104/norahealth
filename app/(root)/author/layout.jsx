@@ -4,6 +4,11 @@ import { AuthorProvider } from "@/lib/authorContext";
 import AuthorSidebar from "./_components/authorSidebar";
 import { ProfileProvider } from "@/lib/profileContext";
 
+export const metadata = {
+  title: "Author",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
+
 const layout = ({ children }) => {
   return (
     <ProfileProvider>

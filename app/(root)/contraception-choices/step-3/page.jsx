@@ -1,30 +1,30 @@
-'use client'
+"use client";
 
-import PageBanner from '@/components/global/page-banner'
-import PrimaryBtn from '@/components/global/primary-btn'
-import { useActionState, useEffect } from 'react'
-import { contraceptionStepThree } from '@/actions/contraception.action'
-import SkeletonLoading from '../_components/loading-skeleton'
-import StepThreeForm from './_components/step-three-form'
-import { toast } from 'sonner'
-import StepsCount from '../_components/steps'
+import PageBanner from "@/components/global/page-banner";
+import PrimaryBtn from "@/components/global/primary-btn";
+import { useActionState, useEffect } from "react";
+import { contraceptionStepThree } from "@/actions/contraception.action";
+import SkeletonLoading from "../_components/loading-skeleton";
+import StepThreeForm from "./_components/step-three-form";
+import { toast } from "sonner";
+import StepsCount from "../_components/steps";
 
 const StepThree = () => {
   const initialState = {
-    msg: '',
-  }
+    msg: "",
+  };
 
   const [state, action, loading] = useActionState(
     contraceptionStepThree,
     initialState
-  )
+  );
 
   useEffect(() => {
     if (state.msg) {
-      toast.warning(state.msg)
-      state.msg = ''
+      toast.warning(state.msg);
+      state.msg = "";
     }
-  }, [state.msg])
+  }, [state.msg]);
 
   return (
     <>
@@ -49,7 +49,7 @@ const StepThree = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default StepThree
+export default StepThree;

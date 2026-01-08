@@ -1,4 +1,8 @@
-import PrimaryBtn from '@/components/global/primary-btn'
+import PrimaryBtn from "@/components/global/primary-btn";
+export const metadata = {
+  title: "Contraception Choices",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
 
 const BeginSteps = () => {
   return (
@@ -23,7 +27,7 @@ const BeginSteps = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default BeginSteps
+export default BeginSteps;

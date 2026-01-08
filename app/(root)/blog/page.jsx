@@ -3,9 +3,14 @@ import PageBanner from "@/components/global/page-banner";
 import React from "react";
 import BlogList from "./_components/blog-list";
 
+export const metadata = {
+  title: "Blog",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
+
 const page = async () => {
   const allPost = await allPosts();
-  console.log(allPost);
+  // console.log(allPost);
 
   return (
     <>

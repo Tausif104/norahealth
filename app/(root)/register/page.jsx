@@ -2,7 +2,10 @@ import { loggedInUserAction } from "@/actions/user.action";
 import RegisterForm from "./_components/registerForm";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-
+export const metadata = {
+  title: "Register",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
 const RegisterPage = async () => {
   const payload = await loggedInUserAction();
 

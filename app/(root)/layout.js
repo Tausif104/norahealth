@@ -6,7 +6,10 @@ import GoogleTranslate from "./_components/GoogleTranslate";
 import { loggedInUserAction, logoutAction } from "@/actions/user.action";
 
 export const metadata = {
-  title: "Home",
+  title: {
+    default: "Home",
+    template: "%s | Nora Health",
+  },
   description: "Free Oral Contraception, Delivered to Your Door",
 };
 

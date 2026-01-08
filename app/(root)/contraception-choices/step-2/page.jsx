@@ -1,30 +1,30 @@
-'use client'
+"use client";
 
-import { useActionState, useEffect } from 'react'
-import PageBanner from '@/components/global/page-banner'
-import PrimaryBtn from '@/components/global/primary-btn'
-import { contraceptionStepTwo } from '@/actions/contraception.action'
-import StepTwoForm from './_components/step-two-form'
-import SkeletonLoading from '../_components/loading-skeleton'
-import { toast } from 'sonner'
-import StepsCount from '../_components/steps'
+import { useActionState, useEffect } from "react";
+import PageBanner from "@/components/global/page-banner";
+import PrimaryBtn from "@/components/global/primary-btn";
+import { contraceptionStepTwo } from "@/actions/contraception.action";
+import StepTwoForm from "./_components/step-two-form";
+import SkeletonLoading from "../_components/loading-skeleton";
+import { toast } from "sonner";
+import StepsCount from "../_components/steps";
 
 const StepTwo = () => {
   const initialState = {
-    msg: '',
-  }
+    msg: "",
+  };
 
   const [state, action, loading] = useActionState(
     contraceptionStepTwo,
     initialState
-  )
+  );
 
   useEffect(() => {
     if (state.msg) {
-      toast.warning(state.msg)
-      state.msg = ''
+      toast.warning(state.msg);
+      state.msg = "";
     }
-  }, [state.msg])
+  }, [state.msg]);
 
   return (
     <>
@@ -50,7 +50,7 @@ const StepTwo = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default StepTwo
+export default StepTwo;

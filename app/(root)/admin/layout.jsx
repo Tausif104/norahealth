@@ -3,6 +3,11 @@ import React from "react";
 import AdminSidebar from "./_components/adminSidebar";
 import { ProfileProvider } from "@/lib/profileContext";
 
+export const metadata = {
+  title: "Admin",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
+
 const layout = ({ children }) => {
   return (
     <ProfileProvider>

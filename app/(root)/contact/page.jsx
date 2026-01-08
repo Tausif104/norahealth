@@ -4,6 +4,11 @@ import ContactInfo from "./_components/contact-info";
 import Faq from "../_components/faq";
 import GetInTouch from "./_components/get-in-touch";
 
+export const metadata = {
+  title: "Contact Us",
+  description: "Contact Us",
+};
+
 const ContactPage = () => {
   return (
     <>

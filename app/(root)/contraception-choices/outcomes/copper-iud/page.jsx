@@ -1,6 +1,10 @@
 import DecorativeBanner from "../../_components/decorative-banner";
 import PrimaryBtn from "@/components/global/primary-btn";
 import Image from "next/image";
+export const metadata = {
+  title: "Contraception Choices",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
 
 export default function CopperSection() {
   return (

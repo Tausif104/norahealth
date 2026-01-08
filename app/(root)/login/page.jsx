@@ -1,7 +1,10 @@
 import React from "react";
 import LoginForm from "./_components/loginForm";
 import Link from "next/link";
-
+export const metadata = {
+  title: "Login",
+  description: "Free Oral Contraception, Delivered to Your Door",
+};
 const page = async () => {
   return (
     <>
