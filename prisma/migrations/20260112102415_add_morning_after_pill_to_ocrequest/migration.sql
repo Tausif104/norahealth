@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "OcRequest" ADD VALUE 'MORNING_AFTER_PILL';

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { prisma } from "@/lib/client/prisma";
+import CreateOrderDialog from "./CreateOrderDialog";
 
 export default async function AppointmentOrderDetailsPage({ params }) {
   const param = await params;
@@ -23,7 +24,7 @@ export default async function AppointmentOrderDetailsPage({ params }) {
   return (
     <div className='p-6  space-y-6'>
       <h1 className='text-xl font-semibold'>Appointment Order Details</h1>
-
+      <CreateOrderDialog bookingId={booking.id} />
       {/* Booking Info */}
       <section className=' p-4 space-y-2'>
         <h2 className='font-bold text-xl'>Booking Info</h2>
@@ -69,6 +70,9 @@ export default async function AppointmentOrderDetailsPage({ params }) {
           <h2 className='font-bold text-xl'>Appointment Order Info</h2>
           <p>
             <b>NHS Service:</b> {booking.nhsService}
+          </p>
+          <p>
+            <b>OC Requested:</b> {booking.ocRequest}
           </p>
           <p>
             <b>Appointment Requested:</b>{" "}

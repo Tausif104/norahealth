@@ -205,7 +205,9 @@ export async function createBookingOrder(formData) {
     const phoneNumber = formData.get("phoneNumber")?.toString().trim();
     const notes = formData.get("notes")?.toString().trim() || null;
 
-    const ocRequest = formData.get("ocRequest")?.toString();
+    const ocRaw = formData.get("ocRequest");
+    const ocRequest =
+      typeof ocRaw === "string" ? ocRaw.trim().toUpperCase() : null;
     const appointmentRequest = formData.get("appointmentRequest") === "true";
 
     const serviceName = formData.get("serviceName")?.toString().trim();
