@@ -2,6 +2,16 @@
 
 import * as React from "react";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   ColumnDef,
   ColumnFiltersState,
   flexRender,
@@ -47,7 +57,7 @@ import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { CreateUserForm } from "./create-user-form";
 import { useAdmin } from "@/lib/adminContext";
-import { updateUserRoleAction } from "@/actions/admin.action";
+import { deleteUserAction, updateUserRoleAction } from "@/actions/admin.action";
 import { toast } from "sonner";
 import { UpdateUserDialog } from "./update-user-dialog";
 const formatRole = (role) =>
@@ -55,12 +65,61 @@ const formatRole = (role) =>
 
 export function UserTable({ users, admin }) {
   const { setMenuOpen } = useAdmin();
-
+  const actor = admin?.admin; // logged in admin user
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
   console.log(users, "userTable");
+
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [deleteTarget, setDeleteTarget] = React.useState(null);
+
+  const canDeleteUser = (actor, targetUser) => {
+    if (!actor || !targetUser) return false;
+
+    const isSelf = actor?.id?.toString() === targetUser?.id?.toString();
+    if (isSelf) return false;
+
+    if (actor.role === "SUPERADMIN") return true;
+
+    if (actor.role === "ADMIN") {
+      return ["PATIENT", "AUTHOR"].includes(targetUser.role);
+    }
+
+    return false;
+  };
+
+  const openDeleteDialog = (user) => {
+    setDeleteTarget(user);
+    setDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    const allowed = canDeleteUser(actor, deleteTarget);
+    if (!allowed) {
+      toast.error("Permission denied");
+      return;
+    }
+
+    setIsDeleting(true);
+    const res = await deleteUserAction(deleteTarget.id);
+
+    if (!res.success) {
+      toast.error(res.message);
+      setIsDeleting(false);
+      return;
+    }
+
+    toast.success(res.message);
+    setIsDeleting(false);
+    setDeleteOpen(false);
+    setDeleteTarget(null);
+    router.refresh();
+  };
   const handleRoleChange = async (userId, newRole) => {
     const res = await updateUserRoleAction({ userId, newRole });
 
@@ -71,6 +130,20 @@ export function UserTable({ users, admin }) {
 
     toast.success(res.message);
   };
+  const handleDeleteUser = async (userId) => {
+    const ok = window.confirm("Are you sure you want to delete this user?");
+    if (!ok) return;
+
+    const res = await deleteUserAction(userId);
+
+    if (!res.success) {
+      toast.error(res.message);
+      return;
+    }
+
+    toast.success(res.message);
+  };
+
   const columns = [
     {
       id: "select",
@@ -260,6 +333,7 @@ export function UserTable({ users, admin }) {
         const user = row.original;
         const admin = table.options.admin.admin;
         const [open, setOpen] = React.useState(false);
+        const canDelete = canDeleteUser(actor, user);
 
         return (
           <>
@@ -290,6 +364,19 @@ export function UserTable({ users, admin }) {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href={`/admin/${user.id}/orders`}>Orders</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem
+                  disabled={!canDelete}
+                  className='text-red-600 focus:text-red-600'
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    openDeleteDialog(user);
+                  }}
+                >
+                  <Trash className='mr-2 h-4 w-4' />
+                  Delete User
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -466,6 +553,49 @@ export function UserTable({ users, admin }) {
             Next
           </Button>
         </div>
+      </div>
+      <div>
+        <AlertDialog
+          open={deleteOpen}
+          onOpenChange={(v) => {
+            setDeleteOpen(v);
+            if (!v) {
+              setDeleteTarget(null);
+              setIsDeleting(false);
+            }
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this user?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone.
+                {deleteTarget?.email ? (
+                  <span className='block mt-2'>
+                    Deleting: <b>{deleteTarget.email}</b>
+                  </span>
+                ) : null}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>
+                Cancel
+              </AlertDialogCancel>
+
+              <AlertDialogAction
+                className='bg-red-600 hover:bg-red-700'
+                disabled={isDeleting}
+                onClick={(e) => {
+                  e.preventDefault();
+                  confirmDelete();
+                }}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

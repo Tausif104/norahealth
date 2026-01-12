@@ -70,7 +70,7 @@ const ConfirmOrder = ({ userDetails }) => {
       }
 
       toast.success("Contraceptives ordered successfully");
-      router.push("/profile");
+      router.push("/profile/orders");
     } catch (err) {
       toast.error("Something went wrong");
     } finally {

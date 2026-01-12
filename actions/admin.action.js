@@ -169,3 +169,75 @@ export const updateUserRoleAction = async ({ userId, newRole }) => {
 
   return { success: true, message: "User role updated successfully" };
 };
+
+// delete user action
+export const deleteUserAction = async (userId) => {
+  const actor = await getAdminUser();
+
+  if (!actor || !isAdminRole(actor.admin.role)) {
+    return { success: false, message: "Unauthorized" };
+  }
+
+  const actorRole = actor.admin.role;
+  const actorId = actor.admin.id;
+
+  // ❌ No self delete
+  if (actorId === userId) {
+    return { success: false, message: "You cannot delete your own account" };
+  }
+
+  const targetUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true },
+  });
+
+  if (!targetUser) {
+    return { success: false, message: "User not found" };
+  }
+
+  const targetRole = targetUser.role;
+
+  // 🔒 ADMIN: can delete ONLY PATIENT/AUTHOR
+  if (actorRole === "ADMIN") {
+    const deletable = ["PATIENT", "AUTHOR"];
+    if (!deletable.includes(targetRole)) {
+      return {
+        success: false,
+        message: "Admin can only delete Patient/Author users",
+      };
+    }
+  }
+
+  // 🔒 SUPERADMIN: can delete anyone except self (already checked)
+  // Optional safety: prevent deleting the last SUPERADMIN
+  if (targetRole === "SUPERADMIN") {
+    const superAdminCount = await prisma.user.count({
+      where: { role: "SUPERADMIN" },
+    });
+
+    if (superAdminCount <= 1) {
+      return {
+        success: false,
+        message: "You cannot delete the last Superadmin",
+      };
+    }
+  }
+
+  try {
+    await prisma.user.delete({ where: { id: userId } });
+
+    revalidatePath("/admin");
+    // revalidatePath("/admin/users"); // if you have a dedicated page
+
+    return { success: true, message: "User deleted successfully" };
+  } catch (err) {
+    // Common: foreign key constraint if user has related records
+    return {
+      success: false,
+      message:
+        err?.code === "P2003"
+          ? "Cannot delete user because related records exist"
+          : "Failed to delete user",
+    };
+  }
+};
