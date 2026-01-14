@@ -13,7 +13,9 @@ import { log } from "console";
 // register action
 export const registerAction = async (prevState, formData) => {
   // getting all the data from the form
-  const email = formData.get("email");
+  const rawEmail = formData.get("email");
+  const email =
+    typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
   const password = formData.get("password");
   const confirm = formData.get("confirm-password");
 
@@ -89,7 +91,9 @@ export const registerAction = async (prevState, formData) => {
 // Login Action
 export const loginAction = async (prevState, formData) => {
   // getting all the from the login form
-  const email = formData.get("email");
+  const rawEmail = formData.get("email");
+  const email =
+    typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
   const password = formData.get("password");
 
   // check if all the fields are filled

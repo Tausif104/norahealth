@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { prisma } from "@/lib/client/prisma";
 import CreateOrderDialog from "./CreateOrderDialog";
+import AppointmentOrdersTable from "./AppointOrdersTable";
 
 export default async function AppointmentOrderDetailsPage({ params }) {
   const param = await params;
@@ -22,12 +23,12 @@ export default async function AppointmentOrderDetailsPage({ params }) {
   console.log(booking, user);
 
   return (
-    <div className='p-6  space-y-6'>
+    <div className='p-6 w-full  space-y-6'>
       <h1 className='text-xl font-semibold'>Appointment Order Details</h1>
       <CreateOrderDialog bookingId={booking.id} />
       {/* Booking Info */}
       <section className=' p-4 space-y-2'>
-        <h2 className='font-bold text-xl'>Booking Info</h2>
+        <h2 className='font-bold text-xl'>Patient Info</h2>
         <p>
           <b>Name:</b> {booking.fullName}
         </p>
@@ -37,14 +38,15 @@ export default async function AppointmentOrderDetailsPage({ params }) {
         <p>
           <b>Phone:</b> {booking.phoneNumber}
         </p>
+
         <p>
-          <b>Service:</b> {booking.serviceName}
-        </p>
-        <p>
-          <b>Provider:</b> {booking.providerName}
-        </p>
-        <p>
-          <b>Appointment:</b> {formatDate(booking.appointment)}{" "}
+          <b>
+            {booking.bookingType === "Booking"
+              ? "Appointment Date"
+              : "Requested Date"}
+            :
+          </b>{" "}
+          {formatDate(booking.appointment)}{" "}
           {booking.slot ? `at ${booking.slot.startTime}` : ""}
         </p>
         <p>
@@ -67,7 +69,7 @@ export default async function AppointmentOrderDetailsPage({ params }) {
 
       {booking.bookingType === "Order" && (
         <section className='p-4 space-y-2'>
-          <h2 className='font-bold text-xl'>Appointment Order Info</h2>
+          <h2 className='font-bold text-xl'>Contraception Order Info</h2>
           <p>
             <b>NHS Service:</b> {booking.nhsService}
           </p>
@@ -106,12 +108,9 @@ export default async function AppointmentOrderDetailsPage({ params }) {
           </p>
 
           <h3 className='mt-3 font-bold text-xl'>Orders</h3>
-          {user.orders.length ? (
-            user.orders.map((o) => (
-              <div key={o.id} className='text-sm'>
-                {o.medicineName} — {o.status} — {formatDate(o.createdAt)}
-              </div>
-            ))
+
+          {user.orders?.length ? (
+            <AppointmentOrdersTable orders={user.orders} />
           ) : (
             <p>No orders yet.</p>
           )}
