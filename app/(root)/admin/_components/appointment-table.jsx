@@ -11,6 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 
 import {
   flexRender,
@@ -64,6 +65,7 @@ import {
   createOrderFromBooking,
   deleteBooking,
   getAllBookingsAction,
+  updateBookingStatus,
 } from "@/actions/booking.action";
 import { useAdmin } from "@/lib/adminContext";
 import { toast } from "sonner";
@@ -174,6 +176,24 @@ const columns = [
     },
   },
 
+  // ✅ NEW: Booking Status column
+  {
+    accessorKey: "bookingStatus",
+    header: "Status",
+    filterFn: (row, id, value) => {
+      if (!value) return true;
+      return String(row.getValue(id)) === String(value);
+    },
+    cell: ({ row }) => {
+      const s = row.getValue("bookingStatus") || "Incomplete";
+      return s === "Complete" ? (
+        <Badge className='bg-green-600 text-white'>Complete</Badge>
+      ) : (
+        <Badge className='bg-yellow-500 text-white'>Incomplete</Badge>
+      );
+    },
+  },
+
   {
     id: "actions",
     header: "Actions",
@@ -201,6 +221,13 @@ const columns = [
               onClick={() => table.options.meta.onCreateOrder(booking)}
             >
               Create Order
+            </DropdownMenuItem>
+
+            {/* ✅ NEW: Update Booking Status */}
+            <DropdownMenuItem
+              onClick={() => table.options.meta.onUpdateBookingStatus(booking)}
+            >
+              Update Status
             </DropdownMenuItem>
 
             <DropdownMenuItem>
@@ -246,6 +273,15 @@ export default function AppointmentOrderTable() {
   const [columnFilters, setColumnFilters] = useState([]);
 
   const [creatingOrder, setCreatingOrder] = useState(false);
+
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [selectedBookingForStatus, setSelectedBookingForStatus] =
+    useState(null);
+  const [bookingStatus, setBookingStatus] = useState("Incomplete");
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  // ✅ status filter (SelectItem value cannot be empty)
+  const [bookingStatusFilter, setBookingStatusFilter] = useState("ALL");
 
   useEffect(() => {
     if (!orderOpen) setCreatingOrder(false);
@@ -298,6 +334,12 @@ export default function AppointmentOrderTable() {
         setTrackingId("");
         setStatus("clinicalreview");
         setOrderOpen(true);
+      },
+
+      onUpdateBookingStatus: (booking) => {
+        setSelectedBookingForStatus(booking);
+        setBookingStatus(booking.bookingStatus || "Incomplete");
+        setStatusDialogOpen(true);
       },
     },
     getCoreRowModel: getCoreRowModel(),
@@ -397,6 +439,29 @@ export default function AppointmentOrderTable() {
           </Select>
         </div>
 
+        {/* ✅ NEW: BookingStatus filter */}
+        <div>
+          <label className='block text-xs text-gray-600 mb-1'>Status</label>
+          <Select
+            value={bookingStatusFilter}
+            onValueChange={(v) => {
+              setBookingStatusFilter(v);
+              table
+                .getColumn("bookingStatus")
+                ?.setFilterValue(v === "ALL" ? undefined : v);
+            }}
+          >
+            <SelectTrigger className='w-[160px] bg-white/40'>
+              <SelectValue placeholder='All' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='ALL'>All</SelectItem>
+              <SelectItem value='Incomplete'>Incomplete</SelectItem>
+              <SelectItem value='Complete'>Complete</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className='ml-auto'>
           <Button
             variant='outline'
@@ -404,6 +469,9 @@ export default function AppointmentOrderTable() {
               setYear("");
               setMonth("");
               setDay("");
+              setBookingStatusFilter("ALL");
+              table.getColumn("bookingStatus")?.setFilterValue(undefined);
+              table.getColumn("email")?.setFilterValue("");
             }}
           >
             Clear
@@ -585,6 +653,78 @@ export default function AppointmentOrderTable() {
                 </span>
               ) : (
                 "Create"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ✅ NEW: UPDATE BOOKING STATUS DIALOG */}
+      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+        <DialogContent className='sm:max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Update Booking Status</DialogTitle>
+            <DialogDescription>
+              Mark this request as Complete or Incomplete.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='space-y-4'>
+            <div>
+              <label className='text-sm font-medium'>Status</label>
+              <Select value={bookingStatus} onValueChange={setBookingStatus}>
+                <SelectTrigger className='w-full'>
+                  <SelectValue placeholder='Select status' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='Incomplete'>Incomplete</SelectItem>
+                  <SelectItem value='Complete'>Complete</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant='outline'
+              onClick={() => setStatusDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              className='bg-theme'
+              disabled={updatingStatus}
+              onClick={async () => {
+                if (!selectedBookingForStatus?.id) return;
+
+                try {
+                  setUpdatingStatus(true);
+
+                  const res = await updateBookingStatus({
+                    bookingId: selectedBookingForStatus.id,
+                    bookingStatus,
+                  });
+
+                  if (res?.success) {
+                    toast.success(res?.msg || "Status updated");
+                    setStatusDialogOpen(false);
+                    await fetchBookings();
+                  } else {
+                    toast.error(res?.msg || "Update failed");
+                  }
+                } finally {
+                  setUpdatingStatus(false);
+                }
+              }}
+            >
+              {updatingStatus ? (
+                <span className='flex items-center gap-2'>
+                  <LoaderIcon className='size-4 animate-spin' />
+                  Updating...
+                </span>
+              ) : (
+                "Update"
               )}
             </Button>
           </DialogFooter>

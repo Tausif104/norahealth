@@ -133,12 +133,18 @@ model Booking {
   appointmentRequest Boolean? @default(false)
   createdAt          DateTime @default(now())
 
-  bookingType BookingType? @default(Booking)
+  bookingType   BookingType?   @default(Booking)
+  bookingStatus BookingStatus? @default(Incomplete)
 
   slotId Int?
   slot   BookingSlot? @relation(fields: [slotId], references: [id])
 
   @@index([slotId])
+}
+
+enum BookingStatus {
+  Incomplete
+  Complete
 }
 
 enum BookingType {

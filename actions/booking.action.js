@@ -938,3 +938,51 @@ export async function createOrderFromBooking({
     return { success: false, msg: "Server error" };
   }
 }
+
+export async function updateBookingStatus(formDataOrObj) {
+  try {
+    let bookingId;
+    let bookingStatus;
+
+    // support: FormData OR plain object
+    if (formDataOrObj && typeof formDataOrObj.get === "function") {
+      bookingId = formDataOrObj.get("bookingId");
+      bookingStatus = formDataOrObj.get("bookingStatus");
+    } else if (formDataOrObj) {
+      bookingId = formDataOrObj.bookingId;
+      bookingStatus = formDataOrObj.bookingStatus;
+    }
+
+    const idNum = Number(bookingId);
+    if (!idNum) return { success: false, msg: "Invalid bookingId" };
+
+    if (!bookingStatus)
+      return { success: false, msg: "bookingStatus required" };
+
+    // ✅ validate enum values
+    if (!["Incomplete", "Complete"].includes(String(bookingStatus))) {
+      return { success: false, msg: "Invalid bookingStatus" };
+    }
+
+    // update
+    const updated = await prisma.booking.update({
+      where: { id: idNum },
+      data: { bookingStatus: String(bookingStatus) },
+      select: { id: true, bookingStatus: true, bookingType: true },
+    });
+
+    // ✅ revalidate (adjust your routes)
+    revalidatePath("/admin/appointments"); // Booking list
+    revalidatePath("/admin/appointments-order"); // if you have this route
+    revalidatePath(`/admin/appointments-order/${updated.id}`); // details page (optional)
+
+    return {
+      success: true,
+      msg: "Booking status updated",
+      data: updated,
+    };
+  } catch (err) {
+    console.error("updateBookingStatus:", err);
+    return { success: false, msg: "Server error" };
+  }
+}
