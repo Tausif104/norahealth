@@ -52,12 +52,12 @@ export default function CreateOrderDialog({ bookingId }) {
       trackingId: trackingId.trim(),
       status,
     });
-    setIsCreating(false);
 
     if (!res?.success) return toast.error(res?.message || "Failed");
 
     toast.success(res?.message || "Order created successfully");
     setOpen(false);
+    setIsCreating(false);
 
     // ✅ এই page আবার server-side re-fetch হবে, orders list updated দেখাবে
     router.refresh();

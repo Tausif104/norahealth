@@ -178,7 +178,7 @@ export default function BookingCalander() {
       </div>
 
       {/* Right: Time slots */}
-      <aside className='max-w-[330px] w-full bg-[#f4e7e1] p-[24px_16px] lg:p-[40px_50px]'>
+      <aside className='max-w-100 lg:max-w-82.5 w-full bg-[#f4e7e1] p-[24px_16px] lg:p-[40px_50px]'>
         <div className='mb-4'>
           <div className='text-[18px] font-medium text-[#2B3244] text-center'>
             {value.toLocaleDateString(undefined, {

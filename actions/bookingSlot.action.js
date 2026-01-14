@@ -4,6 +4,72 @@ import { prisma } from "@/lib/client/prisma";
 import { revalidatePath } from "next/cache";
 
 /* ------------------ helpers ------------------ */
+const isWeekendYMD = (ymd) => {
+  const [y, m, d] = String(ymd).split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  const day = dt.getUTCDay(); // 0=Sun, 6=Sat
+  return day === 0 || day === 6;
+};
+
+const ymdToUTCDate = (ymd) => {
+  const [y, m, d] = String(ymd).split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d, 0, 0, 0, 0));
+};
+
+const dateToYMDUTC = (dateUTC) => {
+  const y = dateUTC.getUTCFullYear();
+  const m = String(dateUTC.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(dateUTC.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+const timeToMinutes = (t) => {
+  const [h, m] = String(t).split(":").map(Number);
+  return h * 60 + m;
+};
+
+const minutesToTime = (mins) => {
+  const h = Math.floor(mins / 60) % 24;
+  const m = mins % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+};
+
+const roundUpToInterval = (mins, interval) =>
+  Math.ceil(mins / interval) * interval;
+
+function buildSlotsForOneDay({ ymd, ranges, intervalMinutes }) {
+  const slots = [];
+  const slotDateUTC = ymdToUTCDate(ymd);
+
+  for (const r of ranges || []) {
+    const startTime = r.startTime;
+    const endTime = r.endTime;
+
+    if (!startTime || !endTime) continue;
+
+    let startMin = timeToMinutes(startTime);
+    let endMin = timeToMinutes(endTime);
+
+    // allow "00:00" to mean end-of-day
+    if (endTime === "00:00" && startTime !== "00:00") endMin = 24 * 60;
+
+    if (endMin <= startMin) continue;
+
+    let current = roundUpToInterval(startMin, intervalMinutes);
+
+    while (current + intervalMinutes <= endMin) {
+      slots.push({
+        slotDate: slotDateUTC,
+        startTime: minutesToTime(current),
+        endTime: minutesToTime(current + intervalMinutes),
+        isBooked: false,
+      });
+      current += intervalMinutes;
+    }
+  }
+
+  return slots;
+}
 
 // For reading (client sends "YYYY-MM-DD")
 function parseYMDtoDate(ymd) {
@@ -19,19 +85,140 @@ function parseDMYtoDate(dmy) {
   return new Date(Date.UTC(y, m - 1, d));
 }
 
-function timeToMinutes(time) {
-  const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
-}
+// function timeToMinutes(time) {
+//   const [h, m] = time.split(":").map(Number);
+//   return h * 60 + m;
+// }
 
-function minutesToTime(mins) {
-  const h = Math.floor(mins / 60) % 24;
-  const m = mins % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
+// function minutesToTime(mins) {
+//   const h = Math.floor(mins / 60) % 24;
+//   const m = mins % 60;
+//   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+// }
 
 function roundUpToNext10(mins) {
   return Math.ceil(mins / 10) * 10;
+}
+
+/* ---------------- main action ---------------- */
+/**
+ * payload supports:
+ *  - single day: { slotDate: "YYYY-MM-DD", ranges: [{startTime,endTime}], intervalMinutes, skipWeekends }
+ *  - bulk days : { startDate:"YYYY-MM-DD", endDate:"YYYY-MM-DD", ranges, intervalMinutes, skipWeekends }
+ */
+export async function createBookingSlots(payload) {
+  try {
+    const {
+      slotDate,
+      startDate,
+      endDate,
+      ranges = [],
+      intervalMinutes = 10,
+      skipWeekends = true,
+    } = payload || {};
+
+    const interval = Math.max(1, Number(intervalMinutes) || 10);
+
+    // -------- determine mode --------
+    const isBulk = !!startDate && !!endDate;
+
+    if (!isBulk && !slotDate) {
+      return {
+        success: false,
+        msg: "slotDate or (startDate,endDate) is required.",
+      };
+    }
+
+    // -------- build candidate dates --------
+    let dates = [];
+
+    if (isBulk) {
+      const start = ymdToUTCDate(startDate);
+      const end = ymdToUTCDate(endDate);
+
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        return { success: false, msg: "Invalid startDate/endDate format." };
+      }
+
+      if (start > end) {
+        return { success: false, msg: "startDate must be <= endDate." };
+      }
+
+      // limit days to prevent huge insert
+      const MAX_DAYS = 366;
+      let cur = new Date(start);
+      let count = 0;
+
+      while (cur <= end) {
+        dates.push(dateToYMDUTC(cur));
+        cur.setUTCDate(cur.getUTCDate() + 1);
+        count++;
+        if (count > MAX_DAYS) {
+          return { success: false, msg: "Too many days selected (max 366)." };
+        }
+      }
+    } else {
+      dates = [slotDate];
+    }
+
+    // -------- skip weekends (server-side enforce) --------
+    const before = dates.length;
+    if (skipWeekends) {
+      dates = dates.filter((d) => !isWeekendYMD(d));
+    }
+    const skippedWeekendDates = before - dates.length;
+
+    if (!dates.length) {
+      return {
+        success: false,
+        msg: "No valid dates to create slots (weekends skipped).",
+      };
+    }
+
+    // -------- build all slots --------
+    let allSlots = [];
+    for (const d of dates) {
+      allSlots.push(
+        ...buildSlotsForOneDay({
+          ymd: d,
+          ranges,
+          intervalMinutes: interval,
+        })
+      );
+    }
+
+    if (!allSlots.length) {
+      return { success: false, msg: "No valid time slots generated." };
+    }
+
+    // -------- insert --------
+    const result = await prisma.bookingSlot.createMany({
+      data: allSlots,
+      skipDuplicates: true, // ✅ works because of @@unique
+    });
+
+    const candidateCount = allSlots.length;
+    const createdCount = result.count;
+    const existingCount = Math.max(0, candidateCount - createdCount);
+
+    revalidatePath("/admin/booking-slot");
+    revalidatePath("/admin/booking-slots");
+
+    return {
+      success: true,
+      msg: "Slots created successfully.",
+      summary: {
+        dateCount: dates.length,
+        skippedWeekendDates,
+        candidateCount,
+        createdCount,
+        existingCount,
+      },
+    };
+  } catch (err) {
+    console.error("createBookingSlots:", err);
+    return { success: false, msg: "Server error", error: err?.message };
+  }
 }
 
 /* ------------------ CREATE SLOTS (admin form) ------------------ */

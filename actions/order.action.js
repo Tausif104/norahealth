@@ -4,7 +4,31 @@ import { prisma } from "@/lib/client/prisma";
 import { getAdminUser } from "./admin.action";
 import { revalidatePath } from "next/cache";
 import { loggedInUserAction } from "./user.action";
+// Build date range filter by createdAt
+function buildCreatedAtRange({ year, month, day }) {
+  const y = year ? Number(year) : null;
+  const m = month ? Number(month) : null;
+  const d = day ? Number(day) : null;
 
+  if (!y) return null;
+
+  // Use UTC range to stay consistent in DB timestamps
+  let start;
+  let end;
+
+  if (y && !m) {
+    start = new Date(Date.UTC(y, 0, 1, 0, 0, 0));
+    end = new Date(Date.UTC(y + 1, 0, 1, 0, 0, 0));
+  } else if (y && m && !d) {
+    start = new Date(Date.UTC(y, m - 1, 1, 0, 0, 0));
+    end = new Date(Date.UTC(y, m, 1, 0, 0, 0)); // next month
+  } else {
+    start = new Date(Date.UTC(y, (m || 1) - 1, d || 1, 0, 0, 0));
+    end = new Date(Date.UTC(y, (m || 1) - 1, (d || 1) + 1, 0, 0, 0)); // next day
+  }
+
+  return { gte: start, lt: end };
+}
 // create order by admin
 export const createOrderByAdmin = async (prevState, formData) => {
   const userId = Number(formData.get("userId"));
@@ -45,6 +69,62 @@ export const createOrderByAdmin = async (prevState, formData) => {
     };
   }
 };
+
+// get all user orders by admin
+
+export async function getAllOrdersAction({ year, month, day } = {}) {
+  try {
+    const user = await getAdminUser();
+
+    const isAdmin = user?.admin?.isAdmin || false;
+
+    if (!isAdmin) {
+      return { success: false, message: "Unauthorized. User is not admin" };
+    }
+    const createdAtRange = buildCreatedAtRange({ year, month, day });
+
+    const where = {};
+    if (createdAtRange) where.createdAt = createdAtRange;
+
+    const orders = await prisma.order.findMany({
+      where,
+      include: {
+        user: {
+          include: { account: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Flatten for table
+    const formatted = orders.map((o) => {
+      const acc = o.user?.account;
+
+      const fullName =
+        acc?.firstName || acc?.lastName
+          ? `${acc?.firstName ?? ""} ${acc?.lastName ?? ""}`.trim()
+          : "N/A";
+
+      return {
+        id: o.id,
+        medicineName: o.medicineName,
+        trackingId: o.trackingId,
+        status: o.status,
+        createdAt: o.createdAt.toISOString(),
+
+        userId: o.userId,
+        email: o.user?.email ?? "N/A",
+        fullName,
+        phoneNumber: acc?.phoneNumber ?? "N/A",
+      };
+    });
+
+    return { success: true, orders: formatted };
+  } catch (err) {
+    console.error(err);
+    return { success: false, orders: [], message: "Failed to fetch orders" };
+  }
+}
 
 // get all orders by admin
 export const getAllOrders = async (userId) => {

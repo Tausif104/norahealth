@@ -183,7 +183,10 @@ export function UserTable({ users, admin }) {
       },
       cell: ({ row }) => (
         <div>
-          <Link href='/' className='hover:underline'>
+          <Link
+            href={`/admin/${row.getValue("id")}/orders`}
+            className='hover:underline'
+          >
             {row.getValue("email")}
           </Link>
         </div>

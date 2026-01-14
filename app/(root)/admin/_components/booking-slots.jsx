@@ -308,12 +308,20 @@ export default function BookingSlots() {
           </button>
           <h2 className='text-xl font-semibold'>Appointment Slots</h2>
         </div>
-        <Link
-          href='/admin/booking-slot/create-slot'
-          className=' bg-[#d67b0e] hover:bg-black px-3 py-2 w-fit rounded-lg flex items-center justify-center text-white text-[12px] md:text-[16px] font-medium  tracking-widest'
-        >
-          Add Slot
-        </Link>
+        <div className='flex gap-4 mb-3'>
+          <Link
+            href='/admin/booking-slot/create-slot'
+            className=' bg-[#d67b0e] hover:bg-black px-3 py-2 w-fit rounded-lg flex items-center justify-center text-white text-[12px] md:text-[16px] font-medium  tracking-widest'
+          >
+            Add Slot
+          </Link>
+          <Link
+            href='/admin/booking-slot/bulk-slot'
+            className=' bg-[#d67b0e] hover:bg-black px-3 py-2 w-fit rounded-lg flex items-center justify-center text-white text-[12px] md:text-[16px] font-medium  tracking-widest'
+          >
+            Create Bulk Slot
+          </Link>
+        </div>
         <div className='calendar-wrapper'>
           <Calendar
             onChange={onDateChange}

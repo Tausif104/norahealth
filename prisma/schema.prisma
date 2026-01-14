@@ -114,6 +114,7 @@ model BookingSlot {
   isBooked  Boolean   @default(false)
   bookings  Booking[]
 
+  @@unique([slotDate, startTime, endTime]) // ✅ add this
   @@index([slotDate, startTime])
 }
 

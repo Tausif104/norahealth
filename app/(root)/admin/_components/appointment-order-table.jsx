@@ -67,7 +67,7 @@ import {
 } from "@/actions/booking.action";
 import { useAdmin } from "@/lib/adminContext";
 import { toast } from "sonner";
-import LoadingIcon from "@/components/global/loading";
+
 import Link from "next/link";
 
 const TableLoader = ({ colSpan }) => (
@@ -133,7 +133,10 @@ const columns = [
     },
     cell: ({ row }) => (
       <div>
-        <Link href='/' className='hover:underline'>
+        <Link
+          href={`/admin/${row.getValue("id")}/orders`}
+          className='hover:underline'
+        >
           {row.getValue("email")}
         </Link>
       </div>
@@ -143,17 +146,17 @@ const columns = [
     accessorKey: "phoneNumber",
     header: "Phone",
   },
-  {
-    accessorKey: "serviceName",
-    header: "Service",
-  },
-  {
-    accessorKey: "providerName",
-    header: "Provider",
-  },
+  // {
+  //   accessorKey: "serviceName",
+  //   header: "Service",
+  // },
+  // {
+  //   accessorKey: "providerName",
+  //   header: "Provider",
+  // },
   {
     accessorKey: "appointment",
-    header: "Appointment",
+    header: "Requested Date",
     cell: ({ row }) => formatDate(row.getValue("appointment")),
   },
   {
@@ -226,6 +229,12 @@ export default function AppointmentOrderTable() {
   const [trackingId, setTrackingId] = useState("");
   const [status, setStatus] = useState("clinicalreview");
   const [columnFilters, setColumnFilters] = useState([]);
+
+  const [creatingOrder, setCreatingOrder] = useState(false);
+
+  useEffect(() => {
+    if (!orderOpen) setCreatingOrder(false);
+  }, [orderOpen]);
 
   // Fetch bookings
   async function fetchBookings() {
@@ -523,24 +532,45 @@ export default function AppointmentOrderTable() {
 
             <Button
               className='bg-[#d18a2d] hover:bg-[#b97622]'
+              disabled={creatingOrder}
               onClick={async () => {
-                const res = await createOrderFromBooking({
-                  bookingId: selectedBooking.id,
-                  medicineName,
-                  trackingId,
-                  status,
-                });
+                if (creatingOrder) return;
 
-                if (res?.success) {
-                  toast.success(res?.message || "Order created successfully");
-                  setOrderOpen(false);
-                  // fetchBookings();
-                } else {
-                  alert(res?.message || "Failed");
+                // simple required validation (optional but useful)
+                if (!medicineName?.trim())
+                  return toast.error("Medicine Name is required");
+                if (!trackingId?.trim())
+                  return toast.error("Tracking ID is required");
+
+                try {
+                  setCreatingOrder(true);
+
+                  const res = await createOrderFromBooking({
+                    bookingId: selectedBooking.id,
+                    medicineName: medicineName.trim(),
+                    trackingId: trackingId.trim(),
+                    status,
+                  });
+
+                  if (res?.success) {
+                    toast.success(res?.message || "Order created successfully");
+                    setOrderOpen(false);
+                  } else {
+                    toast.error(res?.message || "Failed");
+                  }
+                } finally {
+                  setCreatingOrder(false);
                 }
               }}
             >
-              Create
+              {creatingOrder ? (
+                <span className='flex items-center gap-2'>
+                  <LoaderIcon className='size-4 animate-spin' />
+                  Creating...
+                </span>
+              ) : (
+                "Create"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

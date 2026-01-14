@@ -253,33 +253,33 @@ export async function createBookingOrder(formData) {
     let recreatedOrder = null;
 
     // ✅ If SAME_OC -> recreate last order under clinicalreview
-    if (ocRequest === "SAME_OC") {
-      const lastOrder = await prisma.order.findFirst({
-        where: { userId: user.id },
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          medicineName: true,
-        },
-      });
+    // if (ocRequest === "SAME_OC") {
+    //   const lastOrder = await prisma.order.findFirst({
+    //     where: { userId: user.id },
+    //     orderBy: { createdAt: "desc" },
+    //     select: {
+    //       id: true,
+    //       medicineName: true,
+    //     },
+    //   });
 
-      if (!lastOrder) {
-        return {
-          success: false,
-          msg: "You have no previous order to repeat.",
-          data: null,
-        };
-      }
+    //   if (!lastOrder) {
+    //     return {
+    //       success: false,
+    //       msg: "You have no previous order to repeat.",
+    //       data: null,
+    //     };
+    //   }
 
-      recreatedOrder = await prisma.order.create({
-        data: {
-          userId: user.id,
-          medicineName: lastOrder.medicineName,
-          trackingId: crypto.randomUUID(), // or your tracking generator
-          status: "clinicalreview", // ✅ force review
-        },
-      });
-    }
+    //   recreatedOrder = await prisma.order.create({
+    //     data: {
+    //       userId: user.id,
+    //       medicineName: lastOrder.medicineName,
+    //       trackingId: crypto.randomUUID(), // or your tracking generator
+    //       status: "clinicalreview", // ✅ force review
+    //     },
+    //   });
+    // }
 
     // ✅ Your existing booking creation (optional: always create booking)
     const now = new Date();
@@ -302,10 +302,7 @@ export async function createBookingOrder(formData) {
 
     return {
       success: true,
-      msg:
-        ocRequest === "SAME_OC"
-          ? "Previous order repeated successfully (under clinical review)."
-          : "Contraceptive order placed successfully.",
+      msg: "Contraceptive order placed successfully.",
       data: {
         bookingId: booking.id,
         recreatedOrderId: recreatedOrder?.id || null,
@@ -885,6 +882,17 @@ export async function createOrderFromBooking({
       return { success: false, message: "Booking not found" };
     }
 
+    if (!trackingId || !String(trackingId).trim()) {
+      return { success: false, message: "trackingId is required" };
+    }
+
+    // ✅ required: medicineName (fallback: booking.serviceName)
+    const finalMedicineName = String(medicineName).trim();
+
+    if (!finalMedicineName) {
+      return { success: false, message: "medicineName is required" };
+    }
+
     // 1. Check user by email
     let user = await prisma.user.findUnique({
       where: { email: booking.email },
@@ -916,8 +924,8 @@ export async function createOrderFromBooking({
     // 3. Create order
     await prisma.order.create({
       data: {
-        medicineName: medicineName || booking.serviceName,
-        trackingId: trackingId || `ORD-${Date.now()}`,
+        medicineName: finalMedicineName,
+        trackingId: String(trackingId).trim(),
         status: status || "clinicalreview",
         userId: user.id,
       },

@@ -73,6 +73,8 @@ export function OrderTable({ orders, userId }) {
   const [open, setOpen] = React.useState(false);
   const [selectedOrder, setSelectedOrder] = React.useState(null);
   const [status, setStatus] = React.useState("");
+  const ALL_STATUS = "__ALL__";
+  const [statusFilter, setStatusFilter] = React.useState(ALL_STATUS);
 
   const columns = [
     {
@@ -117,6 +119,11 @@ export function OrderTable({ orders, userId }) {
     {
       accessorKey: "status",
       header: "Status",
+      filterFn: (row, id, value) => {
+        // value = "__ALL__" হলে সব দেখাবে
+        if (!value || value === "__ALL__") return true;
+        return String(row.getValue(id)) === String(value);
+      },
       cell: ({ row }) => {
         const orderStatus = row.getValue("status");
 
@@ -247,6 +254,33 @@ export function OrderTable({ orders, userId }) {
 
       <div className='flex items-center py-4'>
         <CreateOrderForm />
+        <div className='ml-4'>
+          <Select
+            value={statusFilter}
+            onValueChange={(val) => {
+              setStatusFilter(val);
+
+              // TanStack filter apply
+              table
+                .getColumn("status")
+                ?.setFilterValue(val === ALL_STATUS ? undefined : val);
+            }}
+          >
+            <SelectTrigger className='w-[220px] bg-white'>
+              <SelectValue placeholder='Filter by status' />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectItem value={ALL_STATUS}>All Status</SelectItem>
+              <SelectItem value='clinicalreview'>
+                Under Clinical Review
+              </SelectItem>
+              <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
+              <SelectItem value='delivered'>Delivered</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='ml-auto'>

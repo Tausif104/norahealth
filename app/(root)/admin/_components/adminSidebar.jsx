@@ -67,7 +67,18 @@ const AdminSidebar = () => {
           }`}
         >
           <ClipboardClock className='w-4 h-4' />
-          <span>Appointments Order</span>
+          <span>Contraception Order</span>
+        </Link>
+        <Link
+          href='/admin/orders'
+          className={`${baseClasses} ${
+            pathname.startsWith("/admin/orders")
+              ? activeClasses
+              : inactiveClasses
+          }`}
+        >
+          <ClipboardClock className='w-4 h-4' />
+          <span>Orders</span>
         </Link>
         {/* Booking Slot */}
         <Link
