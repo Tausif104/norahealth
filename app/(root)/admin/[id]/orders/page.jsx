@@ -1,15 +1,15 @@
-import { OrderTable } from './_components/order-table'
-import { getAllOrders } from '@/actions/order.action'
+import { OrderTable } from "./_components/order-table";
+import { getAllOrders } from "@/actions/order.action";
 
 const OrderPage = async ({ params }) => {
-  const { id } = await params
-  const orders = await getAllOrders(id)
+  const { id } = await params;
+  const orders = await getAllOrders(id);
 
   return (
     <>
-      <OrderTable orders={orders?.orders} userId={id} />
+      <OrderTable orders={orders?.orders} userId={id} user={orders?.user} />
     </>
-  )
-}
+  );
+};
 
-export default OrderPage
+export default OrderPage;

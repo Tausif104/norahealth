@@ -8,6 +8,16 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import { Input } from "@/components/ui/input";
+import { updateOrderStatus } from "@/actions/order.action";
 
 import {
   Select,
@@ -42,6 +52,10 @@ import { useAdmin } from "@/lib/adminContext";
 import { toast } from "sonner";
 import Link from "next/link";
 import { deleteOrder, getAllOrdersAction } from "@/actions/order.action";
+const STICKY_RIGHT_TH =
+  "sticky right-0 z-40 bg-[#faf9f8]  border-l min-w-[110px] shadow-[-6px_0_6px_-6px_rgba(0,0,0,0.15)]";
+const STICKY_RIGHT_TD =
+  "sticky right-0 z-30 bg-[#faf9f8] border-l min-w-[110px] shadow-[-6px_0_6px_-6px_rgba(0,0,0,0.10)]";
 
 const statusPill = (status, trackingId) => {
   const base =
@@ -174,8 +188,14 @@ const columns = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-            <DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link href={`/admin/orders/${order.id}`}>View Details</Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => table.options.meta.openDialog(order)}
+            >
+              Update Status
             </DropdownMenuItem>
 
             <DropdownMenuItem
@@ -202,6 +222,10 @@ export default function AllOrdersTable() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [columnFilters, setColumnFilters] = useState([]);
+
+  const [open, setOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [status, setStatus] = useState("");
 
   async function fetchOrders() {
     setLoading(true);
@@ -254,6 +278,15 @@ export default function AllOrdersTable() {
           toast.error(res?.message || "Delete failed");
         }
       },
+
+      openDialog: (order) => {
+        setSelectedOrder(order);
+        setStatus(order?.status || "");
+        setOpen(true);
+      },
+
+      status,
+      setStatus,
     },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -409,16 +442,21 @@ export default function AllOrdersTable() {
       </div>
 
       {/* TABLE */}
-      <div className='overflow-hidden rounded-md border'>
-        <Table>
+      <div className='rounded-md border overflow-x-auto'>
+        <Table className='min-w-max'>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (
               <TableRow key={hg.id}>
                 {hg.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className={
+                      header.column.id === "actions" ? STICKY_RIGHT_TH : ""
+                    }
+                  >
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
                   </TableHead>
                 ))}
@@ -433,10 +471,15 @@ export default function AllOrdersTable() {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={
+                        cell.column.id === "actions" ? STICKY_RIGHT_TD : ""
+                      }
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -476,6 +519,72 @@ export default function AllOrdersTable() {
           Next
         </Button>
       </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update Order Status</DialogTitle>
+          </DialogHeader>
+
+          <form
+            action={updateOrderStatus}
+            onSubmit={() => {
+              setOpen(false);
+              fetchOrders();
+            }}
+            className='space-y-4'
+          >
+            <input
+              type='hidden'
+              name='orderId'
+              value={selectedOrder?.id || ""}
+            />
+
+            <div>
+              <label className='mb-2 block font-medium'>Tracking ID</label>
+              <Input
+                type='text'
+                name='trackingId'
+                value={selectedOrder?.trackingId || ""}
+                onChange={(e) =>
+                  setSelectedOrder((prev) => ({
+                    ...(prev || {}),
+                    trackingId: e.target.value,
+                  }))
+                }
+                placeholder='Optional unless Posted/Delivered'
+              />
+            </div>
+
+            <Select name='status' value={status} onValueChange={setStatus}>
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder='Select status' />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value='clinicalreview'>
+                  Under Clinical Review
+                </SelectItem>
+                <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
+                {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
+              </SelectContent>
+            </Select>
+
+            <DialogFooter>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' className='bg-theme'>
+                Update
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

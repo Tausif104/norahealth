@@ -1,9 +1,9 @@
 export const menuItems = [
-  {
-    id: 1,
-    label: "Home",
-    link: "/",
-  },
+  // {
+  //   id: 1,
+  //   label: "Home",
+  //   link: "/",
+  // },
   {
     id: 2,
     label: "About Us",
@@ -11,7 +11,7 @@ export const menuItems = [
   },
   {
     id: 3,
-    label: "Make an Appointment",
+    label: "Appointments",
     link: "/booking",
   },
   {
@@ -26,8 +26,8 @@ export const menuItems = [
   },
   {
     id: 6,
-    label: "Insight",
-    link: "/blog",
+    label: "Articles",
+    link: "/articles",
   },
   {
     id: 7,

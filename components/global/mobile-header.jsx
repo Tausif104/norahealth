@@ -72,10 +72,10 @@ const MobileHeader = ({ payload, logoutAction }) => {
               <Mail className='text-white' width={13} />
             </span>
             <a
-              href='mailto:thepharmaclinic@gmail.com'
+              href='mailto:pharmacy.fap80@nhs.net'
               className='text-white cursor-pointer text-[12px]'
             >
-              thepharmaclinic@gmail.com
+              pharmacy.fap80@nhs.net
             </a>
           </div>
 

@@ -1,15 +1,19 @@
-import { MedicationTable } from './_components/medication-table'
-import { getMedicationByUserId } from '@/actions/medication.action'
+import { MedicationTable } from "./_components/medication-table";
+import { getMedicationByUserId } from "@/actions/medication.action";
 
 const MedicationPage = async ({ params }) => {
-  const { id } = await params
-  const medications = await getMedicationByUserId(id)
+  const { id } = await params;
+  const medications = await getMedicationByUserId(id);
 
   return (
     <>
-      <MedicationTable medications={medications?.medication} userId={id} />
+      <MedicationTable
+        medications={medications?.medication}
+        userId={id}
+        user={medications?.user}
+      />
     </>
-  )
-}
+  );
+};
 
-export default MedicationPage
+export default MedicationPage;

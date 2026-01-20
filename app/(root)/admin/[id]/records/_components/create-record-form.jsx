@@ -1,6 +1,6 @@
-'use client'
-import { Button } from '@/components/ui/button'
-import { useParams } from 'next/navigation'
+"use client";
+import { Button } from "@/components/ui/button";
+import { useParams } from "next/navigation";
 import {
   Dialog,
   DialogClose,
@@ -10,37 +10,37 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { DatePicker } from './date-picker'
-import { createRecordByAdmin } from '@/actions/record.action'
-import { useState, useEffect, useActionState, use } from 'react'
-import { LoaderIcon } from 'lucide-react'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { DatePicker } from "./date-picker";
+import { createRecordByAdmin } from "@/actions/record.action";
+import { useState, useEffect, useActionState, use } from "react";
+import { LoaderIcon } from "lucide-react";
 
 export const CreateRecordForm = () => {
-  const params = useParams()
-  const id = params.id
-  const [bpCheck, setbpCheck] = useState(null)
-  const [whCheck, setWHCheck] = useState(null)
-  const [open, setOpen] = useState(false)
+  const params = useParams();
+  const id = params.id;
+  const [bpCheck, setbpCheck] = useState(null);
+  const [whCheck, setWHCheck] = useState(null);
+  const [open, setOpen] = useState(false);
 
   const initialState = {
-    msg: '',
+    msg: "",
     success: false,
-  }
+  };
 
   const [state, action, loading] = useActionState(
     createRecordByAdmin,
-    initialState
-  )
+    initialState,
+  );
 
   useEffect(() => {
     if (state.success) {
-      setOpen(false)
+      setOpen(false);
     }
-    state.success = false
-  }, [state.success])
+    state.success = false;
+  }, [state.success]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -61,19 +61,19 @@ export const CreateRecordForm = () => {
             <input type='hidden' name='userId' value={id} />
 
             <div className='grid gap-3'>
-              <Label htmlFor='weight'>Weight</Label>
+              <Label htmlFor='weight'>Weight (Kg)</Label>
               <Input id='weight' name='weight' placeholder='Weight' />
             </div>
 
             <div className='grid gap-3'>
-              <Label htmlFor='height'>Height</Label>
+              <Label htmlFor='height'>Height (cm)</Label>
               <Input id='height' name='height' placeholder='Height' />
             </div>
 
             <input
               type='hidden'
               name='lwhcheck'
-              value={whCheck ? whCheck : ''}
+              value={whCheck ? whCheck : ""}
             />
             <DatePicker
               name='lwhcheck'
@@ -90,7 +90,7 @@ export const CreateRecordForm = () => {
             <input
               type='hidden'
               name='lbpcheck'
-              value={bpCheck ? bpCheck : ''}
+              value={bpCheck ? bpCheck : ""}
             />
             <DatePicker
               onChange={setbpCheck}
@@ -112,12 +112,12 @@ export const CreateRecordForm = () => {
                   className='size-4 animate-spin mx-auto'
                 />
               ) : (
-                'Save'
+                "Save"
               )}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

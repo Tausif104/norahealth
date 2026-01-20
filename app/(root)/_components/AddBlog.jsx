@@ -25,24 +25,30 @@ const AddBlogEditor = dynamic(() => import("./AddBlogEditor"), {
   ssr: false,
 });
 
+const META_TITLE_MAX = 100;
+const META_DESC_MAX = 200;
+
 export default function AddBlog() {
   const { blogData, setBlogData } = useContext(BlogContext);
 
   const [title, setTitle] = useState(blogData.title || "");
   const [slug, setSlug] = useState(blogData.postSlug || "");
   const [preview, setPreview] = useState(
-    blogData.image || "/images/blog-banner.png"
+    blogData.image || "/images/blog-banner.png",
   );
   const [uploading, setUploading] = useState(false);
   const [bannerAlt, setBannerAlt] = useState(blogData.bannerAltText || "");
   const [metaTitle, setMetaTitle] = useState(blogData.metaTitle || "");
   const [metaDescription, setMetaDescription] = useState(
-    blogData.metaDescription || ""
+    blogData.metaDescription || "",
   );
   const [canonicalUrl, setCanonicalUrl] = useState(blogData.canonicalUrl || "");
   const [slugEdited, setSlugEdited] = useState(false);
   const [canonicalEdited, setCanonicalEdited] = useState(false);
   const fileInputRef = useRef();
+
+  const metaTitleRemaining = META_TITLE_MAX - (metaTitle?.length || 0);
+  const metaDescRemaining = META_DESC_MAX - (metaDescription?.length || 0);
 
   // const updateTitleContext = useRef(
   //   debounce((value) => {
@@ -66,7 +72,7 @@ export default function AddBlog() {
         postSlug: slugEdited ? prev.postSlug : generatedSlug,
         canonicalUrl: canonicalEdited ? prev.canonicalUrl : generatedSlug,
       }));
-    }, 300)
+    }, 300),
   ).current;
 
   const handleTitleChange = (e) => {
@@ -124,13 +130,13 @@ export default function AddBlog() {
   };
 
   const handleMetaTitleChange = (e) => {
-    const value = e.target.value;
+    const value = e.target.value.slice(0, META_TITLE_MAX);
     setMetaTitle(value);
     setBlogData((prev) => ({ ...prev, metaTitle: value }));
   };
 
   const handleMetaDescriptionChange = (e) => {
-    const value = e.target.value;
+    const value = e.target.value.slice(0, META_DESC_MAX);
     setMetaDescription(value);
     setBlogData((prev) => ({ ...prev, metaDescription: value }));
   };
@@ -289,8 +295,16 @@ export default function AddBlog() {
           placeholder='Meta Title (SEO)'
           value={metaTitle}
           onChange={handleMetaTitleChange}
-          className='text-base font-medium w-full outline-none resize-none overflow-hidden mb-6 leading-snug placeholder-gray-500 dark:placeholder-gray-400 text-gray-500 dark:text-white p-4 rounded-lg border border-gray-300 dark:border-gray-700 pb-3 bg-transparent transition-colors duration-300 pt-3'
+          className='text-base font-medium w-full outline-none resize-none overflow-hidden mb-2 leading-snug placeholder-gray-500 dark:placeholder-gray-400 text-gray-500 dark:text-white p-4 rounded-lg border border-gray-300 dark:border-gray-700 pb-3 bg-transparent transition-colors duration-300 pt-3'
         />
+
+        <div
+          className={`text-sm mt-0 flex justify-end ${
+            metaTitleRemaining === 0 ? "text-red-500" : "text-gray-400"
+          }`}
+        >
+          {metaTitleRemaining} characters remaining
+        </div>
       </div>
 
       {/* SEO Meta Description */}
@@ -307,9 +321,17 @@ export default function AddBlog() {
           placeholder='Meta Description (SEO)'
           value={metaDescription}
           onChange={handleMetaDescriptionChange}
-          className='text-base p-4 font-medium w-full outline-none resize-none overflow-hidden mb-6 leading-snug placeholder-gray-500 dark:placeholder-gray-400 text-gray-500 dark:text-white rounded-lg border border-gray-300 dark:border-gray-700 pb-3 bg-transparent transition-colors duration-300'
+          className='text-base p-4 font-medium w-full outline-none resize-none overflow-hidden mb-2 leading-snug placeholder-gray-500 dark:placeholder-gray-400 text-gray-500 dark:text-white rounded-lg border border-gray-300 dark:border-gray-700 pb-3 bg-transparent transition-colors duration-300'
           rows={3}
         />
+
+        <div
+          className={`text-sm mt-0 flex justify-end ${
+            metaDescRemaining === 0 ? "text-red-500" : "text-gray-400"
+          }`}
+        >
+          {metaDescRemaining} characters remaining
+        </div>
       </div>
 
       {/* SEO Canonical Url */}
@@ -340,8 +362,8 @@ export default function AddBlog() {
               user.role === "AUTHOR"
                 ? "/author/blog/preview-blog"
                 : user.role === "ADMIN" || user.role === "SUPERADMIN"
-                ? "/admin/blog/preview-blog"
-                : "/"
+                  ? "/admin/blog/preview-blog"
+                  : "/"
             }
           >
             <Button

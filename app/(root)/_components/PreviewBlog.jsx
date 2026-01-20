@@ -63,7 +63,7 @@ const SeeBlog = () => {
 
           const checked =
             style === "checklist"
-              ? item?.meta?.checked ?? item?.checked ?? false
+              ? (item?.meta?.checked ?? item?.checked ?? false)
               : false;
 
           return (
@@ -91,149 +91,6 @@ const SeeBlog = () => {
     );
   };
 
-  // const renderBlock = (block, index) => {
-  //   if (!block?.type || !block?.data) return null;
-
-  //   switch (block.type) {
-  //     case "header": {
-  //       const HeaderTag = `h${block.data.level || 2}`;
-  //       return (
-  //         <HeaderTag key={index} className='my-4 font-bold text-black'>
-  //           {block.data.text}
-  //         </HeaderTag>
-  //       );
-  //     }
-
-  //     case "paragraph":
-  //       return (
-  //         <p key={index} className='my-2 text-gray-800 leading-relaxed'>
-  //           {block.data.text}
-  //         </p>
-  //       );
-
-  //     case "list": {
-  //       const items = block.data?.items || [];
-
-  //       if (block.data.style === "ordered") {
-  //         return (
-  //           <ol key={index} className='list-decimal my-2'>
-  //             {items.map((item, i) => (
-  //               <li key={i}>{renderItem(item)}</li>
-  //             ))}
-  //           </ol>
-  //         );
-  //       } else if (block.data.style === "checklist") {
-  //         return (
-  //           <ul key={index} className='my-2'>
-  //             {items.map((item, i) => (
-  //               <li key={i} className='flex items-center gap-2'>
-  //                 <input
-  //                   type='checkbox'
-  //                   checked={item?.meta?.checked ?? false}
-  //                   readOnly
-  //                   className='w-4 h-4'
-  //                 />
-  //                 <span>{renderItem(item)}</span>
-  //               </li>
-  //             ))}
-  //           </ul>
-  //         );
-  //       } else {
-  //         return (
-  //           <ul key={index} className='my-2'>
-  //             {items.map((item, i) => (
-  //               <li key={i} className='flex mt-4 gap-2'>
-  //                 <CircleCheckBig /> {renderItem(item)}
-  //               </li>
-  //             ))}
-  //           </ul>
-  //         );
-  //       }
-  //     }
-
-  //     case "image":
-  //       return block.data?.file?.url ? (
-  //         <div key={index} className='my-4'>
-  //           <img
-  //             src={block.data.file.url}
-  //             alt={block.data.caption || "Blog Image"}
-  //             className='w-full rounded-md object-cover'
-  //           />
-  //           {block.data.caption && (
-  //             <p className='text-sm text-white mt-2'>{block.data.caption}</p>
-  //           )}
-  //         </div>
-  //       ) : null;
-
-  //     case "quote":
-  //       return (
-  //         <blockquote
-  //           key={index}
-  //           className='border-l-4 border-gray-300 pl-4 italic my-4'
-  //         >
-  //           {block.data.text}
-  //           {block.data.caption && (
-  //             <cite className='block mt-1'>— {block.data.caption}</cite>
-  //           )}
-  //         </blockquote>
-  //       );
-
-  //     case "code":
-  //       return (
-  //         <pre
-  //           key={index}
-  //           className='bg-gray-100 rounded p-3 overflow-x-auto my-4 font-mono text-sm'
-  //         >
-  //           {block.data.code}
-  //         </pre>
-  //       );
-
-  //     case "table":
-  //       return (
-  //         <div key={index} className='overflow-x-auto my-4'>
-  //           <table className='table-auto border-collapse border border-gray-300 w-full'>
-  //             <tbody>
-  //               {block.data?.content?.map((row, rIdx) => (
-  //                 <tr key={rIdx}>
-  //                   {row.map((cell, cIdx) => (
-  //                     <td key={cIdx} className='border border-gray-300 p-2'>
-  //                       {cell}
-  //                     </td>
-  //                   ))}
-  //                 </tr>
-  //               ))}
-  //             </tbody>
-  //           </table>
-  //         </div>
-  //       );
-
-  //     default:
-  //       return null;
-  //   }
-  // };
-
-  // const handlePublish = (e) => {
-  //   e.preventDefault();
-
-  //   const formData = {
-  //     title: blogData.title,
-  //     shortDesc: blogData.shortDesc,
-  //     image: blogData.image,
-  //     content: JSON.stringify(blogData.content),
-  //     blogCategoryId: blogData.categoryId,
-  //     authorId: userId,
-  //   };
-
-  //   console.log("Publishing blog data:", formData);
-
-  //   setBlogData({
-  //     title: "",
-  //     shortDesc: "",
-  //     content: null,
-  //     image: "/banner.png",
-  //     categories: [],
-  //   });
-  // };
   const renderBlock = (block, i) => {
     if (!block?.type || !block?.data) return null;
 
@@ -373,8 +230,8 @@ const SeeBlog = () => {
               user.role === "AUTHOR"
                 ? "/author/blog/add-blog"
                 : user.role === "ADMIN" || user.role === "SUPERADMIN"
-                ? "/admin/blog/add-blog"
-                : "/"
+                  ? "/admin/blog/add-blog"
+                  : "/"
             }
           >
             <Button type='button' className='w-full'>
@@ -399,7 +256,7 @@ const SeeBlog = () => {
       )}
 
       {blogData.content?.blocks?.map((block, index) =>
-        renderBlock(block, index)
+        renderBlock(block, index),
       )}
 
       <div className='mt-6 flex justify-end'>

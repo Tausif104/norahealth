@@ -1,5 +1,5 @@
-'use client'
-import { Button } from '@/components/ui/button'
+"use client";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -18,36 +18,36 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { createOrderByAdmin } from '@/actions/order.action'
-import { useState, useEffect, useActionState } from 'react'
-import { LoaderIcon } from 'lucide-react'
-import { useParams } from 'next/navigation'
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { createOrderByAdmin } from "@/actions/order.action";
+import { useState, useEffect, useActionState } from "react";
+import { LoaderIcon } from "lucide-react";
+import { useParams } from "next/navigation";
 
 export const CreateOrderForm = () => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
-  const params = useParams()
-  const id = params.id
+  const params = useParams();
+  const id = params.id;
 
   const initialState = {
-    msg: '',
+    msg: "",
     success: false,
-  }
+  };
 
   const [state, action, loading] = useActionState(
     createOrderByAdmin,
-    initialState
-  )
+    initialState,
+  );
 
   useEffect(() => {
     if (state.success) {
-      setOpen(false)
+      setOpen(false);
     }
-    state.success = false
-  }, [state.success])
+    state.success = false;
+  }, [state.success]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -98,7 +98,7 @@ export const CreateOrderForm = () => {
                     <SelectItem value='posted'>
                       Posted Via Royal Mail
                     </SelectItem>
-                    <SelectItem value='delivered'>Delivered</SelectItem>
+                    {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -117,12 +117,12 @@ export const CreateOrderForm = () => {
                   className='size-4 animate-spin mx-auto'
                 />
               ) : (
-                'Create'
+                "Create"
               )}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useContext, useEffect, useState } from "react";
+import { startTransition, use, useContext, useEffect, useState } from "react";
 
 import { ArrowLeft, ArrowUpRight, CircleCheckBig } from "lucide-react";
 import Link from "next/link";
@@ -18,17 +18,62 @@ const EditSeeBlog = () => {
   console.log("blogData: Update", blogData);
 
   if (!blogData) return <p>No blog data available</p>;
-
-  const renderItem = (item) => {
-    if (typeof item === "string") return item;
-
-    if (typeof item === "object") {
-      if ("content" in item) return item.content;
-      if ("text" in item) return item.text;
-      return JSON.stringify(item);
+  const renderListItemContent = (item) => {
+    if (typeof item === "string") {
+      return <span dangerouslySetInnerHTML={{ __html: item }} />;
     }
 
-    return String(item);
+    if (item && typeof item === "object") {
+      const html = item.content ?? item.text ?? "";
+      return html ? <span dangerouslySetInnerHTML={{ __html: html }} /> : null;
+    }
+
+    return <span>{String(item)}</span>;
+  };
+  const renderNestedList = (items, style, keyPrefix = "li") => {
+    const ListTag = style === "ordered" ? "ol" : "ul";
+
+    return (
+      <ListTag
+        className={`pl-6 space-y-2 ${
+          style === "ordered" ? "list-decimal" : "list-disc"
+        }`}
+      >
+        {items.map((item, idx) => {
+          const key = `${keyPrefix}-${idx}`;
+          const children =
+            item && typeof item === "object" && Array.isArray(item.items)
+              ? item.items
+              : null;
+
+          const checked =
+            style === "checklist"
+              ? (item?.meta?.checked ?? item?.checked ?? false)
+              : false;
+
+          return (
+            <li key={key}>
+              <div className='flex gap-2 text-gray-700'>
+                {style === "checklist" ? (
+                  <input
+                    type='checkbox'
+                    checked={checked}
+                    readOnly
+                    className='mt-1 w-4 h-4'
+                  />
+                ) : style === "ordered" ? null : (
+                  <CircleCheckBig size={16} className='mt-1' />
+                )}
+
+                <div>{renderListItemContent(item)}</div>
+              </div>
+
+              {children?.length ? renderNestedList(children, style, key) : null}
+            </li>
+          );
+        })}
+      </ListTag>
+    );
   };
 
   const renderBlock = (block, i) => {
@@ -38,10 +83,7 @@ const EditSeeBlog = () => {
       case "header": {
         const Tag = `h${block.data.level || 2}`;
         return (
-          <Tag
-            key={i}
-            className='mt-8 mb-3 text-xl font-semibold text-gray-900'
-          >
+          <Tag key={i} className='mt-8 mb-3 text-xl font-bold  text-gray-900'>
             {block.data.text}
           </Tag>
         );
@@ -56,17 +98,15 @@ const EditSeeBlog = () => {
           />
         );
 
-      case "list":
+      case "list": {
+        const style = block.data?.style || "unordered";
+        const items = block.data?.items || [];
         return (
-          <ul key={i} className='space-y-2 mb-5'>
-            {block.data.items.map((item, idx) => (
-              <li key={idx} className='flex gap-2 text-gray-700'>
-                <CircleCheckBig size={16} className='mt-1 text-green-600' />
-                {item}
-              </li>
-            ))}
-          </ul>
+          <div key={i} className='mb-5'>
+            {renderNestedList(items, style, `list-${i}`)}
+          </div>
         );
+      }
 
       case "image":
         return (
@@ -116,7 +156,8 @@ const EditSeeBlog = () => {
   //   });
   // };
   const [user, setUser] = useState(null);
-
+  console.log(user, "user");
+  const userRole = user?.role === "AUTHOR" ? "author" : "admin";
   useEffect(() => {
     const fetchUser = async () => {
       const res = await loggedInUserAction();
@@ -184,7 +225,7 @@ const EditSeeBlog = () => {
 
       <div className='flex justify-between items-center mb-6'>
         <h3 className='text-xl font-bold'>Preview</h3>
-        <Link href={`/author/blog/edit-blog/${blogData.id}`}>
+        <Link href={`/${userRole}/blog/edit-blog/${blogData.id}`}>
           <Button type='button' className='w-full'>
             <ArrowLeft /> Back to Edit
           </Button>
@@ -206,7 +247,7 @@ const EditSeeBlog = () => {
       )}
 
       {blogData.content?.blocks?.map((block, index) =>
-        renderBlock(block, index)
+        renderBlock(block, index),
       )}
 
       <div className='mt-6 flex justify-end'>

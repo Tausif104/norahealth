@@ -36,7 +36,7 @@ export const CreateUserForm = () => {
 
   const [state, action, loading] = useActionState(
     createUserAction,
-    initialState
+    initialState,
   );
 
   useEffect(() => {
@@ -55,13 +55,13 @@ export const CreateUserForm = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className='cursor-pointer' variant='outline'>
-          Create User
+          Create Patient
         </Button>
       </DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <form action={action}>
           <DialogHeader>
-            <DialogTitle>Create User</DialogTitle>
+            <DialogTitle>Create Patient's</DialogTitle>
             <DialogDescription>
               Add these information to add a new user.
             </DialogDescription>

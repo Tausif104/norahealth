@@ -42,7 +42,7 @@ const AdminSidebar = () => {
           }`}
         >
           <User className='w-4 h-4' />
-          <span>Users</span>
+          <span>Patient's</span>
         </Link>
 
         {/* Health Records */}

@@ -129,8 +129,8 @@ const HeaderTop = () => {
             <span className='bg-[#ffffff30] w-[25px] h-[25px] rounded-full flex justify-center items-center'>
               <Mail className='text-white' width={13} />
             </span>
-            <a href='mailto:thepharmaclinic@gmail.com' className='text-white'>
-              thepharmaclinic@gmail.com
+            <a href='mailto:pharmacy.fap80@nhs.net' className='text-white'>
+              pharmacy.fap80@nhs.net
             </a>
           </div>
 

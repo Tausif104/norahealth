@@ -39,6 +39,27 @@ export default function CreateSlotsPanel({ defaultInterval = 10 }) {
     const day = String(d.getDate()).padStart(2, "0");
     return `${y}-${mo}-${day}`;
   }
+  function formatDateDDMMMYYYY(date) {
+    const day = String(date.getDate()).padStart(2, "0");
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    return `${day} ${month} ${year}`;
+  }
 
   const today = useMemo(() => {
     const t = new Date();
@@ -102,7 +123,7 @@ export default function CreateSlotsPanel({ defaultInterval = 10 }) {
           // tileDisabled / tileClassName can be used to show booked dates if desired
         />
         <div className='mt-3 text-sm text-muted-foreground'>
-          Selected: {formatDateYYYYMMDD(date)}
+          Selected: {formatDateDDMMMYYYY(date)}
         </div>
       </div>
 

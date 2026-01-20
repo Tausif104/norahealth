@@ -4,7 +4,7 @@ import React from "react";
 import BlogList from "./_components/blog-list";
 
 export const metadata = {
-  title: "Blog",
+  title: "Articles",
   description: "Free Oral Contraception, Delivered to Your Door",
 };
 

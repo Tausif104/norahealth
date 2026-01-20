@@ -436,7 +436,7 @@ export function UserTable({ users, admin }) {
           </button>
           <h2 className='text-xl font-semibold'>
             {" "}
-            Users{" "}
+            Patient's{" "}
             <Badge variant='primary' className='bg-white'>
               {table?.options?.data.length}
             </Badge>
@@ -494,7 +494,7 @@ export function UserTable({ users, admin }) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -514,7 +514,7 @@ export function UserTable({ users, admin }) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

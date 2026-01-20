@@ -24,7 +24,7 @@ const DecorativeBanner = ({ image }) => {
         <span className='flex items-center justify-center'>
           <span>Book a Free Call</span>
           <span className='ml-2 -rotate-45 group-hover:rotate-0 transition duration-300'>
-            <ArrowRight />
+            <ArrowRight className='w-5 h-5' />
           </span>
         </span>
       </Link>

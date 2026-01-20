@@ -9,6 +9,8 @@ const page = async () => {
   const allPost = await postList();
   console.log(allPost, "Blog");
   const payload = await loggedInUserAction();
+  console.log(payload);
+
   const currentUserId = payload?.payload?.id;
 
   return (
@@ -18,7 +20,7 @@ const page = async () => {
           <div className='px-4 lg:px-6'>
             <BlogTable
               allPost={allPost}
-              userRole='admin'
+              userRole={payload?.payload?.role}
               currentUserId={currentUserId}
             />
           </div>

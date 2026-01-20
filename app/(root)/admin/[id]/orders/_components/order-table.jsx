@@ -57,14 +57,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CreateOrderForm } from "./create-order-form";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatShortDate, getFullName } from "@/lib/utils";
 import { deleteMedicationByAdmin } from "@/actions/medication.action";
 import { Badge } from "@/components/ui/badge";
 import { useAdmin } from "@/lib/adminContext";
 import { deleteOrder, updateOrderStatus } from "@/actions/order.action";
 import AdminNavigation from "../../_components/admin-navigation";
 
-export function OrderTable({ orders, userId }) {
+export function OrderTable({ orders, userId, user }) {
   const { setMenuOpen } = useAdmin();
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -236,6 +236,12 @@ export function OrderTable({ orders, userId }) {
     },
   });
 
+  const fullName = React.useMemo(() => getFullName(user), [user]);
+  const joinedDate = React.useMemo(
+    () => formatShortDate(user?.account?.dob),
+    [user?.account?.dob],
+  );
+
   return (
     <div className='w-full p-10'>
       {/* HEADER */}
@@ -249,7 +255,10 @@ export function OrderTable({ orders, userId }) {
         >
           <PanelLeft />
         </button>
-        <h2 className='text-xl font-semibold'>Orders</h2>
+        <h2 className='text-xl font-semibold'>Orders of {fullName}</h2>
+        <p className='text-sm text-muted-foreground'>
+          Date of Birth: {joinedDate}
+        </p>
       </div>
 
       <div className='flex items-center py-4'>
@@ -276,7 +285,7 @@ export function OrderTable({ orders, userId }) {
                 Under Clinical Review
               </SelectItem>
               <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
-              <SelectItem value='delivered'>Delivered</SelectItem>
+              {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
             </SelectContent>
           </Select>
         </div>
@@ -320,7 +329,7 @@ export function OrderTable({ orders, userId }) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -340,7 +349,7 @@ export function OrderTable({ orders, userId }) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

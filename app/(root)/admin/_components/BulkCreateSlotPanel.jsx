@@ -15,7 +15,27 @@ function toYMD(d) {
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
+function formatDateDDMMMYYYY(date) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
 
+  return `${day} ${month} ${year}`;
+}
 function startOfDay(d) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
@@ -133,13 +153,13 @@ export default function BulkCreateSlotsPanel({ defaultInterval = 10 }) {
           res?.summary?.createdCount ??
             res?.data?.createdCount ??
             res?.createdCount ??
-            0
+            0,
         );
         totalExisting += Number(
           res?.summary?.existingCount ??
             res?.data?.existingCount ??
             res?.existingCount ??
-            0
+            0,
         );
       }
 
@@ -158,7 +178,7 @@ export default function BulkCreateSlotsPanel({ defaultInterval = 10 }) {
         toast.error(
           `Some dates failed: ${failedDates.slice(0, 3).join(", ")}${
             failedDates.length > 3 ? "..." : ""
-          }`
+          }`,
         );
       } else {
         toast.success("Bulk slots created successfully");
@@ -172,9 +192,13 @@ export default function BulkCreateSlotsPanel({ defaultInterval = 10 }) {
   }
 
   const startStr =
-    Array.isArray(rangeValue) && rangeValue[0] ? toYMD(rangeValue[0]) : "";
+    Array.isArray(rangeValue) && rangeValue[0]
+      ? formatDateDDMMMYYYY(rangeValue[0])
+      : "";
   const endStr =
-    Array.isArray(rangeValue) && rangeValue[1] ? toYMD(rangeValue[1]) : "";
+    Array.isArray(rangeValue) && rangeValue[1]
+      ? formatDateDDMMMYYYY(rangeValue[1])
+      : "";
 
   return (
     <div className='grid grid-cols-12 gap-6 p-6 bg-white rounded-2xl'>

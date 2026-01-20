@@ -159,8 +159,8 @@ model Post {
   shortDesc       String?
   bannerImage     String
   bannerAltText   String?
-  metaTitle       String?   @db.VarChar(70)
-  metaDescription String?   @db.VarChar(160)
+  metaTitle       String?   @db.VarChar(100)
+  metaDescription String?   @db.VarChar(200)
   canonicalUrl    String?
   content         Json
   author          User?     @relation(fields: [authorId], references: [id], onDelete: Cascade)

@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from "next/image";
 
 const ContactInfo = () => {
   return (
@@ -19,8 +19,8 @@ const ContactInfo = () => {
             <div>
               <h4 className='text-theme text-[18px] font-semibold'>Email</h4>
               <p>
-                <a href='mailto:thepharmaclinic@gmail.com' className='text-pg'>
-                  thepharmaclinic@gmail.com
+                <a href='mailto:pharmacy.fap80@nhs.net' className='text-pg'>
+                  pharmacy.fap80@nhs.net
                 </a>
               </p>
             </div>
@@ -36,7 +36,7 @@ const ContactInfo = () => {
             <div>
               <h4 className='text-theme text-[18px] font-semibold'>Phone</h4>
               <p>
-                <a href='tel:thepharmaclinic@gmail.com' className='text-pg'>
+                <a href='tel:02086797198' className='text-pg'>
                   0208 679 7198
                 </a>
               </p>
@@ -55,7 +55,7 @@ const ContactInfo = () => {
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ContactInfo
+export default ContactInfo;

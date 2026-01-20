@@ -44,7 +44,7 @@ export const createOrderByAdmin = async (prevState, formData) => {
     return { success: false, message: "Unauthorized. User is not admin" };
   }
 
-  if (!medicineName || !trackingId || !status) {
+  if (!medicineName || !status) {
     return {
       msg: "Please insert all the fields",
       success: false,
@@ -128,12 +128,29 @@ export async function getAllOrdersAction({ year, month, day } = {}) {
 
 // get all orders by admin
 export const getAllOrders = async (userId) => {
-  const user = await getAdminUser();
+  const adminuser = await getAdminUser();
 
-  const isAdmin = user?.admin?.isAdmin || false;
+  const isAdmin = adminuser?.admin?.isAdmin || false;
 
   if (!isAdmin) {
     return { success: false, message: "Unauthorized. User is not admin" };
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: Number(userId) },
+    select: {
+      id: true,
+      email: true,
+      account: true,
+      // add only what you need
+    },
+  });
+
+  if (!user) {
+    return {
+      success: false,
+      message: "User not found",
+    };
   }
 
   const orders = await prisma.order.findMany({
@@ -142,6 +159,8 @@ export const getAllOrders = async (userId) => {
   });
 
   return {
+    success: true,
+    user,
     orders,
   };
 };
@@ -215,6 +234,7 @@ export const updateOrderStatus = async (formData) => {
     };
   }
   revalidatePath(`/admin`);
+  revalidatePath(`/admin/orders`);
 
   if (order) {
     return {

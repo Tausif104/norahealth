@@ -59,12 +59,14 @@ import { useProfile } from "@/lib/profileContext";
 export default function BlogTable({ allPost, userRole, currentUserId }) {
   const data = allPost?.postsWithContentObj || [];
   const isPrivileged = ["admin", "superadmin"].includes(
-    (userRole || "").toLowerCase()
+    (userRole || "").toLowerCase(),
   );
   const [deletePostId, setDeletePostId] = React.useState(null);
 
   console.log(data, "BlogTable");
   const { setMenuOpen } = useProfile();
+
+  const userRoleRoute = userRole === "author" ? "author" : "admin";
 
   const router = useRouter();
 
@@ -116,34 +118,34 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
       },
 
       {
-        accessorKey: "createdAt",
+        accessorKey: "updatedAt",
         header: ({ column }) => (
           <Button
             variant='ghost'
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Date <ArrowUpDown className='ml-2 h-4 w-4' />
+            Last Updated <ArrowUpDown className=' h-4 w-4' />
           </Button>
         ),
         cell: ({ row }) =>
-          new Date(row.original.createdAt).toLocaleDateString("en-GB", {
+          new Date(row.original.updatedAt).toLocaleDateString("en-GB", {
             day: "2-digit",
             month: "short",
             year: "numeric",
           }),
       },
-      {
-        accessorKey: "comments",
-        header: "Comments",
-        cell: ({ row }) => (
-          <div>
-            <span className='flex items-center gap-1'>
-              <MessageCircleMore className='mr-1 w-4 h-4' />
-              {row.original.Comment.length}
-            </span>
-          </div>
-        ),
-      },
+      // {
+      //   accessorKey: "comments",
+      //   header: "Comments",
+      //   cell: ({ row }) => (
+      //     <div>
+      //       <span className='flex items-center gap-1'>
+      //         <MessageCircleMore className='mr-1 w-4 h-4' />
+      //         {row.original.Comment.length}
+      //       </span>
+      //     </div>
+      //   ),
+      // },
 
       {
         accessorKey: "isActive",
@@ -166,15 +168,33 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
         enableHiding: false,
         cell: ({ row }) => {
           // adjust these depending on your data shape:
+          // const postAuthorId =
+          //   row.original.authorId ||
+          //   row.original.author?.id ||
+          //   row.original.author?.account?.id;
+
+          // const isOwnPost =
+          //   postAuthorId && currentUserId && postAuthorId === currentUserId;
+
+          // const canToggleApproval = isPrivileged && !isOwnPost;
+          const role = (userRole || "").toLowerCase();
+          const isSuperAdmin = role === "superadmin";
+          const isAdmin = role === "admin";
+          const isPrivileged = isAdmin || isSuperAdmin;
+
+          // IMPORTANT: your Post.authorId is the User.id (Int). Use that first.
           const postAuthorId =
-            row.original.authorId ||
-            row.original.author?.id ||
-            row.original.author?.account?.id;
+            row.original.authorId ?? row.original.author?.id ?? null;
 
           const isOwnPost =
-            postAuthorId && currentUserId && postAuthorId === currentUserId;
+            postAuthorId != null &&
+            currentUserId != null &&
+            Number(postAuthorId) === Number(currentUserId);
 
-          const canToggleApproval = isPrivileged && !isOwnPost;
+          // Admin cannot approve own post; Superadmin can.
+          const canToggleApproval = isSuperAdmin
+            ? true
+            : isPrivileged && !isOwnPost;
 
           return (
             <DropdownMenu>
@@ -193,7 +213,7 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
 
                     const res = await togglePostApproval(
                       row.original.id,
-                      !row.original.isActive
+                      !row.original.isActive,
                     );
 
                     if (res?.success) {
@@ -206,21 +226,25 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
                 >
                   {!isPrivileged
                     ? "Approve (Admins only)"
-                    : isOwnPost
-                    ? "Approve (Not allowed on your own post)"
-                    : row.original.isActive
-                    ? "Disapprove"
-                    : "Approve"}
+                    : !isSuperAdmin && isOwnPost
+                      ? "Approve (Not allowed on your own post)"
+                      : row.original.isActive
+                        ? "Disapprove"
+                        : "Approve"}
                 </DropdownMenuItem>
 
                 {/* EDIT */}
                 <DropdownMenuItem asChild>
-                  <Link href={`/${userRole}/blog/edit-blog/${row.original.id}`}>
+                  <Link
+                    href={`/${userRoleRoute}/blog/edit-blog/${row.original.id}`}
+                  >
                     Edit
                   </Link>
                 </DropdownMenuItem>
                 {/* Comments*/}
-                {userRole === "admin" || userRole === "superadmin" ? (
+                {/* {["admin", "superadmin"].includes(
+                  (userRole || "").toLowerCase(),
+                ) ? (
                   <DropdownMenuItem asChild>
                     <Link
                       href={`/${userRole}/blog/comments?postId=${row.original.id}`}
@@ -228,7 +252,7 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
                       Comments
                     </Link>
                   </DropdownMenuItem>
-                ) : null}
+                ) : null} */}
 
                 {/* DELETE */}
                 <DropdownMenuItem
@@ -247,7 +271,7 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
         },
       },
     ],
-    [router, userRole, currentUserId, isPrivileged]
+    [router, userRole, currentUserId, isPrivileged],
   );
 
   const [sorting, setSorting] = React.useState([]);
@@ -339,7 +363,7 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -357,7 +381,7 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
