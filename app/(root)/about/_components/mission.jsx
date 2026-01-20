@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from "next/image";
 
 const Mission = () => {
   return (
@@ -11,7 +11,7 @@ const Mission = () => {
               width={600}
               height={530}
               alt='Mission Thumb'
-              className='w-full'
+              className='w-full h-full object-cover rounded-[12px]'
             />
           </div>
           <div className='md:col-span-7 col-span-1'>
@@ -52,7 +52,7 @@ const Mission = () => {
                 <p className='2xl:text-[22px] xl:text-[20px] text-[16px] text-pg'>
                   At Nora Health, our mission is simple: to make womens
                   healthcare more <span className='text-theme'>accessible</span>
-                  , <span className='text-theme'>private</span>, and{' '}
+                  , <span className='text-theme'>private</span>, and{" "}
                   <span className='text-theme'>convenient</span>. We believe
                   every woman deserves safe, professional, and affordable access
                   to essential treatments without unnecessary barriers.
@@ -63,7 +63,7 @@ const Mission = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Mission
+export default Mission;

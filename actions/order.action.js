@@ -72,29 +72,114 @@ export const createOrderByAdmin = async (prevState, formData) => {
 
 // get all user orders by admin
 
-export async function getAllOrdersAction({ year, month, day } = {}) {
+// export async function getAllOrdersAction({ year, month, day } = {}) {
+//   try {
+//     const user = await getAdminUser();
+
+//     const isAdmin = user?.admin?.isAdmin || false;
+
+//     if (!isAdmin) {
+//       return { success: false, message: "Unauthorized. User is not admin" };
+//     }
+//     const createdAtRange = buildCreatedAtRange({ year, month, day });
+
+//     const where = {};
+//     if (createdAtRange) where.createdAt = createdAtRange;
+
+//     const orders = await prisma.order.findMany({
+//       where,
+//       include: {
+//         user: {
+//           include: { account: true },
+//         },
+//       },
+//       orderBy: { createdAt: "desc" },
+//     });
+
+//     // Flatten for table
+//     const formatted = orders.map((o) => {
+//       const acc = o.user?.account;
+
+//       const fullName =
+//         acc?.firstName || acc?.lastName
+//           ? `${acc?.firstName ?? ""} ${acc?.lastName ?? ""}`.trim()
+//           : "N/A";
+
+//       return {
+//         id: o.id,
+//         medicineName: o.medicineName,
+//         trackingId: o.trackingId,
+//         status: o.status,
+//         createdAt: o.createdAt.toISOString(),
+
+//         userId: o.userId,
+//         email: o.user?.email ?? "N/A",
+//         fullName,
+//         phoneNumber: acc?.phoneNumber ?? "N/A",
+//       };
+//     });
+
+//     return { success: true, orders: formatted };
+//   } catch (err) {
+//     console.error(err);
+//     return { success: false, orders: [], message: "Failed to fetch orders" };
+//   }
+// }
+// actions/order.action.js (server)
+export async function getAllOrdersAction({
+  year,
+  month,
+  day,
+  status,
+  email,
+  page = 0,
+  pageSize = 10,
+} = {}) {
   try {
     const user = await getAdminUser();
-
     const isAdmin = user?.admin?.isAdmin || false;
 
     if (!isAdmin) {
       return { success: false, message: "Unauthorized. User is not admin" };
     }
-    const createdAtRange = buildCreatedAtRange({ year, month, day });
 
     const where = {};
+
+    // Date range filter (your existing helper)
+    const createdAtRange = buildCreatedAtRange({ year, month, day });
     if (createdAtRange) where.createdAt = createdAtRange;
 
-    const orders = await prisma.order.findMany({
-      where,
-      include: {
-        user: {
-          include: { account: true },
+    // Status filter
+    if (status && status !== "all") {
+      where.status = status; // "clinicalreview" | "posted" | "delivered"
+    }
+
+    // Email search filter (relation)
+    if (email && String(email).trim()) {
+      where.user = {
+        email: { contains: String(email).trim(), mode: "insensitive" },
+      };
+    }
+
+    const safePage = Number.isFinite(Number(page)) ? Number(page) : 0;
+    const safePageSize = Number.isFinite(Number(pageSize))
+      ? Number(pageSize)
+      : 10;
+
+    const [orders, total] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        include: {
+          user: {
+            include: { account: true },
+          },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        orderBy: { createdAt: "desc" },
+        skip: safePage * safePageSize,
+        take: safePageSize,
+      }),
+      prisma.order.count({ where }),
+    ]);
 
     // Flatten for table
     const formatted = orders.map((o) => {
@@ -119,10 +204,21 @@ export async function getAllOrdersAction({ year, month, day } = {}) {
       };
     });
 
-    return { success: true, orders: formatted };
+    return {
+      success: true,
+      orders: formatted,
+      total,
+      page: safePage,
+      pageSize: safePageSize,
+    };
   } catch (err) {
-    console.error(err);
-    return { success: false, orders: [], message: "Failed to fetch orders" };
+    console.error("getAllOrdersAction error:", err);
+    return {
+      success: false,
+      orders: [],
+      total: 0,
+      message: err?.message || "Failed to fetch orders",
+    };
   }
 }
 
@@ -164,84 +260,133 @@ export const getAllOrders = async (userId) => {
     orders,
   };
 };
+const RECENT_DAYS = 45;
+const cutoff = new Date(Date.now() - RECENT_DAYS * 24 * 60 * 60 * 1000);
 
 // get order by user
 export const getPastOrderByUser = async () => {
   const payload = await loggedInUserAction();
 
-  if (!payload?.payload?.id) {
-    return {
-      msg: "User not logged In",
-      success: false,
-    };
+  const userId = payload?.payload?.id;
+  if (!userId) {
+    return { msg: "User not logged In", success: false };
   }
+
+  const RECENT_DAYS = 45;
+  const cutoff = new Date(Date.now() - RECENT_DAYS * 24 * 60 * 60 * 1000);
 
   const orders = await prisma.order.findMany({
     where: {
-      userId: Number(payload?.payload?.id),
-      status: "delivered",
+      userId: Number(userId),
+      createdAt: { lt: cutoff },
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: { createdAt: "desc" },
   });
 
   return { success: true, msg: "OK", orders };
 };
+
 export const getRecentOrderByUser = async () => {
   const payload = await loggedInUserAction();
 
-  if (!payload?.payload?.id) {
-    return {
-      msg: "User not logged In",
-      success: false,
-    };
+  const userId = payload?.payload?.id;
+  if (!userId) {
+    return { msg: "User not logged In", success: false };
   }
+
+  const RECENT_DAYS = 45;
+  const cutoff = new Date(Date.now() - RECENT_DAYS * 24 * 60 * 60 * 1000);
 
   const orders = await prisma.order.findMany({
     where: {
-      userId: Number(payload?.payload?.id),
-      NOT: {
-        status: "delivered",
-      },
+      userId: Number(userId),
+      createdAt: { gte: cutoff },
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: { createdAt: "desc" },
   });
 
   return { success: true, msg: "OK", orders };
 };
 
+// export const updateOrderStatus = async (formData) => {
+//   const orderId = formData.get("orderId");
+//   const status = formData.get("status");
+//   const trackingId = formData.get("trackingId");
+//   const adminUser = await getAdminUser();
+//   if (!adminUser?.admin?.isAdmin) {
+//     return { success: false, msg: "Unauthorized. Not an admin." };
+//   }
+//   if (!trackingId || !String(trackingId).trim()) {
+//     return { success: false, msg: "trackingId is required" };
+//   }
+
+//   const order = await prisma.order.update({
+//     where: { id: Number(orderId) },
+//     data: { status, trackingId },
+//   });
+
+//   if (!order) {
+//     return {
+//       msg: "Order not found",
+//       success: false,
+//     };
+//   }
+//   revalidatePath(`/admin`);
+//   revalidatePath(`/admin/orders`);
+
+//   if (order) {
+//     return {
+//       msg: "Order Status Updated Successfully",
+//       success: true,
+//     };
+//   }
+// };
+
 export const updateOrderStatus = async (formData) => {
   const orderId = formData.get("orderId");
-  const status = formData.get("status");
-  const trackingId = formData.get("trackingId");
+  const status = String(formData.get("status") || "").trim();
+  const trackingIdRaw = formData.get("trackingId");
+  const trackingId = String(trackingIdRaw || "").trim();
+
   const adminUser = await getAdminUser();
   if (!adminUser?.admin?.isAdmin) {
     return { success: false, msg: "Unauthorized. Not an admin." };
   }
 
+  if (!orderId) {
+    return { success: false, msg: "orderId is required" };
+  }
+
+  // Require trackingId only when status is "posted"
+  if (status === "posted" && !trackingId) {
+    return {
+      success: false,
+      msg: "Tracking ID is required when status is posted.",
+    };
+  }
+
+  // Optional: also require for delivered
+  // if ((status === "posted" || status === "delivered") && !trackingId) {
+  //   return { success: false, msg: "Tracking ID is required for posted/delivered status." };
+  // }
+
+  // Build update data conditionally
+  const data = { status };
+  if (trackingId) data.trackingId = trackingId;
+
   const order = await prisma.order.update({
     where: { id: Number(orderId) },
-    data: { status, trackingId },
+    data,
   });
 
   if (!order) {
-    return {
-      msg: "Order not found",
-      success: false,
-    };
+    return { success: false, msg: "Order not found" };
   }
+
   revalidatePath(`/admin`);
   revalidatePath(`/admin/orders`);
 
-  if (order) {
-    return {
-      msg: "Order Status Updated Successfully",
-      success: true,
-    };
-  }
+  return { success: true, msg: "Order Status Updated Successfully" };
 };
 
 export const deleteOrder = async (formData) => {

@@ -53,7 +53,7 @@ export async function createBooking(formData) {
       nhsService,
       bookingdate,
       bookingtime,
-      "booking action"
+      "booking action",
     );
 
     if (
@@ -770,7 +770,7 @@ export const createBookingSlots = async (formOrObj) => {
 
     // check overlap with any existing
     const conflict = existingIntervals.some((iv) =>
-      overlaps(cStart, cEnd, iv.s, iv.e)
+      overlaps(cStart, cEnd, iv.s, iv.e),
     );
 
     if (conflict) {
@@ -882,9 +882,9 @@ export async function createOrderFromBooking({
       return { success: false, message: "Booking not found" };
     }
 
-    if (!trackingId || !String(trackingId).trim()) {
-      return { success: false, message: "trackingId is required" };
-    }
+    // if (!trackingId || !String(trackingId).trim()) {
+    //   return { success: false, message: "trackingId is required" };
+    // }
 
     // ✅ required: medicineName (fallback: booking.serviceName)
     const finalMedicineName = String(medicineName).trim();

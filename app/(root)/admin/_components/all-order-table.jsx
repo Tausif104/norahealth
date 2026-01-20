@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
+
 import {
   Dialog,
   DialogContent,
@@ -15,10 +15,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-
 import { Input } from "@/components/ui/input";
-import { updateOrderStatus } from "@/actions/order.action";
-
 import {
   Select,
   SelectTrigger,
@@ -26,7 +23,6 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -35,7 +31,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-
 import {
   Table,
   TableHeader,
@@ -46,14 +41,16 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { LoaderIcon, MoreHorizontal, PanelLeft } from "lucide-react";
+import { MoreHorizontal, PanelLeft } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useAdmin } from "@/lib/adminContext";
-import { toast } from "sonner";
 import Link from "next/link";
-import { deleteOrder, getAllOrdersAction } from "@/actions/order.action";
+import { toast } from "sonner";
+
+import { deleteOrder, updateOrderStatus } from "@/actions/order.action";
+
 const STICKY_RIGHT_TH =
-  "sticky right-0 z-40 bg-[#faf9f8]  border-l min-w-[110px] shadow-[-6px_0_6px_-6px_rgba(0,0,0,0.15)]";
+  "sticky right-0 z-40 bg-[#faf9f8] border-l min-w-[110px] shadow-[-6px_0_6px_-6px_rgba(0,0,0,0.15)]";
 const STICKY_RIGHT_TD =
   "sticky right-0 z-30 bg-[#faf9f8] border-l min-w-[110px] shadow-[-6px_0_6px_-6px_rgba(0,0,0,0.10)]";
 
@@ -75,7 +72,7 @@ const statusPill = (status, trackingId) => {
         className={`${base} bg-blue-50 text-blue-700 border-blue-200 flex flex-col items-start`}
       >
         <span>Posted via Royal Mail</span>
-        <span>{trackingId ? `Tracking ID: ${trackingId}` : ""}</span>
+        {trackingId ? <span>{`Tracking ID: ${trackingId}`}</span> : null}
       </span>
     );
   }
@@ -95,210 +92,181 @@ const statusPill = (status, trackingId) => {
   );
 };
 
-const TableLoader = ({ colSpan }) => (
-  <TableRow>
-    <TableCell colSpan={colSpan} className='h-24 text-center'>
-      <div className='w-full justify-center items-center h-[30vh] flex'>
-        <LoaderIcon className='size-5 animate-spin mx-auto' />
-      </div>
-    </TableCell>
-  </TableRow>
-);
-
-// -----------------------
-// TABLE COLUMNS (Orders)
-// -----------------------
-const columns = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label='Select all'
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label='Select row'
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
+export default function AllOrdersTable({
+  initialOrders = [],
+  initialTotal = 0,
+  initialPageIndex = 0,
+  pageSize = 10,
+  initialFilters = {
+    year: "all",
+    month: "all",
+    day: "all",
+    status: "all",
+    email: "",
   },
-  { accessorKey: "id", header: "ID" },
-  { accessorKey: "fullName", header: "Full Name" },
-  {
-    accessorKey: "email",
-    header: "Email",
-    filterFn: (row, id, value) => {
-      const v = (value ?? "").toString().toLowerCase();
-      const cell = (row.getValue(id) ?? "").toString().toLowerCase();
-      return cell.includes(v);
-    },
-    cell: ({ row }) => (
-      <Link
-        href={`/admin/${row.getValue("id")}/orders`}
-        className='hover:underline'
-      >
-        {row.getValue("email")}
-      </Link>
-    ),
-  },
-  { accessorKey: "phoneNumber", header: "Phone" },
-  { accessorKey: "medicineName", header: "Medicine" },
-  { accessorKey: "trackingId", header: "Tracking ID" },
-  {
-    accessorKey: "status",
-    header: "Status",
-    filterFn: (row, id, value) => {
-      if (!value) return true;
-      return String(row.getValue(id)) === String(value);
-    },
-    cell: ({ row }) => {
-      const status = row.getValue("status");
-      const trackingId = row.getValue("trackingId");
-      return statusPill(status, trackingId);
-    },
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Created",
-    cell: ({ row }) => formatDate(new Date(row.getValue("createdAt"))),
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({ row, table }) => {
-      const order = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-            <DropdownMenuItem asChild>
-              <Link href={`/admin/orders/${order.id}`}>View Details</Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              onClick={() => table.options.meta.openDialog(order)}
-            >
-              Update Status
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              className='text-red-600'
-              onClick={() => table.options.meta.onDelete(order.id)}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
-
-export default function AllOrdersTable() {
+}) {
+  const router = useRouter();
   const { setMenuOpen } = useAdmin();
 
-  const [year, setYear] = useState("all");
-  const [month, setMonth] = useState("all");
-  const [day, setDay] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+  // These states only control the UI controls.
+  const [year, setYear] = useState(initialFilters.year);
+  const [month, setMonth] = useState(initialFilters.month);
+  const [day, setDay] = useState(initialFilters.day);
+  const [statusFilter, setStatusFilter] = useState(initialFilters.status);
+  const [emailSearch, setEmailSearch] = useState(initialFilters.email);
 
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [columnFilters, setColumnFilters] = useState([]);
-
+  // Dialog
   const [open, setOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [status, setStatus] = useState("");
 
-  async function fetchOrders() {
-    setLoading(true);
+  const totalPages = Math.max(1, Math.ceil((initialTotal || 0) / pageSize));
 
-    try {
-      const toUndef = (v) => (v && v !== "all" ? v : undefined);
+  // Build URL from UI state
+  const pushWithParams = (overrides = {}) => {
+    const params = new URLSearchParams();
 
-      const res = await getAllOrdersAction({
-        year: toUndef(year),
-        month: toUndef(month),
-        day: toUndef(day),
-        status: toUndef(statusFilter), // (optional) if you later want server-side status
-      });
+    const nextYear = overrides.year ?? year;
+    const nextMonth = overrides.month ?? month;
+    const nextDay = overrides.day ?? day;
+    const nextStatus = overrides.status ?? statusFilter;
+    const nextEmail = overrides.email ?? emailSearch;
+    const nextPage = overrides.page ?? 0;
 
-      if (!res?.success) {
-        toast.error(res?.message || "Failed to load orders");
-        setOrders([]);
-        return;
-      }
+    if (nextYear && nextYear !== "all") params.set("year", nextYear);
+    if (nextMonth && nextMonth !== "all") params.set("month", nextMonth);
+    if (nextDay && nextDay !== "all") params.set("day", nextDay);
+    if (nextStatus && nextStatus !== "all") params.set("status", nextStatus);
+    if (nextEmail && nextEmail.trim()) params.set("email", nextEmail.trim());
+    if (nextPage && Number(nextPage) > 0) params.set("page", String(nextPage));
 
-      setOrders(res?.orders || []);
-    } catch (err) {
-      console.error(err);
-      setOrders([]);
-      toast.error("Server error");
-    } finally {
-      setLoading(false);
-    }
-  }
+    router.push(`/admin/orders?${params.toString()}`);
+  };
 
-  useEffect(() => {
-    fetchOrders();
-  }, [year, month, day]);
+  // Table columns
+  const columns = useMemo(
+    () => [
+      {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label='Select all'
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label='Select row'
+          />
+        ),
+      },
+      { accessorKey: "id", header: "ID" },
+      { accessorKey: "fullName", header: "Full Name" },
+      {
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => (
+          <Link
+            href={`/admin/${row.original.userId}/orders`}
+            className='hover:underline'
+          >
+            {row.getValue("email")}
+          </Link>
+        ),
+      },
+      { accessorKey: "phoneNumber", header: "Phone" },
+      { accessorKey: "medicineName", header: "Medicine" },
+      { accessorKey: "trackingId", header: "Tracking ID" },
+      {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) =>
+          statusPill(row.getValue("status"), row.getValue("trackingId")),
+      },
+      {
+        accessorKey: "createdAt",
+        header: "Created",
+        cell: ({ row }) => formatDate(new Date(row.getValue("createdAt"))),
+      },
+      {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+          const order = row.original;
+
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='ghost' className='h-8 w-8 p-0'>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align='end'>
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+                <DropdownMenuItem asChild>
+                  <Link href={`/admin/orders/${order.id}`}>View Details</Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedOrder(order);
+                    setStatus(order?.status || "");
+                    setOpen(true);
+                  }}
+                >
+                  Update Status
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  className='text-red-600'
+                  onClick={async () => {
+                    const ok = confirm("Delete this order?");
+                    if (!ok) return;
+
+                    const res = await deleteOrder({ orderId: order.id });
+                    if (res?.success) {
+                      toast.success(res?.message || "Order deleted");
+                      // Refresh current server data
+                      router.refresh();
+                    } else {
+                      toast.error(res?.message || "Delete failed");
+                    }
+                  }}
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      },
+    ],
+    [router],
+  );
 
   const table = useReactTable({
-    data: orders,
+    data: initialOrders,
     columns,
-    state: { columnFilters },
-    onColumnFiltersChange: setColumnFilters,
-    meta: {
-      onDelete: async (id) => {
-        const ok = confirm("Delete this order?");
-        if (!ok) return;
-
-        const res = await deleteOrder({ orderId: id });
-        if (res?.success) {
-          toast.success(res?.message || "Order deleted");
-          fetchOrders();
-        } else {
-          toast.error(res?.message || "Delete failed");
-        }
-      },
-
-      openDialog: (order) => {
-        setSelectedOrder(order);
-        setStatus(order?.status || "");
-        setOpen(true);
-      },
-
-      status,
-      setStatus,
-    },
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   });
 
-  // Filter options (same style like your component)
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const yearOptions = Array.from(new Set([2024, currentYear, currentYear + 1]))
-    .sort((a, b) => a - b)
-    .map(String);
+  // Year options (no future year)
+  const START_YEAR = 2024;
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from(
+    { length: currentYear - START_YEAR + 1 },
+    (_, i) => String(START_YEAR + i),
+  );
 
   const months = [
     { id: 1, label: "Jan" },
@@ -314,8 +282,9 @@ export default function AllOrdersTable() {
     { id: 11, label: "Nov" },
     { id: 12, label: "Dec" },
   ];
-
   const days = Array.from({ length: 31 }, (_, i) => String(i + 1));
+
+  const isPosted = status === "posted";
 
   return (
     <div className='w-full p-6 overflow-x-auto'>
@@ -330,13 +299,17 @@ export default function AllOrdersTable() {
         <h2 className='text-xl font-semibold'>Orders</h2>
       </div>
 
-      {/* FILTERS (simple dropdowns like yours) */}
-      {/* FILTERS (shadcn Select) */}
+      {/* FILTERS (onChange updates URL immediately) */}
       <div className='flex flex-wrap items-end gap-3'>
-        {/* Year */}
         <div>
           <label className='block text-xs text-gray-600 mb-1'>Year</label>
-          <Select value={year} onValueChange={setYear}>
+          <Select
+            value={year}
+            onValueChange={(v) => {
+              setYear(v);
+              pushWithParams({ year: v, page: 0 });
+            }}
+          >
             <SelectTrigger className='w-[120px] bg-white/40'>
               <SelectValue placeholder='Year' />
             </SelectTrigger>
@@ -351,10 +324,15 @@ export default function AllOrdersTable() {
           </Select>
         </div>
 
-        {/* Month */}
         <div>
           <label className='block text-xs text-gray-600 mb-1'>Month</label>
-          <Select value={month} onValueChange={setMonth}>
+          <Select
+            value={month}
+            onValueChange={(v) => {
+              setMonth(v);
+              pushWithParams({ month: v, page: 0 });
+            }}
+          >
             <SelectTrigger className='w-[120px] bg-white/40'>
               <SelectValue placeholder='Month' />
             </SelectTrigger>
@@ -369,10 +347,15 @@ export default function AllOrdersTable() {
           </Select>
         </div>
 
-        {/* Day */}
         <div>
           <label className='block text-xs text-gray-600 mb-1'>Day</label>
-          <Select value={day} onValueChange={setDay}>
+          <Select
+            value={day}
+            onValueChange={(v) => {
+              setDay(v);
+              pushWithParams({ day: v, page: 0 });
+            }}
+          >
             <SelectTrigger className='w-[80px] bg-white/40'>
               <SelectValue placeholder='Day' />
             </SelectTrigger>
@@ -387,16 +370,13 @@ export default function AllOrdersTable() {
           </Select>
         </div>
 
-        {/* Status */}
         <div>
           <label className='block text-xs text-gray-600 mb-1'>Status</label>
           <Select
             value={statusFilter}
             onValueChange={(v) => {
               setStatusFilter(v);
-              table
-                .getColumn("status")
-                ?.setFilterValue(v === "all" ? undefined : v);
+              pushWithParams({ status: v, page: 0 });
             }}
           >
             <SelectTrigger className='w-[180px] bg-white/40'>
@@ -411,17 +391,16 @@ export default function AllOrdersTable() {
           </Select>
         </div>
 
-        {/* Clear */}
         <div className='ml-auto'>
           <Button
             variant='outline'
             onClick={() => {
-              setYear("");
-              setMonth("");
-              setDay("");
-              setStatusFilter("");
-              table.getColumn("status")?.setFilterValue(undefined);
-              table.getColumn("email")?.setFilterValue("");
+              setYear("all");
+              setMonth("all");
+              setDay("all");
+              setStatusFilter("all");
+              setEmailSearch("");
+              router.push("/admin/orders"); // clears searchParams
             }}
           >
             Clear
@@ -429,16 +408,20 @@ export default function AllOrdersTable() {
         </div>
       </div>
 
-      {/* SEARCH */}
-      <div className='flex items-center py-4 w-full max-w-sm'>
+      {/* EMAIL SEARCH (onChange or button) */}
+      <div className='flex items-center py-4 w-full max-w-sm gap-2'>
         <input
-          value={table.getColumn("email")?.getFilterValue() ?? ""}
-          onChange={(e) =>
-            table.getColumn("email")?.setFilterValue(e.target.value)
-          }
+          value={emailSearch}
+          onChange={(e) => setEmailSearch(e.target.value)}
           placeholder='Search by email...'
           className='w-[260px] bg-white/40 rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-200'
         />
+        <Button
+          variant='outline'
+          onClick={() => pushWithParams({ email: emailSearch, page: 0 })}
+        >
+          Search
+        </Button>
       </div>
 
       {/* TABLE */}
@@ -465,9 +448,7 @@ export default function AllOrdersTable() {
           </TableHeader>
 
           <TableBody>
-            {loading ? (
-              <TableLoader colSpan={columns.length} />
-            ) : table.getRowModel().rows.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
@@ -499,28 +480,42 @@ export default function AllOrdersTable() {
         </Table>
       </div>
 
-      {/* PAGINATION */}
-      <div className='flex items-center justify-end gap-2 py-4'>
+      {/* PAGINATION (URL-driven) */}
+      <div className='flex items-center justify-end gap-3 py-4'>
         <Button
           variant='outline'
           size='sm'
-          disabled={!table.getCanPreviousPage()}
-          onClick={() => table.previousPage()}
+          disabled={initialPageIndex === 0}
+          onClick={() => pushWithParams({ page: initialPageIndex - 1 })}
         >
           Previous
         </Button>
 
+        <div className='text-sm text-muted-foreground'>
+          Page {initialPageIndex + 1} of {totalPages} ({initialTotal} total)
+        </div>
+
         <Button
           variant='outline'
           size='sm'
-          disabled={!table.getCanNextPage()}
-          onClick={() => table.nextPage()}
+          disabled={initialPageIndex + 1 >= totalPages}
+          onClick={() => pushWithParams({ page: initialPageIndex + 1 })}
         >
           Next
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      {/* UPDATE STATUS DIALOG (kept as-is; refresh on submit) */}
+      <Dialog
+        open={open}
+        onOpenChange={(v) => {
+          setOpen(v);
+          if (!v) {
+            setSelectedOrder(null);
+            setStatus("");
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Update Order Status</DialogTitle>
@@ -530,7 +525,7 @@ export default function AllOrdersTable() {
             action={updateOrderStatus}
             onSubmit={() => {
               setOpen(false);
-              fetchOrders();
+              router.refresh(); // refresh server data
             }}
             className='space-y-4'
           >
@@ -539,24 +534,32 @@ export default function AllOrdersTable() {
               name='orderId'
               value={selectedOrder?.id || ""}
             />
+            <input type='hidden' name='status' value={status} />
 
             <div>
-              <label className='mb-2 block font-medium'>Tracking ID</label>
+              <label className='mb-2 block font-medium'>
+                Tracking ID{" "}
+                {isPosted ? <span className='text-red-500'>*</span> : null}
+              </label>
+
               <Input
                 type='text'
                 name='trackingId'
-                value={selectedOrder?.trackingId || ""}
+                value={selectedOrder?.trackingId ?? ""}
                 onChange={(e) =>
                   setSelectedOrder((prev) => ({
                     ...(prev || {}),
                     trackingId: e.target.value,
                   }))
                 }
-                placeholder='Optional unless Posted/Delivered'
+                required={isPosted}
+                placeholder={
+                  isPosted ? "Enter tracking id" : "Required only for Posted"
+                }
               />
             </div>
 
-            <Select name='status' value={status} onValueChange={setStatus}>
+            <Select value={status} onValueChange={setStatus}>
               <SelectTrigger className='w-full'>
                 <SelectValue placeholder='Select status' />
               </SelectTrigger>
@@ -566,7 +569,6 @@ export default function AllOrdersTable() {
                   Under Clinical Review
                 </SelectItem>
                 <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
-                {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
               </SelectContent>
             </Select>
 
@@ -578,7 +580,11 @@ export default function AllOrdersTable() {
               >
                 Cancel
               </Button>
-              <Button type='submit' className='bg-theme'>
+              <Button
+                type='submit'
+                className='bg-theme'
+                disabled={isPosted && !(selectedOrder?.trackingId || "").trim()}
+              >
                 Update
               </Button>
             </DialogFooter>

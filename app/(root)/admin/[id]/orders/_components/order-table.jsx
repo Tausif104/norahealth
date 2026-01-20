@@ -242,6 +242,8 @@ export function OrderTable({ orders, userId, user }) {
     [user?.account?.dob],
   );
 
+  const isPosted = status === "posted"; // put near dialog render
+
   return (
     <div className='w-full p-10'>
       {/* HEADER */}
@@ -383,11 +385,23 @@ export function OrderTable({ orders, userId, user }) {
               <input type='hidden' name='orderId' value={selectedOrder?.id} />
 
               <div>
-                <label className='mb-2 block font-medium'>Tracking ID</label>
+                <label className='mb-2 block font-medium'>
+                  Tracking ID{" "}
+                  {status === "posted" ? (
+                    <span className='text-red-500'>*</span>
+                  ) : null}
+                </label>
                 <Input
                   type='text'
                   name='trackingId'
                   value={selectedOrder?.trackingId}
+                  disabled={!isPosted}
+                  required={isPosted}
+                  placeholder={
+                    isPosted
+                      ? "Enter tracking id"
+                      : "Tracking id required only for Posted"
+                  }
                   onChange={(e) =>
                     setSelectedOrder({
                       ...selectedOrder,
@@ -395,6 +409,11 @@ export function OrderTable({ orders, userId, user }) {
                     })
                   }
                 />
+                {isPosted && !(selectedOrder?.trackingId || "").trim() ? (
+                  <p className='text-sm text-red-500 mt-1'>
+                    Tracking ID is required for Posted status.
+                  </p>
+                ) : null}
               </div>
 
               <Select
@@ -411,7 +430,7 @@ export function OrderTable({ orders, userId, user }) {
                     Under Clinical Review
                   </SelectItem>
                   <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
-                  <SelectItem value='delivered'>Delivered</SelectItem>
+                  {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
                 </SelectContent>
               </Select>
 
@@ -423,7 +442,13 @@ export function OrderTable({ orders, userId, user }) {
                 >
                   Cancel
                 </Button>
-                <Button type='submit' className='bg-theme'>
+                <Button
+                  type='submit'
+                  className='bg-theme'
+                  disabled={
+                    isPosted && !(selectedOrder?.trackingId || "").trim()
+                  }
+                >
                   Update
                 </Button>
               </DialogFooter>

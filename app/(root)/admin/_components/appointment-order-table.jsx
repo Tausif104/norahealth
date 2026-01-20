@@ -466,7 +466,7 @@ export default function AppointmentOrderTable() {
                   <TableHead key={header.id}>
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
                   </TableHead>
                 ))}
@@ -484,7 +484,7 @@ export default function AppointmentOrderTable() {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -584,8 +584,8 @@ export default function AppointmentOrderTable() {
 
                 if (!medicineName?.trim())
                   return toast.error("Medicine Name is required");
-                if (!trackingId?.trim())
-                  return toast.error("Tracking ID is required");
+                // if (!trackingId?.trim())
+                //   return toast.error("Tracking ID is required");
 
                 try {
                   setCreatingOrder(true);

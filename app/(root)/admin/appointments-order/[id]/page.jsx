@@ -30,6 +30,9 @@ export default async function AppointmentOrderDetailsPage({ params }) {
       <section className=' p-4 space-y-2'>
         <h2 className='font-bold text-xl'>Patient Info</h2>
         <p>
+          <b>User ID:</b> {user.id}
+        </p>
+        <p>
           <b>Name:</b> {booking.fullName}
         </p>
         <p>
@@ -38,24 +41,30 @@ export default async function AppointmentOrderDetailsPage({ params }) {
         <p>
           <b>Phone:</b> {booking.phoneNumber}
         </p>
-
         <p>
-          <b>
-            {booking.bookingType === "Booking"
-              ? "Appointment Date"
-              : "Requested Date"}
-            :
-          </b>{" "}
-          {formatDate(booking.appointment)}{" "}
-          {booking.slot ? `at ${booking.slot.startTime}` : ""}
+          <b>Date of Birth:</b>{" "}
+          {user?.account?.dob ? formatDate(user.account.dob) : "N/A"}
         </p>
+        {booking.bookingType === "Booking" && (
+          <p>
+            <b>
+              {booking.bookingType === "Booking"
+                ? "Appointment Date"
+                : "Requested Date"}
+              :
+            </b>{" "}
+            {formatDate(booking.appointment)}{" "}
+            {booking.slot ? `at ${booking.slot.startTime}` : ""}
+          </p>
+        )}
+
         <p>
           <b>Notes:</b> {booking.notes || "—"}
         </p>
       </section>
 
       {/* Slot Info */}
-      {booking.bookingType === "Booking" && booking.slot && (
+      {/* {booking.bookingType === "Booking" && booking.slot && (
         <section className='p-4 space-y-2'>
           <h2 className='font-bold text-xl'>Slot Info</h2>
           <p>
@@ -65,7 +74,7 @@ export default async function AppointmentOrderDetailsPage({ params }) {
             <b>Time:</b> {booking.slot.startTime} – {booking.slot.endTime}
           </p>
         </section>
-      )}
+      )} */}
 
       {booking.bookingType === "Order" && (
         <section className='p-4 space-y-2'>
@@ -89,7 +98,7 @@ export default async function AppointmentOrderDetailsPage({ params }) {
       {/* User + Orders */}
       {user && (
         <section className='p-4 space-y-2'>
-          <h2 className='font-bold text-xl'>User Info</h2>
+          {/* <h2 className='font-bold text-xl'>User Info</h2>
           <p>
             <b>User ID:</b> {user.id}
           </p>
@@ -102,12 +111,12 @@ export default async function AppointmentOrderDetailsPage({ params }) {
           <p>
             <b>Date of Birth:</b>{" "}
             {user?.account?.dob ? formatDate(user.account.dob) : "N/A"}
-          </p>
-          <p>
+          </p> */}
+          {/* <p>
             <b>Role:</b> {user.role}
-          </p>
+          </p> */}
 
-          <h3 className='mt-3 font-bold text-xl'>Orders</h3>
+          <h3 className='mt-3 font-bold text-xl'>Patient Orders</h3>
 
           {user.orders?.length ? (
             <AppointmentOrdersTable orders={user.orders} />
