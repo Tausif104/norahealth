@@ -42,7 +42,7 @@ const AdminSidebar = () => {
           }`}
         >
           <User className='w-4 h-4' />
-          <span>Patient's</span>
+          <span>Patients</span>
         </Link>
 
         {/* Health Records */}
@@ -67,7 +67,7 @@ const AdminSidebar = () => {
           }`}
         >
           <ClipboardClock className='w-4 h-4' />
-          <span>Contraception Order</span>
+          <span>Online OC Orders</span>
         </Link>
         <Link
           href='/admin/orders'
@@ -78,7 +78,7 @@ const AdminSidebar = () => {
           }`}
         >
           <ClipboardClock className='w-4 h-4' />
-          <span>Orders</span>
+          <span>Admin OC Orders</span>
         </Link>
         {/* Booking Slot */}
         <Link

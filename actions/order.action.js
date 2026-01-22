@@ -342,7 +342,7 @@ export const getRecentOrderByUser = async () => {
 //   }
 // };
 
-export const updateOrderStatus = async (formData) => {
+export const updateOrderStatus = async (prevState, formData) => {
   const orderId = formData.get("orderId");
   const status = String(formData.get("status") || "").trim();
   const trackingIdRaw = formData.get("trackingId");
@@ -358,12 +358,12 @@ export const updateOrderStatus = async (formData) => {
   }
 
   // Require trackingId only when status is "posted"
-  if (status === "posted" && !trackingId) {
-    return {
-      success: false,
-      msg: "Tracking ID is required when status is posted.",
-    };
-  }
+  // if (status === "posted" && !trackingId) {
+  //   return {
+  //     success: false,
+  //     msg: "Tracking ID is required when status is posted.",
+  //   };
+  // }
 
   // Optional: also require for delivered
   // if ((status === "posted" || status === "delivered") && !trackingId) {

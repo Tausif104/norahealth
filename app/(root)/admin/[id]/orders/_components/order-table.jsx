@@ -63,6 +63,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAdmin } from "@/lib/adminContext";
 import { deleteOrder, updateOrderStatus } from "@/actions/order.action";
 import AdminNavigation from "../../_components/admin-navigation";
+import { toast } from "sonner";
 
 export function OrderTable({ orders, userId, user }) {
   const { setMenuOpen } = useAdmin();
@@ -244,6 +245,22 @@ export function OrderTable({ orders, userId, user }) {
 
   const isPosted = status === "posted"; // put near dialog render
 
+  const initial = { success: null, msg: "" };
+  const [actionState, formAction, isPending] = React.useActionState(
+    updateOrderStatus,
+    initial,
+  );
+
+  React.useEffect(() => {
+    if (actionState?.success === true) {
+      toast.success(actionState.msg || "Updated");
+      setOpen(false);
+    }
+    if (actionState?.success === false) {
+      toast.error(actionState.msg || "Update failed");
+    }
+  }, [actionState]);
+
   return (
     <div className='w-full p-10'>
       {/* HEADER */}
@@ -377,31 +394,20 @@ export function OrderTable({ orders, userId, user }) {
               <DialogTitle>Update Order Status</DialogTitle>
             </DialogHeader>
 
-            <form
-              action={updateOrderStatus}
-              onSubmit={() => setOpen(false)}
-              className='space-y-4'
-            >
-              <input type='hidden' name='orderId' value={selectedOrder?.id} />
+            <form action={formAction} className='space-y-4'>
+              <input
+                type='hidden'
+                name='orderId'
+                value={selectedOrder?.id || ""}
+              />
 
               <div>
-                <label className='mb-2 block font-medium'>
-                  Tracking ID{" "}
-                  {status === "posted" ? (
-                    <span className='text-red-500'>*</span>
-                  ) : null}
-                </label>
+                <label className='mb-2 block font-medium'>Tracking ID</label>
                 <Input
                   type='text'
                   name='trackingId'
-                  value={selectedOrder?.trackingId}
-                  disabled={!isPosted}
-                  required={isPosted}
-                  placeholder={
-                    isPosted
-                      ? "Enter tracking id"
-                      : "Tracking id required only for Posted"
-                  }
+                  value={selectedOrder?.trackingId || ""}
+                  placeholder='Enter tracking id'
                   onChange={(e) =>
                     setSelectedOrder({
                       ...selectedOrder,
@@ -409,11 +415,6 @@ export function OrderTable({ orders, userId, user }) {
                     })
                   }
                 />
-                {isPosted && !(selectedOrder?.trackingId || "").trim() ? (
-                  <p className='text-sm text-red-500 mt-1'>
-                    Tracking ID is required for Posted status.
-                  </p>
-                ) : null}
               </div>
 
               <Select
@@ -424,13 +425,11 @@ export function OrderTable({ orders, userId, user }) {
                 <SelectTrigger className='w-full'>
                   <SelectValue placeholder='Select status' />
                 </SelectTrigger>
-
                 <SelectContent>
                   <SelectItem value='clinicalreview'>
                     Under Clinical Review
                   </SelectItem>
                   <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
-                  {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
                 </SelectContent>
               </Select>
 
@@ -442,14 +441,9 @@ export function OrderTable({ orders, userId, user }) {
                 >
                   Cancel
                 </Button>
-                <Button
-                  type='submit'
-                  className='bg-theme'
-                  disabled={
-                    isPosted && !(selectedOrder?.trackingId || "").trim()
-                  }
-                >
-                  Update
+
+                <Button type='submit' className='bg-theme' disabled={isPending}>
+                  {isPending ? "Updating..." : "Update"}
                 </Button>
               </DialogFooter>
             </form>

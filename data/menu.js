@@ -4,33 +4,34 @@ export const menuItems = [
   //   label: "Home",
   //   link: "/",
   // },
+
   {
-    id: 2,
-    label: "About Us",
-    link: "/about",
-  },
-  {
-    id: 3,
+    id: 1,
     label: "Appointments",
     link: "/booking",
   },
   {
-    id: 4,
+    id: 2,
     label: "Order Contraception",
     link: "/booking/order",
   },
   {
-    id: 5,
+    id: 3,
     label: "Contraception Choices",
     link: "/contraception-choices/begin",
   },
   {
-    id: 6,
+    id: 4,
     label: "Articles",
     link: "/articles",
   },
   {
-    id: 7,
+    id: 5,
+    label: "About Us",
+    link: "/about",
+  },
+  {
+    id: 6,
     label: "Contact us",
     link: "/contact",
   },

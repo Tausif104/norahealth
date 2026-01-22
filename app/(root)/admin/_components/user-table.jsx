@@ -436,7 +436,7 @@ export function UserTable({ users, admin }) {
           </button>
           <h2 className='text-xl font-semibold'>
             {" "}
-            Patient's{" "}
+            Patients{" "}
             <Badge variant='primary' className='bg-white'>
               {table?.options?.data.length}
             </Badge>

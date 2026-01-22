@@ -108,7 +108,7 @@ export default function CreateOrderDialog({ bookingId }) {
                     Clinical Review
                   </SelectItem>
                   <SelectItem value='posted'>Posted</SelectItem>
-                  <SelectItem value='delivered'>Delivered</SelectItem>
+                  {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
                 </SelectContent>
               </Select>
             </div>

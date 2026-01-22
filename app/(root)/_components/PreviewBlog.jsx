@@ -1,4 +1,5 @@
 "use client";
+import { decode } from "html-entities";
 
 import { startTransition, useContext, useEffect, useState } from "react";
 
@@ -33,16 +34,20 @@ const SeeBlog = () => {
   };
 
   const renderListItemContent = (item) => {
-    if (typeof item === "string") {
-      return <span dangerouslySetInnerHTML={{ __html: item }} />;
-    }
+    // normalize to html string
+    const html =
+      typeof item === "string"
+        ? item
+        : item && typeof item === "object"
+          ? (item.content ?? item.text ?? "")
+          : String(item ?? "");
 
-    if (item && typeof item === "object") {
-      const html = item.content ?? item.text ?? "";
-      return html ? <span dangerouslySetInnerHTML={{ __html: html }} /> : null;
-    }
+    // decode entities then render
+    const safeHtml = decode(html);
 
-    return <span>{String(item)}</span>;
+    return safeHtml ? (
+      <span dangerouslySetInnerHTML={{ __html: safeHtml }} />
+    ) : null;
   };
 
   const renderNestedList = (items, style, keyPrefix = "li") => {
@@ -97,9 +102,10 @@ const SeeBlog = () => {
     switch (block.type) {
       case "header": {
         const Tag = `h${block.data.level || 2}`;
+        const text = decode(block.data.text || "");
         return (
-          <Tag key={i} className='mt-8 mb-3 text-xl font-bold  text-gray-900'>
-            {block.data.text}
+          <Tag key={i} className='mt-8 mb-3 text-xl font-bold text-gray-900'>
+            {text}
           </Tag>
         );
       }

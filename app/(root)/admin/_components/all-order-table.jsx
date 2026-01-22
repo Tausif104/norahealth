@@ -285,6 +285,21 @@ export default function AllOrdersTable({
   const days = Array.from({ length: 31 }, (_, i) => String(i + 1));
 
   const isPosted = status === "posted";
+  const initial = { success: null, msg: "" };
+  const [actionState, formAction, isPending] = React.useActionState(
+    updateOrderStatus,
+    initial,
+  );
+
+  React.useEffect(() => {
+    if (actionState?.success === true) {
+      toast.success(actionState.msg || "Updated");
+      setOpen(false);
+    }
+    if (actionState?.success === false) {
+      toast.error(actionState.msg || "Update failed");
+    }
+  }, [actionState]);
 
   return (
     <div className='w-full p-6 overflow-x-auto'>
@@ -521,7 +536,7 @@ export default function AllOrdersTable({
             <DialogTitle>Update Order Status</DialogTitle>
           </DialogHeader>
 
-          <form
+          {/* <form
             action={updateOrderStatus}
             onSubmit={() => {
               setOpen(false);
@@ -586,6 +601,59 @@ export default function AllOrdersTable({
                 disabled={isPosted && !(selectedOrder?.trackingId || "").trim()}
               >
                 Update
+              </Button>
+            </DialogFooter>
+          </form> */}
+          <form action={formAction} className='space-y-4'>
+            <input
+              type='hidden'
+              name='orderId'
+              value={selectedOrder?.id || ""}
+            />
+
+            <div>
+              <label className='mb-2 block font-medium'>Tracking ID</label>
+              <Input
+                type='text'
+                name='trackingId'
+                value={selectedOrder?.trackingId || ""}
+                placeholder='Enter tracking id'
+                onChange={(e) =>
+                  setSelectedOrder({
+                    ...selectedOrder,
+                    trackingId: e.target.value,
+                  })
+                }
+              />
+            </div>
+
+            <Select
+              name='status'
+              value={status}
+              onValueChange={(val) => setStatus(val)}
+            >
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder='Select status' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='clinicalreview'>
+                  Under Clinical Review
+                </SelectItem>
+                <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <DialogFooter>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+
+              <Button type='submit' className='bg-theme' disabled={isPending}>
+                {isPending ? "Updating..." : "Update"}
               </Button>
             </DialogFooter>
           </form>

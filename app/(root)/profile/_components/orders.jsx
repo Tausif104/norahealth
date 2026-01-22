@@ -2,6 +2,13 @@
 
 import { useProfile } from "@/lib/profileContext";
 import { PanelLeft } from "lucide-react";
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
 
 export default function Orders({ recentOrders, pastOrders }) {
   const { setMenuOpen } = useProfile();
@@ -41,9 +48,7 @@ export default function Orders({ recentOrders, pastOrders }) {
                 key={order.id}
                 className='grid grid-cols-[160px_1fr_180px] items-center text-sm text-[#3A3D42] px-5 py-3 border-b border-[#F5F0EE]'
               >
-                <div className='font-medium'>
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </div>
+                <div className='font-medium'>{formatDate(order.createdAt)}</div>
 
                 <div>
                   <p className='font-semibold text-[#0D060C]'>
@@ -133,9 +138,7 @@ export default function Orders({ recentOrders, pastOrders }) {
                 key={order.id}
                 className='grid grid-cols-[160px_1fr_160px] items-center text-sm text-[#3A3D42] px-5 py-3 border-b border-[#F3E4D6]'
               >
-                <div className='font-medium'>
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </div>
+                <div className='font-medium'>{formatDate(order.createdAt)}</div>
 
                 <div>
                   <p className='font-semibold text-[#0D060C]'>
@@ -167,9 +170,7 @@ export default function Orders({ recentOrders, pastOrders }) {
               <div key={order.id} className='border-b border-[#F3E4D6] py-4'>
                 <div className='flex justify-between text-[12px] text-[#A3A3A3] mb-1'>
                   <span>Title:</span>
-                  <span>
-                    Date: {new Date(order.createdAt).toLocaleDateString()}
-                  </span>
+                  <span>Date: {formatDate(order.createdAt)}</span>
                 </div>
 
                 <p className='text-[14px] font-semibold text-[#0D060C]'>

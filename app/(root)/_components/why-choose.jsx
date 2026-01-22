@@ -14,7 +14,7 @@ const WhyChooseNora = () => {
       id: 2,
       img: "/images/why-choose-us/2.svg",
       title: "Convenience",
-      description: "Within 24 hours (Monday-Friday) during working hours",
+      description: "Contraception prescriptions issued within 24 hours",
     },
     {
       id: 3,

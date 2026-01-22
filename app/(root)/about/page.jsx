@@ -19,7 +19,7 @@ const AboutPage = () => {
       <TeamSection />
       <VideoSection />
       <StatisticsBoxes />
-      <ReviewsSection />
+      {/* <ReviewsSection /> */}
     </>
   );
 };

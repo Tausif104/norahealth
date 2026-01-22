@@ -312,7 +312,7 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
           <h2 className='text-xl font-semibold'> Blogs </h2>
         </div>
         <Link
-          href={`/${userRole}/blog/add-blog`}
+          href={`/${userRoleRoute}/blog/add-blog`}
           className='text-[#fff] flex items-center gap-2 transition rounded-[10px] text-[16px] bg-[#d67b0e] md:py-[10px] px-[25px] hover:bg-[#000]'
         >
           <Plus /> Add Blog

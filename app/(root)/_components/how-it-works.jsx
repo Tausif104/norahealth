@@ -1,9 +1,9 @@
-import IconCard from '@/components/global/icon-card'
-import { howItWorks } from '@/data/how-it-works'
+import IconCard from "@/components/global/icon-card";
+import { howItWorks } from "@/data/how-it-works";
 
 const HowItWorks = () => {
   return (
-    <section className='section-bottom-padding'>
+    <section className='section-padding'>
       <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
         <h2 className='text-heading xl:text-5xl lg:text-4xl text-2xl font-semibold text-center sm:mb-[50px] mb-[30px]'>
           How It Works
@@ -22,7 +22,7 @@ const HowItWorks = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default HowItWorks
+export default HowItWorks;

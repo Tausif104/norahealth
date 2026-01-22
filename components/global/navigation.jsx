@@ -31,20 +31,30 @@ const Navigation = ({ isAdmin, payload, isAuthor, logoutAction }) => {
   return (
     <nav className='flex items-center gap-6'>
       <ul className='flex items-center gap-2.5 2xl:gap-6'>
-        {menuItems.map((item) => (
-          <li key={item.id}>
-            <Link
-              className={`font-medium   text-[16px] ${
-                currentLang === "en"
-                  ? " lg:text-[13px] xl:text-[16px]"
-                  : "  lg:text-[12px] 2xl:text-[13px] xl:text-[14px]"
-              }`}
-              href={item.link}
-            >
-              {item.label}
-            </Link>
-          </li>
-        ))}
+        {menuItems.map((item) => {
+          const isCTA =
+            item.label === "Appointments" ||
+            item.label === "Order Contraception";
+
+          return (
+            <li key={item.id}>
+              <Link
+                className={`
+          text-[16px]
+          ${
+            currentLang === "en"
+              ? "lg:text-[13px] xl:text-[16px]"
+              : "lg:text-[12px] 2xl:text-[13px] xl:text-[14px]"
+          }
+          ${isCTA ? "font-bold " : "font-medium"}
+        `}
+                href={item.link}
+              >
+                {item.label}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
 
       <div className='flex items-center gap-2'>
