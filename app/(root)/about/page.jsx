@@ -14,7 +14,7 @@ const AboutPage = () => {
   return (
     <>
       <PageBanner title='About Us' />
-      <AboutAlt />
+      {/* <AboutAlt /> */}
       <Mission />
       <TeamSection />
       <VideoSection />

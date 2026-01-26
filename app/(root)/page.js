@@ -8,6 +8,7 @@ import Benifits from "./_components/benifits";
 import Stories from "./_components/stories";
 import Faq from "./_components/faq";
 import ReviewsSection from "./about/_components/reviews";
+import VideoSectionHome from "./_components/videoHome";
 
 const HomePage = () => {
   return (
@@ -15,7 +16,7 @@ const HomePage = () => {
       <Hero />
       {/* <AboutSection /> */}
       <HowItWorks />
-      <VideoSection />
+      <VideoSectionHome />
       <WhyChooseNora />
       <ChoicesSection />
       <Benifits />

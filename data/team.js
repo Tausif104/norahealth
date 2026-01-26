@@ -1,26 +1,21 @@
 export const team = [
   {
     id: 1,
-    name: 'Dr. Lena A.',
-    designation: 'Medical Director',
+    name: 'Dev J.',
+    designation: 'Founder & Chief Pharmacist',
     image: '/images/team/team-1.png',
   },
   {
     id: 2,
-    name: 'Autumn P.',
-    designation: 'Pharmacists',
+    name: 'Niki J.',
+    designation: 'Clinical Governance Pharmacist',
     image: '/images/team/team-2.png',
   },
   {
     id: 3,
-    name: 'Sara K.',
-    designation: 'Pharmacist & Product Lead',
+    name: 'Dr Keya S. ',
+    designation: 'Medical Consultant',
     image: '/images/team/team-3.png',
   },
-  {
-    id: 4,
-    name: 'Alex B.',
-    designation: 'Specialists',
-    image: '/images/team/team-4.png',
-  },
+  
 ]

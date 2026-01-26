@@ -8,7 +8,6 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import cloudinary from "@/lib/cloudinary";
-import { log } from "console";
 
 // register action
 export const registerAction = async (prevState, formData) => {
@@ -89,71 +88,134 @@ export const registerAction = async (prevState, formData) => {
 };
 
 // Login Action
+// export const loginAction = async (prevState, formData) => {
+//   // getting all the from the login form
+//   const rawEmail = formData.get("email");
+//   const email =
+//     typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+//   const password = formData.get("password");
+
+//   // check if all the fields are filled
+//   if (!email || !password) {
+//     return {
+//       msg: "Please enter all the fields",
+//       success: false,
+//     };
+//   }
+
+//   // fetching user from database
+//   const user = await prisma.user.findUnique({ where: { email } });
+
+//   // check user is valid
+//   if (!user) {
+//     return {
+//       msg: "Invalid Email",
+//       success: false,
+//     };
+//   }
+
+//   // password check
+//   const passwordCheck = await bcrypt.compare(password, user.password);
+//   if (!passwordCheck) {
+//     return {
+//       msg: "Invalid Password",
+//       success: false,
+//     };
+//   }
+
+//   // creating safe user
+//   const safeUser = {
+//     id: user.id,
+//     email: user.email,
+//     role: user.role,
+//     isAdmin: user.isAdmin,
+//     createdAt: user.createdAt,
+//   };
+
+//   // creating token with user object
+//   const token = await signToken(safeUser);
+
+//   // initiate cookie from next.js
+//   const coookiesStore = await cookies();
+
+//   // setting logged in user to cookie
+//   coookiesStore.set({
+//     name: "auth_token",
+//     value: token,
+//     httpOnly: true,
+//     secure: true,
+//     path: "/",
+//     sameSite: "strict",
+//     maxAge: 60 * 60 * 24 * 30,
+//   });
+
+//   return {
+//     msg: "You are Logged In",
+//     success: true,
+//   };
+// };
+
+// Login Action
 export const loginAction = async (prevState, formData) => {
-  // getting all the from the login form
-  const rawEmail = formData.get("email");
-  const email =
-    typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
-  const password = formData.get("password");
+  try {
+    // getting all the from the login form
+    const rawEmail = formData.get("email");
+    const rawPassword = formData.get("password");
 
-  // check if all the fields are filled
-  if (!email || !password) {
-    return {
-      msg: "Please enter all the fields",
-      success: false,
+    const email =
+      typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+    const password = typeof rawPassword === "string" ? rawPassword : "";
+
+    // check if all the fields are filled
+    if (!email || !password) {
+      return { msg: "Please enter all the fields", success: false };
+    }
+
+    // fetching user from database
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    // check user is valid
+    if (!user) {
+      return { msg: "Invalid email", success: false };
+    }
+
+    // password check
+    const passwordCheck = await bcrypt.compare(password, user.password);
+    if (!passwordCheck) {
+      return { msg: "Invalid password", success: false };
+    }
+
+    // creating safe user
+    const safeUser = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      isAdmin: user.isAdmin,
+      createdAt: user.createdAt,
     };
+
+    // creating token with user object
+    const token = await signToken(safeUser);
+
+    // initiate cookie from next.js (NO await)
+    const cookieStore = await cookies();
+
+    // setting logged in user to cookie
+    cookieStore.set({
+      name: "auth_token",
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // important
+      path: "/",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 30,
+    });
+
+    return { msg: "You are logged in", success: true };
+  } catch (err) {
+    console.error("loginAction error:", err);
+    return { msg: "Something went wrong. Please try again.", success: false };
   }
-
-  // fetching user from database
-  const user = await prisma.user.findUnique({ where: { email } });
-
-  // check user is valid
-  if (!user) {
-    return {
-      msg: "Invalid Email",
-      success: false,
-    };
-  }
-
-  // password check
-  const passwordCheck = await bcrypt.compare(password, user.password);
-  if (!passwordCheck) {
-    return {
-      msg: "Invalid Password",
-      success: false,
-    };
-  }
-
-  // creating safe user
-  const safeUser = {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    isAdmin: user.isAdmin,
-    createdAt: user.createdAt,
-  };
-
-  // creating token with user object
-  const token = await signToken(safeUser);
-
-  // initiate cookie from next.js
-  const coookiesStore = await cookies();
-
-  // setting logged in user to cookie
-  coookiesStore.set({
-    name: "auth_token",
-    value: token,
-    httpOnly: true,
-    secure: true,
-    path: "/",
-    sameSite: "strict",
-    maxAge: 60 * 60 * 24 * 30,
-  });
-
-  return {
-    msg: "You are Logged In",
-    success: true,
-  };
 };
 
 // Log out Action
@@ -424,7 +486,7 @@ export const uploadProfileImageAction = async (formData) => {
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
-          }
+          },
         )
         .end(buffer);
     });

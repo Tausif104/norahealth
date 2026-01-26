@@ -18,7 +18,12 @@ const IconCard = (props) => {
       </div>
       <div>
         <h4 className='text-heading sm:text-[24px] text-[20px] font-semibold leading-[1.4] sm:mb-5 mb-3 mt-7'>
-          {title}
+          {title.split("\n").map((line, i) => (
+    <span key={i}>
+      {line}
+      <br />
+    </span>
+  ))}
         </h4>
         <p className='text-pg text-[16px] leading-6'>{description}</p>
       </div>

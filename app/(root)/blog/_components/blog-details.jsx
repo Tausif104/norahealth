@@ -194,7 +194,7 @@ const BlogDetails = ({ post }) => {
           </div>
 
           {/* BLOG BODY */}
-          <article className='prose prose-lg max-w-none'>
+          <article className='prose prose-lg max-w-none blog-content'>
             {content?.blocks?.map(renderBlock)}
           </article>
 

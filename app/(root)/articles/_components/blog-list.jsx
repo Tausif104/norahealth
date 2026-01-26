@@ -13,18 +13,22 @@ const BlogList = ({ allPost }) => {
             <div key={post.id} className='group'>
               {/* Image */}
               <div className='overflow-hidden rounded-xl'>
-                <img
-                  src={post.bannerImage}
-                  alt={post.title}
-                  className='w-full h-[220px] object-cover transition-transform duration-300 group-hover:scale-105'
-                />
+                <Link href={`/blog/${post.postSlug}`}>
+                  <img
+                    src={post.bannerImage}
+                    alt={post.title}
+                    className='w-full h-[220px] object-cover transition-transform duration-300 group-hover:scale-105'
+                  />
+                </Link>
               </div>
 
               {/* Content */}
               <div className='mt-5'>
-                <h3 className='text-xl font-semibold text-heading leading-snug mb-3'>
-                  {post.title}
-                </h3>
+                <Link href={`/blog/${post.postSlug}`}>
+                  <h3 className='text-xl font-semibold text-heading leading-snug mb-3'>
+                    {post.title}
+                  </h3>
+                </Link>
 
                 <p className='text-sm text-gray-600 leading-relaxed mb-4'>
                   {post.shortDesc}

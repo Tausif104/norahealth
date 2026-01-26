@@ -383,3 +383,19 @@ body {
   opacity: 1;
   pointer-events: all;
 }
+
+
+.blog-content a{
+  text-decoration: underline;
+  color: #cd8936;
+}
+
+.menu-item a {
+    
+    background: linear-gradient(90deg,currentcolor 0,currentcolor) 0 95%/0 1px no-repeat;
+    transition: all .5s ease;
+}
+.menu-item a:hover {
+    background-size: 100% 1px;
+    color: var(--tolak-base,#cd8936);
+}

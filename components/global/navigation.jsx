@@ -31,30 +31,38 @@ const Navigation = ({ isAdmin, payload, isAuthor, logoutAction }) => {
   return (
     <nav className='flex items-center gap-6'>
       <ul className='flex items-center gap-2.5 2xl:gap-6'>
-        {menuItems.map((item) => {
-          const isCTA =
-            item.label === "Appointments" ||
-            item.label === "Order Contraception";
+       {menuItems.map((item, index) => {
+  const isCTA =
+    item.label === "Appointments" ||
+    item.label === "Order Contraception";
 
-          return (
-            <li key={item.id}>
-              <Link
-                className={`
+  const isOrderContraception = item.label === "Order Contraception";
+
+  return (
+    <li key={item.id} className="flex items-center gap-2.5 menu-item">
+      <Link
+        className={`
           text-[16px]
           ${
             currentLang === "en"
               ? "lg:text-[13px] xl:text-[16px]"
               : "lg:text-[12px] 2xl:text-[13px] xl:text-[14px]"
           }
-          ${isCTA ? "font-bold " : "font-medium"}
+          ${isCTA ? "font-bold text-[#cd8936]" : "font-medium"}
         `}
-                href={item.link}
-              >
-                {item.label}
-              </Link>
-            </li>
-          );
-        })}
+        href={item.link}
+      >
+        {item.label}
+      </Link>
+
+      {/* ✅ Separator after "Order Contraception" */}
+      {isOrderContraception && (
+        <span className="text-[#D6866B] opacity-60 select-none">|</span>
+      )}
+    </li>
+  );
+})}
+
       </ul>
 
       <div className='flex items-center gap-2'>
