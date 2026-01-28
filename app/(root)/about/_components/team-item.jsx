@@ -5,7 +5,7 @@ const TeamItem = ({ item }) => {
     <div className="group transition duration-300 hover:-translate-y-3 relative">
       
       {/* Image wrapper */}
-      <div className="relative overflow-hidden rounded-[8px]">
+      <div className="relative overflow-hidden rounded-[12px]">
         <Image
           className="w-full"
           src={item.image}
@@ -16,7 +16,7 @@ const TeamItem = ({ item }) => {
 
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-black/60 flex items-center justify-center 
-                        opacity-0 group-hover:opacity-100 transition duration-300">
+                        opacity-0 group-hover:opacity-100 transition duration-300 rounded-[12px]">
           <p className="text-white text-lg font-semibold tracking-wide">
             Text 
           </p>
