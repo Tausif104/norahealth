@@ -399,3 +399,26 @@ body {
     background-size: 100% 1px;
     color: var(--tolak-base,#cd8936);
 }
+
+.team-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.text-heading:hover{
+  text-align: left;
+}
+
+.team-card:hover{
+  transform: translateY(-8px);
+}
+.team-card:hover .team-card-overlay{
+  opacity: 1;
+}
+.team-card-text{
+  transform: translateY(100%);
+}
+.team-card:hover .team-card-text{
+  
+  transform: translateY(0);
+}
