@@ -6,7 +6,7 @@ const TeamSection = () => {
     <section className='section-padding sm:px-0 px-[24px]'>
       <div className='container custom-container mx-auto'>
         <div className='mb-[50px]'>
-          <h2 className='text-heading xl:text-5xl lg:text-4xl text-2xl  font-semibold text-center'>
+          <h2 className='text-heading xl:text-5xl lg:text-4xl text-2xl  font-semibold text-center '>
             Meet the Team
           </h2>
         </div>

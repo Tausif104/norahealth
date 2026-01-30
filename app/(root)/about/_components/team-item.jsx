@@ -2,7 +2,7 @@ import Image from "next/image";
 
 const TeamItem = ({ item }) => {
   return (
-    <div className="group transition duration-300 hover:-translate-y-3 relative">
+    <div className="group transition-all duration-500 ease-in-out hover:-translate-y-3 relative">
       
       {/* Image wrapper */}
       <div className="relative overflow-hidden rounded-[12px]">
@@ -14,11 +14,11 @@ const TeamItem = ({ item }) => {
           alt={item.name}
         />
 
-
         {/* Hover overlay */}
-        <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 opacity-0 transition-all duration-400  group-hover:opacity-100"></div>
-         <div className="absolute inset-0  flex items-center justify-center 
-                        translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-[12px]">
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 opacity-0 transition-all duration-500 group-hover:opacity-100"></div>
+        
+        {/* Overlay text */}
+        <div className="absolute inset-0 flex items-center justify-center translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-in-out rounded-[12px]">
           <p className="text-white text-base md:text-lg font-semibold tracking-wide px-5">
             {item?.overlayText}
           </p>
