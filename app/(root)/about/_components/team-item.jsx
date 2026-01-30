@@ -14,11 +14,13 @@ const TeamItem = ({ item }) => {
           alt={item.name}
         />
 
+
         {/* Hover overlay */}
-        <div className="absolute inset-0 bg-black/60 flex items-center justify-center 
-                        opacity-0 group-hover:opacity-100 transition duration-300 rounded-[12px]">
-          <p className="text-white text-lg font-semibold tracking-wide">
-            Text 
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 opacity-0 transition-all duration-400  group-hover:opacity-100"></div>
+         <div className="absolute inset-0  flex items-center justify-center 
+                        translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-[12px]">
+          <p className="text-white text-base md:text-lg font-semibold tracking-wide px-5">
+            {item?.overlayText}
           </p>
         </div>
       </div>
