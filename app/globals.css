@@ -405,9 +405,7 @@ body {
   overflow: hidden;
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
-.text-heading:hover{
-  text-align: left;
-}
+
 
 .team-card:hover{
   transform: translateY(-8px);
