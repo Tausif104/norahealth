@@ -3,7 +3,7 @@ import { Mail, Phone, User, LogInIcon, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Cookies from "js-cookie";
-import { useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { menuItems } from "@/data/menu";
 import {
   DropdownMenu,
@@ -220,11 +220,25 @@ const MobileHeader = ({ payload, logoutAction }) => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
-                {menuItems.map((item) => (
-                  <DropdownMenuItem key={item.id}>
-                    <Link href={item.link}>{item.label}</Link>
-                  </DropdownMenuItem>
-                ))}
+               {menuItems.map((item) => {
+  const isCTA =
+    item.label === "Appointments" || item.label === "Order Contraception";
+
+  const isOrderContraception = item.label === "Order Contraception";
+
+  return (
+    <Fragment key={item.id}>
+      <DropdownMenuItem className={isCTA ? "font-bold text-[#cd8936]" : ""}>
+        <Link href={item.link} className="w-full">
+          {item.label}
+        </Link>
+      </DropdownMenuItem>
+
+      {/* optional: separator after Order Contraception (mobile-friendly instead of "|") */}
+      {isOrderContraception && <DropdownMenuSeparator />}
+    </Fragment>
+  );
+})}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
