@@ -3,6 +3,14 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 
+function formatDate(date) {
+  return new Date(date).toLocaleString("en-GB", {
+    dateStyle: "full",
+    timeStyle: "short",
+  });
+}
+
+
 function escapeHtml(str) {
   return String(str)
     .replace(/&/g, "&amp;")
