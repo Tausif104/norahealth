@@ -127,7 +127,7 @@ export default function EditBlog({ id, user }) {
     setBlogData((prev) => ({ ...prev, canonicalUrl: value }));
   };
 
-  console.log(blogData, user, "blogData edit");
+  // console.log(blogData, user, "blogData edit");
 
   return (
     <div className=' transition-colors duration-300'>

@@ -5,11 +5,11 @@ import { notFound } from "next/navigation";
 
 const page = async ({ params }) => {
   const param = await params;
-  console.log(param);
+  // console.log(param);
 
   const { postSlug } = param;
   const res = await getBlogBySlug(postSlug);
-  console.log(res, "blog details page");
+  // console.log(res, "blog details page");
 
   if (!res?.success || !res?.post) {
     notFound();

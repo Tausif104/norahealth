@@ -16,7 +16,7 @@ import { loggedInUserAction } from "@/actions/user.action";
 const EditSeeBlog = () => {
   const router = useRouter();
   const { blogData, setBlogData } = useContext(BlogContext);
-  console.log("blogData: Update", blogData);
+  // console.log("blogData: Update", blogData);
 
   if (!blogData) return <p>No blog data available</p>;
   const renderListItemContent = (item) => {
@@ -163,7 +163,7 @@ const EditSeeBlog = () => {
   //   });
   // };
   const [user, setUser] = useState(null);
-  console.log(user, "user");
+  // console.log(user, "user");
   const userRole = user?.role === "AUTHOR" ? "author" : "admin";
   useEffect(() => {
     const fetchUser = async () => {

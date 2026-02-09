@@ -125,24 +125,32 @@ const columns = [
   },
   { accessorKey: "fullName", header: "Full Name" },
   {
-    accessorKey: "email",
-    header: "Email",
-    filterFn: (row, id, value) => {
-      const v = (value ?? "").toString().toLowerCase();
-      const cell = (row.getValue(id) ?? "").toString().toLowerCase();
-      return cell.includes(v);
-    },
-    cell: ({ row }) => (
+  accessorKey: "email",
+  header: "Email",
+  filterFn: (row, id, value) => {
+    const v = (value ?? "").toString().toLowerCase();
+    const cell = (row.getValue(id) ?? "").toString().toLowerCase();
+    return cell.includes(v);
+  },
+  cell: ({ row }) => {
+    const booking = row.original; // ✅ এখানে booking.user আছে
+    const userId = booking?.user?.id;
+
+    // userId না থাকলে (account নাই/ user নাই) শুধু email দেখাবে
+    if (!userId) {
+      return <div>{row.getValue("email")}</div>;
+    }
+
+    return (
       <div>
-        <Link
-          href={`/admin/${row.getValue("id")}/orders`}
-          className='hover:underline'
-        >
+        <Link href={`/admin/${userId}/orders`} className="hover:underline">
           {row.getValue("email")}
         </Link>
       </div>
-    ),
+    );
   },
+}
+,
   { accessorKey: "phoneNumber", header: "Phone" },
 
   {
@@ -340,6 +348,7 @@ export default function AppointmentOrderTable() {
   ];
 
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
 
   return (
     <div className='w-full p-6'>

@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 import { prisma } from "@/lib/client/prisma";
 import { createCalendarEvent } from "@/lib/googleCalendar";
 import { revalidatePath } from "next/cache";
-import { sendBookingConfirmationEmail } from "./sendBookingConfirmation.action";
+import { sendBookingConfirmationEmail, sendOrderBookingConfirmationEmail } from "@/lib/emailTemplate";
+
 
 function parseYMDtoDate(ymd) {
   const [y, m, d] = ymd.split("-").map(Number);
@@ -148,7 +149,7 @@ export async function createBooking(formData) {
           .filter(Boolean)
           .join("\n");
 
-        await createCalendarEvent({
+        const res=await createCalendarEvent({
           calendarId,
           start: appointmentStart,
           end: appointmentEnd,
@@ -158,23 +159,32 @@ export async function createBooking(formData) {
           email,
           name: fullName,
         });
+        console.log("res calander", res);
+        
       } else {
-        console.warn("GOOGLE_CALENDAR_ID not set; skipping calendar event");
+       console.warn("GOOGLE_CALENDAR_ID not set; skipping calendar event");
       }
     } catch (calendarError) {
       console.error("Failed to create Google Calendar event:", calendarError);
+      console.error("Failed to create Google Calendar event:", calendarError);
+  console.error("Error details:", calendarError.stack);
       // we don't fail the booking for this
     }
 
-    sendBookingConfirmationEmail({
-      to: email,
-      fullName,
-      serviceName,
-      providerName,
-      nhsService,
-      appointment: appointmentStart,
-      notes,
-    });
+   try {
+  await sendBookingConfirmationEmail({
+    to: email,
+    fullName,
+    serviceName,
+    providerName,
+    nhsService,
+    appointment: appointmentStart,
+    notes,
+  });
+} catch (emailError) {
+  console.error("Booking confirmation email failed:", emailError);
+  // booking should NOT fail because of email
+}
 
     return {
       success: true,
@@ -186,7 +196,7 @@ export async function createBooking(formData) {
       },
     };
   } catch (error) {
-    console.error("createBooking error:", error);
+    // console.error("createBooking error:", error);
     return {
       success: false,
       msg: "Server error while creating booking.",
@@ -300,6 +310,24 @@ export async function createBookingOrder(formData) {
       },
     });
 
+
+    // ✅ send confirmation email (non-blocking)
+try {
+  await sendOrderBookingConfirmationEmail({
+    to: email,
+    fullName,
+    serviceName,
+    providerName,
+    nhsService,
+    ocRequest,
+    appointmentRequest,
+    createdAt: booking.createdAt || now,
+    notes,
+  });
+} catch (emailError) {
+  console.error("Order booking confirmation email failed:", emailError);
+}
+
     return {
       success: true,
       msg: "Contraceptive order placed successfully.",
@@ -318,56 +346,7 @@ export async function createBookingOrder(formData) {
   }
 }
 
-// export async function getAllBookingsAction({ year, month, day } = {}) {
-//   // Fetch all bookings (ordered by appointment as baseline)
-//   let bookings = await prisma.booking.findMany({
-//     orderBy: { createdAt: "desc" },
-//   });
 
-//   // Parse filters
-//   const y = year ? Number(year) : null; // e.g. 2024
-//   const m = month ? Number(month) : null; // 1..12
-//   const d = day ? Number(day) : null; // 1..31
-
-//   // Filter according to combos, covering all cases:
-//   bookings = bookings.filter((b) => {
-//     const dt = new Date(b.appointment);
-//     const by = dt.getFullYear();
-//     const bm = dt.getMonth() + 1;
-//     const bd = dt.getDate();
-
-//     // Exact combos:
-//     if (y && m && d) return by === y && bm === m && bd === d;
-//     if (y && m && !d) return by === y && bm === m;
-//     if (y && !m && !d) return by === y;
-//     if (!y && m && !d) return bm === m; // month across years
-//     if (!y && !m && d) return bd === d; // day-of-month across months/years
-//     if (!y && m && d) return bm === m && bd === d; // month+day across years
-
-//     // no filters => keep
-//     return true;
-//   });
-
-//   // Sort result by year -> month -> day (ascending)
-//   bookings.sort((a, b) => {
-//     const A = new Date(a.appointment);
-//     const B = new Date(b.appointment);
-
-//     const Ay = A.getFullYear(),
-//       By = B.getFullYear();
-//     if (Ay !== By) return Ay - By;
-
-//     const Am = A.getMonth() + 1,
-//       Bm = B.getMonth() + 1;
-//     if (Am !== Bm) return Am - Bm;
-
-//     const Ad = A.getDate(),
-//       Bd = B.getDate();
-//     return Ad - Bd;
-//   });
-
-//   return { success: true, msg: "OK", bookings };
-// }
 export async function getAllBookingsAction({ year, month, day } = {}) {
   let bookings = await prisma.booking.findMany({
     where: { bookingType: "Booking" },
@@ -393,8 +372,47 @@ export async function getAllBookingsAction({ year, month, day } = {}) {
 
     return true;
   });
+   // emails from bookings
+  const emails = [
+    ...new Set(
+      bookings
+        .map((b) => (b.email || "").trim().toLowerCase())
+        .filter(Boolean)
+    ),
+  ];
 
-  return { success: true, msg: "OK", bookings };
+  const userMap = new Map(); // email -> {} or {id,email}
+
+  if (emails.length) {
+    const users = await prisma.user.findMany({
+      where: { email: { in: emails } },
+      select: {
+        id: true,
+        email: true,
+        account: { select: { id: true } }, // account exists?
+      },
+    });
+
+    for (const u of users) {
+      userMap.set(
+        u.email.toLowerCase(),
+        u.account ? { id: u.id, email: u.email } : {}
+      );
+    }
+  }
+
+  // ✅ ensure EVERY booking has "user: {}" (even if no user found)
+  const bookingsWithUser = bookings.map((b) => {
+    const key = (b.email || "").trim().toLowerCase();
+    return {
+      ...b,
+      user: userMap.get(key) ?? {}, // always {} default
+    };
+  });
+
+  return { success: true, msg: "OK", bookings: bookingsWithUser };
+
+  // return { success: true, msg: "OK", bookings };
 }
 export async function getAllBookingOrdersAction({ year, month, day } = {}) {
   let bookings = await prisma.booking.findMany({
@@ -422,7 +440,46 @@ export async function getAllBookingOrdersAction({ year, month, day } = {}) {
     return true;
   });
 
-  return { success: true, msg: "OK", bookings };
+  // return { success: true, msg: "OK", bookings };
+   // emails from bookings
+  const emails = [
+    ...new Set(
+      bookings
+        .map((b) => (b.email || "").trim().toLowerCase())
+        .filter(Boolean)
+    ),
+  ];
+
+  const userMap = new Map(); // email -> {} or {id,email}
+
+  if (emails.length) {
+    const users = await prisma.user.findMany({
+      where: { email: { in: emails } },
+      select: {
+        id: true,
+        email: true,
+        account: { select: { id: true } }, // account exists?
+      },
+    });
+
+    for (const u of users) {
+      userMap.set(
+        u.email.toLowerCase(),
+        u.account ? { id: u.id, email: u.email } : {}
+      );
+    }
+  }
+
+  // ✅ ensure EVERY booking has "user: {}" (even if no user found)
+  const bookingsWithUser = bookings.map((b) => {
+    const key = (b.email || "").trim().toLowerCase();
+    return {
+      ...b,
+      user: userMap.get(key) ?? {}, // always {} default
+    };
+  });
+
+  return { success: true, msg: "OK", bookings: bookingsWithUser };
 }
 
 /**

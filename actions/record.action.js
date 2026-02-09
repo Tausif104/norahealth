@@ -108,7 +108,7 @@ export const getRecordByUserId = async (userId) => {
   const adminuser = await getAdminUser();
 
   const isAdmin = adminuser?.admin?.isAdmin || false;
-  console.log(isAdmin, "isAdmin");
+  // console.log(isAdmin, "isAdmin");
 
   if (!isAdmin) {
     return { success: false, message: "Unauthorized. User is not admin" };

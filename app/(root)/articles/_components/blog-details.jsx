@@ -147,6 +147,7 @@ const BlogDetails = ({ post }) => {
   const approvedComments = post.Comment?.filter((c) => c.approved) || [];
 
   const content = JSON.parse(post.content || "{}");
+console.log(post, "post");
 
   return (
     <section className='section-padding'>

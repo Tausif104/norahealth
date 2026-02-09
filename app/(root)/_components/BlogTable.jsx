@@ -63,7 +63,7 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
   );
   const [deletePostId, setDeletePostId] = React.useState(null);
 
-  console.log(data, "BlogTable");
+  // console.log(data, "BlogTable");
   const { setMenuOpen } = useProfile();
 
   const userRoleRoute = userRole === "author" ? "author" : "admin";

@@ -171,7 +171,7 @@ export default function AddBlog() {
     fetchUser();
   }, []);
 
-  console.log(blogData, user, "blogData add");
+  // console.log(blogData, user, "blogData add");
 
   return (
     <div className=''>

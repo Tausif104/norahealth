@@ -43,7 +43,7 @@ export default function CreateOrderDialog({ bookingId }) {
 
   const onCreate = async () => {
     if (!medicineName.trim()) return toast.error("Medicine name required");
-    if (!trackingId.trim()) return toast.error("Tracking ID required");
+    // if (!trackingId.trim()) return toast.error("Tracking ID required");
 
     setIsCreating(true);
     const res = await createOrderFromBooking({

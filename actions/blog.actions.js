@@ -175,7 +175,7 @@ export const postList = async () => {
 /** ---------- Create Post ---------- */
 export const postCreate = async (_prevState, formData) => {
   const user = await loggedInUserAction();
-  console.log(user, "post user");
+  // console.log(user, "post user");
 
   try {
     const title = getString(formData.get("title"));
@@ -454,7 +454,7 @@ export const getPostById = async (id) => {
    GET SINGLE BLOG BY SLUG (PUBLIC)
 ===================================================== */
 export async function getBlogBySlug(postSlug) {
-  console.log(postSlug, "postSlug");
+  // console.log(postSlug, "postSlug");
 
   try {
     const post = await prisma.post.findFirst({

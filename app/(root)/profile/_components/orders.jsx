@@ -68,7 +68,7 @@ export default function Orders({ recentOrders, pastOrders }) {
 
                   {order.status === "posted" && (
                     <span className='inline-flex items-center rounded-full bg-[#E7EDFF] text-[#0A72C8] text-[12px] px-3 py-1 whitespace-nowrap'>
-                      Posted via Royal Mail. Tracking ID
+                      Posted via Royal Mail.
                     </span>
                   )}
                 </div>

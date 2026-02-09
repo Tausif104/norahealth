@@ -20,7 +20,7 @@ export default async function AppointmentOrderDetailsPage({ params }) {
     include: { orders: true, account: true },
   });
 
-  console.log(booking, user);
+  console.log("online oc", booking, user);
 
   return (
     <div className='p-6 w-full  space-y-6'>
@@ -60,6 +60,9 @@ export default async function AppointmentOrderDetailsPage({ params }) {
 
         <p>
           <b>Notes:</b> {booking.notes || "—"}
+        </p>
+        <p>
+          <b>Delivery Address:</b> {user?.account?.deliveryAddress}
         </p>
       </section>
 

@@ -16,7 +16,7 @@ const GetInTouch = () => {
     initialState
   );
 
-  console.log(state);
+  console.log("state",state);
 
   useEffect(() => {
     if (!state?.msg) return;

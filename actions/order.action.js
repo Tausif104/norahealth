@@ -4,6 +4,10 @@ import { prisma } from "@/lib/client/prisma";
 import { getAdminUser } from "./admin.action";
 import { revalidatePath } from "next/cache";
 import { loggedInUserAction } from "./user.action";
+import { Resend } from "resend";
+import { orderEmailTemplate, orderStatusEmailTemplate } from "@/lib/emailTemplate";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 // Build date range filter by createdAt
 function buildCreatedAtRange({ year, month, day }) {
   const y = year ? Number(year) : null;
@@ -51,6 +55,16 @@ export const createOrderByAdmin = async (prevState, formData) => {
     };
   }
 
+  // 1️⃣ Get customer info
+  const customer = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, name: true },
+  });
+
+  if (!customer?.email) {
+    return { success: false, msg: "Customer email not found" };
+  }
+
   const order = await prisma.order.create({
     data: {
       userId,
@@ -59,6 +73,25 @@ export const createOrderByAdmin = async (prevState, formData) => {
       status,
     },
   });
+
+
+
+  // 3️⃣ Send confirmation email
+  try {
+    await resend.emails.send({
+      from: "Norahealth <contact@norahealth.co.uk>",
+      to: customer.email,
+      subject: "Your Order Has Been Confirmed",
+      html: orderEmailTemplate({
+        medicineName,
+        trackingId,
+        status,
+      }),
+    });
+  } catch (err) {
+    console.error("Order email failed:", err);
+    // order is created, so we don’t fail the action
+  }
 
   revalidatePath(`/admin/${userId}/orders`);
 
@@ -381,6 +414,32 @@ export const updateOrderStatus = async (prevState, formData) => {
 
   if (!order) {
     return { success: false, msg: "Order not found" };
+  }
+
+  // ✅ fetch customer email/name
+  const customer = await prisma.user.findUnique({
+    where: { id: order.userId },
+    select: { email: true, name: true },
+  });
+
+  // ✅ send email (don’t block update if email fails)
+  if (customer?.email) {
+    try {
+      await resend.emails.send({
+        from: "Norahealth <contact@norahealth.co.uk>",
+        to: customer.email,
+        subject: `Order #${order.id} status: ${order.status}`,
+        replyTo: "contact@norahealth.co.uk",
+        html: orderStatusEmailTemplate({
+          customerName: customer.name,
+          orderId: order.id,
+          status: order.status,
+          trackingId: order.trackingId,
+        }),
+      });
+    } catch (err) {
+      console.error("Status update email failed:", err);
+    }
   }
 
   revalidatePath(`/admin`);

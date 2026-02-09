@@ -147,6 +147,12 @@ export default function OrderDetailsClient({ order }) {
                 {order?.user?.account?.address ?? "N/A"}
               </span>
             </div>
+             <div className='flex items-center justify-between'>
+              <span className='text-gray-600'>Delivery Address</span>
+              <span className='font-medium'>
+                {order?.user?.account?.deliveryAddress ?? "N/A"}
+              </span>
+            </div>
 
             <div className='flex items-center justify-between'>
               <span className='text-gray-600'>Post Code</span>
