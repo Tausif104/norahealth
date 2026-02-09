@@ -90,7 +90,7 @@ export const orderStatusEmailTemplate=({ customerName, orderId, status, tracking
 
       <tr>
         <td style="padding:12px 20px 20px;font-size:15px;color:#333;">
-          <p style="margin:0 0 12px;">Hi ${safeName},</p>
+        
           <p style="margin:0 0 16px;">Your order status has been updated.</p>
 
           <table width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;color:#333;">
@@ -300,4 +300,67 @@ export async function sendOrderBookingConfirmationEmail({
     replyTo: "contact@norahealth.co.uk",
     html,
   });
+}
+
+
+export const orderFromBookingEmailTemplate=({
+  fullName,
+  medicineName,
+  status,
+  trackingId,
+})=> {
+  return `
+  <div style="font-family:Arial,sans-serif;background:#f9f9f9;padding:20px;">
+    <table width="100%" style="max-width:600px;margin:auto;background:#fff;border-radius:6px;border:1px solid #eee;">
+      <tr>
+        <td style="background:#cd8936;color:#fff;padding:16px;text-align:center;font-size:22px;font-weight:bold;">
+          Norahealth
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:20px;font-size:18px;font-weight:bold;color:#333;">
+          Order Created From Your Booking
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:0 20px 20px;font-size:15px;color:#333;">
+          <p>Hi ${escapeHtml(fullName)},</p>
+
+          <p>
+            Your booking has been successfully converted into an order.
+            Here are the order details:
+          </p>
+
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding:6px 0;font-weight:bold;color:#cd8936;">Medicine:</td>
+              <td>${escapeHtml(medicineName)}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0;font-weight:bold;color:#cd8936;">Status:</td>
+              <td>${escapeHtml(status)}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0;font-weight:bold;color:#cd8936;">Tracking ID:</td>
+              <td>${escapeHtml(trackingId || "Pending")}</td>
+            </tr>
+          </table>
+
+          <p style="margin-top:16px;font-size:13px;color:#555;">
+            Our clinical team will review your order and update you shortly.
+            If you have questions, simply reply to this email.
+          </p>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="background:#f3f3f3;padding:12px;text-align:center;font-size:13px;color:#777;">
+          © ${new Date().getFullYear()} Norahealth. All rights reserved.
+        </td>
+      </tr>
+    </table>
+  </div>
+  `;
 }

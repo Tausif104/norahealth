@@ -3,8 +3,10 @@ import bcrypt from "bcrypt";
 import { prisma } from "@/lib/client/prisma";
 import { createCalendarEvent } from "@/lib/googleCalendar";
 import { revalidatePath } from "next/cache";
-import { sendBookingConfirmationEmail, sendOrderBookingConfirmationEmail } from "@/lib/emailTemplate";
+import { orderFromBookingEmailTemplate, sendBookingConfirmationEmail, sendOrderBookingConfirmationEmail } from "@/lib/emailTemplate";
+import { Resend } from "resend";
 
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 function parseYMDtoDate(ymd) {
   const [y, m, d] = ymd.split("-").map(Number);
@@ -351,6 +353,9 @@ export async function getAllBookingsAction({ year, month, day } = {}) {
   let bookings = await prisma.booking.findMany({
     where: { bookingType: "Booking" },
     orderBy: { createdAt: "desc" }, // ✅ newest first
+    include: {
+      slot: true,
+    },
   });
 
   const y = year ? Number(year) : null;
@@ -979,7 +984,7 @@ export async function createOrderFromBooking({
     }
 
     // 3. Create order
-    await prisma.order.create({
+    const order = await prisma.order.create({
       data: {
         medicineName: finalMedicineName,
         trackingId: String(trackingId).trim(),
@@ -987,6 +992,24 @@ export async function createOrderFromBooking({
         userId: user.id,
       },
     });
+
+    // 3️⃣ Send email (non-blocking)
+    try {
+      await resend.emails.send({
+        from: "Norahealth <contact@norahealth.co.uk>",
+        to: booking.email,
+        subject: "Your Order Has Been Created",
+        replyTo: "contact@norahealth.co.uk",
+        html: orderFromBookingEmailTemplate({
+          fullName: booking.fullName,
+          medicineName: finalMedicineName,
+          status: order.status,
+          trackingId: order.trackingId,
+        }),
+      });
+    } catch (emailErr) {
+      console.error("Order-from-booking email failed:", emailErr);
+    }
 
     revalidatePath("/admin/appointments");
     return { success: true, msg: "Order created successfully" };

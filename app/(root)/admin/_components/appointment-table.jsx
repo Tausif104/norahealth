@@ -165,24 +165,23 @@ const columns = [
   //   header: "Provider",
   // },
   {
-    accessorKey: "appointment",
-    header: "Appointment",
-    cell: ({ row }) => {
-      const raw = row.getValue("appointment");
-      if (!raw) return "—";
+  accessorKey: "appointment",
+  header: "Appointment",
+  cell: ({ row }) => {
+    const booking = row.original;
 
-      const dt = new Date(raw);
-      if (Number.isNaN(dt.getTime())) return "—";
+    const appt = booking?.appointment; // Date/string
+    const slot = booking?.slot;        // { startTime, ... } (if you have it)
 
-      return dt.toLocaleString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    },
+    if (!appt) return "—";
+
+    return (
+      <div>
+        {formatDate(appt)} {slot?.startTime ? `at ${slot.startTime}` : ""}
+      </div>
+    );
   },
+},
 
   // ✅ NEW: Booking Status column
   {
@@ -383,6 +382,9 @@ export default function AppointmentOrderTable() {
   ];
 
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  console.log("bookings", bookings);
+  
 
   return (
     <div className='w-full p-6'>

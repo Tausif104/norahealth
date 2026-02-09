@@ -58,7 +58,7 @@ export const createOrderByAdmin = async (prevState, formData) => {
   // 1️⃣ Get customer info
   const customer = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, name: true },
+    select: { email: true },
   });
 
   if (!customer?.email) {
@@ -419,7 +419,7 @@ export const updateOrderStatus = async (prevState, formData) => {
   // ✅ fetch customer email/name
   const customer = await prisma.user.findUnique({
     where: { id: order.userId },
-    select: { email: true, name: true },
+    select: { email: true },
   });
 
   // ✅ send email (don’t block update if email fails)
@@ -431,7 +431,7 @@ export const updateOrderStatus = async (prevState, formData) => {
         subject: `Order #${order.id} status: ${order.status}`,
         replyTo: "contact@norahealth.co.uk",
         html: orderStatusEmailTemplate({
-          customerName: customer.name,
+          // customerName: customer.name,
           orderId: order.id,
           status: order.status,
           trackingId: order.trackingId,
