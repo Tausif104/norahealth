@@ -8,6 +8,8 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import cloudinary from "@/lib/cloudinary";
+import { resend } from "@/lib/reset";
+import { randomBytes, createHash } from "node:crypto"; // ✅ IMPORTANT
 
 // register action
 export const registerAction = async (prevState, formData) => {
@@ -516,51 +518,51 @@ export const uploadProfileImageAction = async (formData) => {
   }
 };
 
-export async function forgotPasswordAction(prevState, formData) {
-  const step = formData.get("step")?.toString();
-  const email = formData.get("email")?.toString();
+// export async function forgotPasswordAction(prevState, formData) {
+//   const step = formData.get("step")?.toString();
+//   const email = formData.get("email")?.toString();
 
-  if (step === "1") {
-    // Step 1 → Check email exists
-    if (!email) return { success: false, msg: "Email is required", step: 1 };
+//   if (step === "1") {
+//     // Step 1 → Check email exists
+//     if (!email) return { success: false, msg: "Email is required", step: 1 };
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return { success: false, msg: "Email not found", step: 1 };
-    }
+//     const user = await prisma.user.findUnique({ where: { email } });
+//     if (!user) {
+//       return { success: false, msg: "Email not found", step: 1 };
+//     }
 
-    return { success: true, msg: "Email found", step: 2 };
-  }
+//     return { success: true, msg: "Email found", step: 2 };
+//   }
 
-  if (step === "2") {
-    // Step 2 → Update password
-    const password = formData.get("password")?.toString();
-    const confirm = formData.get("confirm")?.toString();
+//   if (step === "2") {
+//     // Step 2 → Update password
+//     const password = formData.get("password")?.toString();
+//     const confirm = formData.get("confirm")?.toString();
 
-    if (!password || !confirm) {
-      return { success: false, msg: "Both fields required", step: 2 };
-    }
+//     if (!password || !confirm) {
+//       return { success: false, msg: "Both fields required", step: 2 };
+//     }
 
-    if (password !== confirm) {
-      return { success: false, msg: "Passwords do not match", step: 2 };
-    }
+//     if (password !== confirm) {
+//       return { success: false, msg: "Passwords do not match", step: 2 };
+//     }
 
-    if (!email) {
-      return { success: false, msg: "Something went wrong", step: 1 };
-    }
+//     if (!email) {
+//       return { success: false, msg: "Something went wrong", step: 1 };
+//     }
 
-    const hashed = await bcrypt.hash(password, 10);
+//     const hashed = await bcrypt.hash(password, 10);
 
-    await prisma.user.update({
-      where: { email },
-      data: { password: hashed },
-    });
+//     await prisma.user.update({
+//       where: { email },
+//       data: { password: hashed },
+//     });
 
-    return { success: true, msg: "Password updated", step: 3 };
-  }
+//     return { success: true, msg: "Password updated", step: 3 };
+//   }
 
-  return { success: false, msg: "Invalid step", step: 1 };
-}
+//   return { success: false, msg: "Invalid step", step: 1 };
+// }
 
 export async function updateUserPasswordAction({ userId, password }) {
   try {
@@ -625,5 +627,69 @@ export async function updateUserPasswordAction({ userId, password }) {
       success: false,
       message: "Failed to update password",
     };
+  }
+}
+
+
+export async function forgotPasswordAction(_prev, formData) {
+  try {
+    const email = (formData.get("email") || "").toString().trim().toLowerCase();
+
+    // Always return same msg (anti-enumeration)
+    const ok = {
+      success: true,
+      msg: "If that email exists, we sent a password reset link.",
+    };
+
+    if (!email) return { success: false, msg: "Email is required." };
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, email: true },
+    });
+
+     // ✅ user না পেলে register message
+    if (!user) {
+      return {
+        success: false,
+        msg: "No account found with this email. Please register first.",
+      };
+    }
+
+    const rawToken = randomBytes(32).toString("hex");
+const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    await prisma.passwordResetToken.deleteMany({
+      where: { userId: user.id, usedAt: null },
+    });
+
+    await prisma.passwordResetToken.create({
+      data: { tokenHash, expiresAt, userId: user.id },
+    });
+
+    const resetUrl = `${process.env.APP_URL}/reset-password?token=${rawToken}`;
+
+    await resend.emails.send({
+      from: process.env.RESEND_FROM,
+      to: user.email,
+      subject: "Reset your password",
+      html: `
+        <p>Click to reset your password (valid for <b>15 minutes</b>):</p>
+        <p><a href="${resetUrl}">Reset Password</a></p>
+        <p>If you didn't request this, ignore this email.</p>
+      `,
+      text: `Reset your password (valid for 15 minutes): ${resetUrl}`,
+    });
+
+    // ✅ user পেলে success message
+    return {
+      success: true,
+      msg: "We sent a password reset link to your email. Please check your inbox (and spam).",
+    };
+  } catch (err) {
+    console.log("forgote err", err);
+    
+    return { success: false, msg: "Something went wrong." };
   }
 }
