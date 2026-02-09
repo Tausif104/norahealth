@@ -11,7 +11,7 @@ import { updateAccountAction } from "@/actions/account.action";
 
 import { toast } from "sonner";
 import { uploadProfileImageAction } from "@/actions/user.action";
-import { de } from "date-fns/locale";
+
 
 const Profile = ({ account }) => {
   const [dob, setDob] = useState(null);
