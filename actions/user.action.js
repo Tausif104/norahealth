@@ -693,3 +693,48 @@ const tokenHash = createHash("sha256").update(rawToken).digest("hex");
     return { success: false, msg: "Something went wrong." };
   }
 }
+
+export async function resetPasswordAction(_prev, formData) {
+  try {
+    const token = (formData.get("token") || "").toString().trim();
+    const password = (formData.get("password") || "").toString();
+    const confirm = (formData.get("confirm") || "").toString();
+
+    if (!token) return { success: false, msg: "Invalid reset link." };
+    if (password.length < 8)
+      return { success: false, msg: "Password must be at least 8 characters." };
+    if (password !== confirm)
+      return { success: false, msg: "Passwords do not match." };
+
+    // ✅ hash token using node:crypto createHash
+    const tokenHash = createHash("sha256").update(token).digest("hex");
+
+    const prt = await prisma.passwordResetToken.findUnique({
+      where: { tokenHash },
+      select: { id: true, userId: true, expiresAt: true, usedAt: true },
+    });
+
+    if (!prt) return { success: false, msg: "Invalid or expired token." };
+    if (prt.usedAt) return { success: false, msg: "This link was already used." };
+    if (prt.expiresAt < new Date())
+      return { success: false, msg: "Reset link expired." };
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: prt.userId },
+        data: { password: passwordHash },
+      }),
+      prisma.passwordResetToken.update({
+        where: { id: prt.id },
+        data: { usedAt: new Date() },
+      }),
+    ]);
+
+    return { success: true, msg: "Password updated successfully." };
+  } catch (err) {
+    console.log("reset err", err);
+    return { success: false, msg: "Something went wrong." };
+  }
+}
