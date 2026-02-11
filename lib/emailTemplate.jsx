@@ -327,7 +327,7 @@ export const orderFromBookingEmailTemplate=({
 
           <p style="margin-top:16px;font-size:13px;color:#555;">
             Our clinical team will review your order and update you shortly.
-            If you have questions, simply reply to this email.
+           
           </p>
         </td>
       </tr>
