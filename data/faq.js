@@ -6,8 +6,8 @@ export const faqData = [
   },
   {
     id: 2,
-    title: 'Do I need to pay for contraception at Norahealth or Manor Chemist?',
-    body: 'No — all NHS contraception services provided through Norahealth and Manor Chemist are completely free.',
+    title: 'Do I need to pay for contraception at Nora Health or Manor Chemist?',
+    body: 'No — all NHS contraception services provided through Nora Health and Manor Chemist are completely free.',
   },
   {
     id: 3,
@@ -47,8 +47,8 @@ export const faqData = [
   {
     id: 10,
     title:
-      'What types of contraception are available through Norahealth and the NHS?',
-    body: 'Norahealth currently offers oral contraception. Other options include the patch, injection, implant, and IUD (coil), which may be accessible via your usual GP.',
+      'What types of contraception are available through Nora Health and the NHS?',
+    body: 'Nora Health currently offers oral contraception. Other options include the patch, injection, implant, and IUD (coil), which may be accessible via your usual GP.',
   },
   {
     id: 11,
@@ -72,7 +72,7 @@ export const faqData = [
   },
   {
     id: 15,
-    title: 'Will Norahealth offer support for menopause and HRT?',
+    title: 'Will Nora Health offer support for menopause and HRT?',
     body: "Absolutely. We're committed to improving access to hormone replacement therapy (HRT) and menopause support, with tailored advice and compassionate care.",
   },
 ]

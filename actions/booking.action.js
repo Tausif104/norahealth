@@ -250,7 +250,7 @@ export async function createBookingOrder(formData) {
     // ✅ Find user (needed for Order.userId)
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { id: true },
+      select: { id: true, account: true },
     });
 
     // If orders must be tied to a user, stop here if user not found
@@ -324,6 +324,7 @@ try {
     ocRequest,
     appointmentRequest,
     createdAt: booking.createdAt || now,
+    deliveryAddress: user.account.deliveryAddress || user.account.address || "",
     notes,
   });
 } catch (emailError) {
@@ -996,7 +997,7 @@ export async function createOrderFromBooking({
     // 3️⃣ Send email (non-blocking)
     try {
       await resend.emails.send({
-        from: "Norahealth <contact@norahealth.co.uk>",
+        from: "Nora Health <contact@norahealth.co.uk>",
         to: booking.email,
         subject: "Your Order Has Been Created",
         replyTo: "contact@norahealth.co.uk",

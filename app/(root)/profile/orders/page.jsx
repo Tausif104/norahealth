@@ -1,9 +1,11 @@
 import React from "react";
-import Orders from "../_components/orders";
+
 import {
   getPastOrderByUser,
   getRecentOrderByUser,
 } from "@/actions/order.action";
+import Orders from "../_components/orders";
+
 export const metadata = {
   title: "Orders",
   description: "Free Oral Contraception, Delivered to Your Door",

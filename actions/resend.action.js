@@ -16,7 +16,7 @@ export const resendEmailAction = async (prevState, formData) => {
     <!-- Header -->
     <tr>
       <td style="background: #cd8936; padding: 16px; text-align: center; color: #ffffff; font-size: 22px; font-weight: bold;">
-        Norahealth
+        Nora Health
       </td>
     </tr>
 
@@ -59,7 +59,7 @@ export const resendEmailAction = async (prevState, formData) => {
     <!-- Footer -->
     <tr>
       <td style="background: #f3f3f3; padding: 12px; text-align: center; font-size: 13px; color: #777;">
-        © ${new Date().getFullYear()} Norahealth. All rights reserved.
+        © ${new Date().getFullYear()} Nora Health. All rights reserved.
       </td>
     </tr>
 
@@ -76,7 +76,7 @@ export const resendEmailAction = async (prevState, formData) => {
 
   try {
     const res = await resend.emails.send({
-   from: "Norahealth <contact@norahealth.co.uk>",
+   from: "Nora Health <contact@norahealth.co.uk>",
       to: "engmahfuz14@gmail.com",
       subject: "New Contact Message",
       html: emailTemplate,

@@ -104,7 +104,7 @@ const Footer = () => {
       <div className='bg-[#3F1836] py-4'>
         <div className='container custom-container mx-auto'>
           <p className='text-white opacity-80 text-center 2xl:text-[16px] xl:text-[16px] text-[14px]'>
-            Copywriting all rights reserved &copy; 2025 NoraHelth
+            Copywriting all rights reserved &copy; {new Date().getFullYear()} Nora Health
           </p>
         </div>
       </div>

@@ -13,6 +13,27 @@ import { toast } from "sonner";
 export default function BookingCalander() {
   const router = useRouter();
   const { bookingData, setBookingData } = useBooking();
+  const [nowTick, setNowTick] = useState(Date.now());
+
+
+  useEffect(() => {
+  const id = setInterval(() => setNowTick(Date.now()), 30 * 1000); // update every 30s
+  return () => clearInterval(id);
+}, []);
+
+
+// helper: "HH:MM" -> minutes from 00:00
+function toMinutes(hhmm) {
+  if (!hhmm) return 0;
+  const [hh, mm] = hhmm.split(":").map(Number);
+  return hh * 60 + mm;
+}
+
+// helper: current minutes
+function currentMinutes() {
+  const n = new Date(nowTick);
+  return n.getHours() * 60 + n.getMinutes();
+}
 
   // parse "YYYY-MM-DD" from server into Date object for calendar
   function parseYMD(ymd) {
@@ -163,6 +184,17 @@ export default function BookingCalander() {
     router.push("/booking/confirm");
   }
 
+  // filtered slots for UI
+const visibleSlots = useMemo(() => {
+  if (!value) return [];
+  if (!isSameDay(value, today)) return timeSlots; // not today -> show all
+
+  const nowMins = currentMinutes();
+
+  // rule: hide slots that already started (startTime <= now)
+  return timeSlots.filter((slot) => toMinutes(slot.startTime) > nowMins);
+}, [timeSlots, value, today, nowTick]);
+
   return (
     <div className='bg-[#f4e7e1] rounded-2xl overflow-hidden flex flex-col md:flex-row h-full'>
       {/* Left: react-calendar */}
@@ -207,7 +239,7 @@ export default function BookingCalander() {
               </div>
             )}
 
-            {timeSlots.map((slot) => {
+            {visibleSlots.map((slot) => {
               const isActive = selectedSlot === slot.id;
               return (
                 <button

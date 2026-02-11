@@ -12,7 +12,7 @@ const AboutAlt = () => {
             </h2>
             <div className='mt-5 mb-8'>
               <p className='2xl:text-[24px] xl:text-[24px] lg:text-[20px] text-[14px] text-pg lg:mb-2 mb-1'>
-                At Norahealth, we believe contraception should be simple, safe,
+                At Nora Health, we believe contraception should be simple, safe,
                 and stigma-free.
               </p>
               <p className='2xl:text-[24px] xl:text-[24px] lg:text-[20px] text-[14px] text-pg lg:mb-2 mb-1'>

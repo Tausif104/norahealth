@@ -79,7 +79,7 @@ export const createOrderByAdmin = async (prevState, formData) => {
   // 3️⃣ Send confirmation email
   try {
     await resend.emails.send({
-      from: "Norahealth <contact@norahealth.co.uk>",
+      from: "Nora Health <contact@norahealth.co.uk>",
       to: customer.email,
       subject: "Your Order Has Been Confirmed",
       html: orderEmailTemplate({
@@ -327,13 +327,12 @@ export const getRecentOrderByUser = async () => {
     return { msg: "User not logged In", success: false };
   }
 
-  const RECENT_DAYS = 45;
-  const cutoff = new Date(Date.now() - RECENT_DAYS * 24 * 60 * 60 * 1000);
+  
 
   const orders = await prisma.order.findMany({
     where: {
       userId: Number(userId),
-      createdAt: { gte: cutoff },
+      
     },
     orderBy: { createdAt: "desc" },
   });
@@ -426,7 +425,7 @@ export const updateOrderStatus = async (prevState, formData) => {
   if (customer?.email) {
     try {
       await resend.emails.send({
-        from: "Norahealth <contact@norahealth.co.uk>",
+        from: "Nora Health <contact@norahealth.co.uk>",
         to: customer.email,
         subject: `Order #${order.id} status: ${order.status}`,
         replyTo: "contact@norahealth.co.uk",
@@ -434,6 +433,7 @@ export const updateOrderStatus = async (prevState, formData) => {
           // customerName: customer.name,
           orderId: order.id,
           status: order.status,
+          medicineName: order.medicineName,
           trackingId: order.trackingId,
         }),
       });

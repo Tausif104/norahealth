@@ -118,7 +118,7 @@ const Profile = ({ account }) => {
               }
               alt='Profile'
               fill
-              className='object-cover  w-[64px] lg:w-[100px] h-[64px] lg:h-[100px] rounded-full border-2 border-[#CE8936]'
+              className='object-cover object-top w-[64px] lg:w-[100px] h-[64px] lg:h-[100px] rounded-full border-2 border-[#CE8936]'
             />
             {/* Upload Button on Image */}
             <label className='absolute bottom-0 right-0 bg-white shadow-lg p-2 rounded-full cursor-pointer'>
