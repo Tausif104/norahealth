@@ -325,7 +325,7 @@ export const orderFromBookingEmailTemplate=({
             </tr>
           </table>
 
-          <p style="margin-top:16px;font-size:13px;color:#555;">
+          <p style="margin-top:16px;font-size:13px;color:#555;"> 
             Our clinical team will review your order and update you shortly.
            
           </p>
