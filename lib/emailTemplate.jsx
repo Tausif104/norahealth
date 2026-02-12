@@ -127,7 +127,7 @@ export const orderStatusEmailTemplate=({ customerName, orderId, status, tracking
           </table>
 
           <p style="margin:16px 0 0;color:#555;font-size:13px;">
-            If you have any questions, just reply to this email.
+            If you have any questions please contact with us.
           </p>
         </td>
       </tr>
