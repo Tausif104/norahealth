@@ -399,9 +399,9 @@ export default function AllOrdersTable({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='all'>All</SelectItem>
-              <SelectItem value='clinicalreview'>Clinical Review</SelectItem>
+              <SelectItem value='clinicalreview'>Under Clinical Review</SelectItem>
               <SelectItem value='posted'>Posted</SelectItem>
-              <SelectItem value='delivered'>Delivered</SelectItem>
+              {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
             </SelectContent>
           </Select>
         </div>

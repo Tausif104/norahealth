@@ -8,6 +8,7 @@ function getStatusLabel(status) {
 
   if (s === "clinicalreview") return "Under Clinical Review";
   if (s === "posted") return "Posted via Royal Mail";
+  if (s === "declined") return "Declined";
 
   return status || "";
 }

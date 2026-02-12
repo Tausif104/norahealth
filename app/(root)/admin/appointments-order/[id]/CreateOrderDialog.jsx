@@ -105,10 +105,11 @@ export default function CreateOrderDialog({ bookingId }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='clinicalreview'>
-                    Clinical Review
+                    Under Clinical Review
                   </SelectItem>
                   <SelectItem value='posted'>Posted</SelectItem>
-                  {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
+                  <SelectItem value='declined'>Declined</SelectItem>
+
                 </SelectContent>
               </Select>
             </div>

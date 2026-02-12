@@ -87,6 +87,7 @@ enum OrderStatus {
   clinicalreview
   posted
   delivered
+  declined
 }
 
 model Account {

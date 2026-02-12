@@ -164,9 +164,9 @@ export default function AppointmentOrdersTable({ orders = [] }) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='ALL'>All</SelectItem>
-                <SelectItem value='clinicalreview'>Clinical Review</SelectItem>
+                <SelectItem value='clinicalreview'> Under Clinical Review</SelectItem>
                 <SelectItem value='posted'>Posted</SelectItem>
-                <SelectItem value='delivered'>Delivered</SelectItem>
+                {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
               </SelectContent>
             </Select>
           </div>
