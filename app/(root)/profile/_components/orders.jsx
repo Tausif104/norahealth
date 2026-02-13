@@ -29,6 +29,13 @@ const getStatusBadge = (status) => {
       </span>
     );
   }
+  if (s === "declined") {
+    return (
+      <span className="inline-flex items-center rounded-full bg-[#ff7565] text-[#fff] text-[12px] px-3 py-1 whitespace-nowrap">
+        Declined
+      </span>
+    );
+  }
 
   return (
     <span className="inline-flex items-center rounded-full bg-[#F5F0EE] text-[#3A3D42] text-[12px] px-3 py-1 whitespace-nowrap">

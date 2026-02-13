@@ -77,7 +77,7 @@ export const resendEmailAction = async (prevState, formData) => {
   try {
     const res = await resend.emails.send({
    from: "Nora Health <contact@norahealth.co.uk>",
-      to: "engmahfuz14@gmail.com",
+      to: "pharmacy.fap80@nhs.net",
       subject: "New Contact Message",
       html: emailTemplate,
     });

@@ -134,13 +134,13 @@ export function OrderTable({ orders, userId, user }) {
               <Badge className='bg-yellow-500 text-white'>
                 Under Clinical Review
               </Badge>
-            ) : orderStatus === "delivered" ? (
-              <Badge className='bg-blue-500 text-white'>Delivered</Badge>
-            ) : (
-              <Badge className='bg-green-500 text-white'>
-                Posted via Royal Mail.
+            ) : orderStatus === "posted" ? (
+              <Badge className='bg-green-500 text-white'>Posted via Royal Mail</Badge>
+            ) :orderStatus === "declined" ? (
+              <Badge className='bg-red-500 text-white'>
+                Declined.
               </Badge>
-            )}
+            ) :""}
           </div>
         );
       },

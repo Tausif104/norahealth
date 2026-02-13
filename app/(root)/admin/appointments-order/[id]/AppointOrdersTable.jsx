@@ -58,6 +58,13 @@ function StatusPill({ status, trackingId }) {
       </span>
     );
   }
+  if (status === "declined") {
+    return (
+      <span className={`${base} bg-red-50 text-red-700 border-red-200`}>
+        Declined
+      </span>
+    );
+  }
 
   return (
     <span className={`${base} bg-gray-50 text-gray-700 border-gray-200`}>
