@@ -34,7 +34,7 @@ export const resendEmailAction = async (prevState, formData) => {
           
           <tr>
             <td style="padding: 8px 0; width: 120px; font-weight: bold; color: #cd8936;">Name:</td>
-            <td>${name}</td>
+            <td>${name}</td> 
           </tr>
 
           <tr>
