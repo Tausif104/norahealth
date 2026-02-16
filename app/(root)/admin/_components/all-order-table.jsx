@@ -408,6 +408,7 @@ export default function AllOrdersTable({
               <SelectItem value='all'>All</SelectItem>
               <SelectItem value='clinicalreview'>Under Clinical Review</SelectItem>
               <SelectItem value='posted'>Posted</SelectItem>
+              <SelectItem value='declined'>Declined</SelectItem>
               {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
             </SelectContent>
           </Select>
@@ -647,6 +648,7 @@ export default function AllOrdersTable({
                   Under Clinical Review
                 </SelectItem>
                 <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
+                <SelectItem value='declined'>Declined</SelectItem>
               </SelectContent>
             </Select>
 

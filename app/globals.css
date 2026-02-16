@@ -132,6 +132,12 @@ h6 {
   body {
     @apply bg-background text-foreground;
   }
+  b{
+    @apply font-bold
+  }
+  strong{
+   @apply font-bold
+  }
 }
 
 @layer utilities {

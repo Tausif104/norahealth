@@ -173,6 +173,7 @@ export default function AppointmentOrdersTable({ orders = [] }) {
                 <SelectItem value='ALL'>All</SelectItem>
                 <SelectItem value='clinicalreview'> Under Clinical Review</SelectItem>
                 <SelectItem value='posted'>Posted</SelectItem>
+                <SelectItem value='declined'>Declined</SelectItem>
                 {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
               </SelectContent>
             </Select>

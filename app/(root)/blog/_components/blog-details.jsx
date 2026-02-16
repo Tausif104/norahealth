@@ -47,7 +47,7 @@ const BlogDetails = ({ post }) => {
     return (
       <ListTag
         className={`pl-6 space-y-2 ${
-          style === "ordered" ? "list-decimal" : "list-disc"
+          style === "ordered" ? "list-decimal" : "list-none"
         }`}
       >
         {items.map((item, idx) => {
@@ -63,7 +63,7 @@ const BlogDetails = ({ post }) => {
               : false;
 
           return (
-            <li key={key}>
+            <li key={key} >
               <div className='flex gap-2 text-gray-700'>
                 {style === "checklist" ? (
                   <input
@@ -94,8 +94,8 @@ const BlogDetails = ({ post }) => {
         const Tag = `h${block.data.level || 2}`;
         const text = decode(block.data.text || "");
         return (
-          <Tag key={i} className='mt-8 mb-3 text-xl font-bold text-gray-900'>
-            {text}
+          <Tag key={i} className='mt-8 mb-3 text-xl font-bold text-gray-900' dangerouslySetInnerHTML={{ __html: text }}>
+            
           </Tag>
         );
       }

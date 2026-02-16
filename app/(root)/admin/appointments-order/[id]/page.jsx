@@ -20,6 +20,9 @@ export default async function AppointmentOrderDetailsPage({ params }) {
     include: { orders: true, account: true },
   });
 
+  console.log(user, "user");
+  
+
   console.log("online oc", booking, user);
 
   return (
@@ -30,7 +33,7 @@ export default async function AppointmentOrderDetailsPage({ params }) {
       <section className=' p-4 space-y-2'>
         <h2 className='font-bold text-xl'>Patient Info</h2>
         <p>
-          <b>User ID:</b> {user.id}
+          <b>User ID:</b> {user?.id && user?.id || "N/A"}
         </p>
         <p>
           <b>Name:</b> {booking.fullName}
@@ -62,7 +65,7 @@ export default async function AppointmentOrderDetailsPage({ params }) {
           <b>Notes:</b> {booking.notes || "—"}
         </p>
         <p>
-          <b>Delivery Address:</b> {user?.account?.deliveryAddress}
+          <b>Delivery Address:</b> {user?.account?.deliveryAddress ? user?.account?.deliveryAddress :"N/A" }
         </p>
       </section>
 

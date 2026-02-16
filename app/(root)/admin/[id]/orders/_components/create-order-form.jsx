@@ -98,6 +98,7 @@ export const CreateOrderForm = () => {
                     <SelectItem value='posted'>
                       Posted Via Royal Mail
                     </SelectItem>
+                    <SelectItem value='declined'>Declined</SelectItem>
                     {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
                   </SelectGroup>
                 </SelectContent>

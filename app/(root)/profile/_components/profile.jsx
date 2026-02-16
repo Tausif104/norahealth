@@ -114,7 +114,7 @@ const Profile = ({ account }) => {
               src={
                 uploadedImage ||
                 profileImage ||
-                "/images/profile-placeholder.png"
+                "/images/profile-placeholder.jpeg"
               }
               alt='Profile'
               fill

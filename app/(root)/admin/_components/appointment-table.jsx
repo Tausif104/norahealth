@@ -612,6 +612,7 @@ export default function AppointmentOrderTable() {
                     Clinical Review
                   </SelectItem>
                   <SelectItem value='posted'>Posted</SelectItem>
+                  <SelectItem value='declined'>Declined</SelectItem>
                   {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
                 </SelectContent>
               </Select>

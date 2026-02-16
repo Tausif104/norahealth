@@ -131,11 +131,11 @@ export const orderEmailTemplate = ({ medicineName, trackingId, status }) => {
         </p>
 
         <p style="margin-top:12px;color:#555;font-size:13px;">
-          If you have any queries regarding your order please
+          If you have any queries please
           <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" style="color:#cd8936;text-decoration:underline;">
-            click here
+             message us on WhatsApp
           </a>
-          to message us on WhatsApp (${whatsappNumber}) or send us an email on
+           or send us an email on
           <a href="mailto:${supportEmail}" style="color:#cd8936;text-decoration:underline;">
             ${supportEmail}
           </a>.
@@ -560,7 +560,7 @@ export async function sendOrderBookingConfirmationEmail({
             <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" style="color:#cd8936;text-decoration:underline;">
               message us on WhatsApp
             </a>
-            (${whatsappNumber}) or email us at
+             or email us at
             <a href="mailto:${supportEmail}" style="color:#cd8936;text-decoration:underline;">
               ${supportEmail}
             </a>.
@@ -647,7 +647,7 @@ export const orderFromBookingEmailTemplate = ({
             <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" style="color:#cd8936;text-decoration:underline;">
               message us on WhatsApp
             </a>
-            (${whatsappNumber}) or email us at
+            or email us at
             <a href="mailto:${supportEmail}" style="color:#cd8936;text-decoration:underline;">
               ${supportEmail}
             </a>.

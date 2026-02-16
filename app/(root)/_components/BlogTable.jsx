@@ -99,7 +99,7 @@ export default function BlogTable({ allPost, userRole, currentUserId }) {
         header: "Title",
 
         cell: ({ row }) => (
-          <div className='flex items-center gap-3'>
+          <div className='flex items-center gap-3 max-w-[350px] overflow-hidden'>
             <Avatar className='h-7 w-7 rounded-sm'>
               <AvatarImage src={row.original.bannerImage || ""} />
             </Avatar>
