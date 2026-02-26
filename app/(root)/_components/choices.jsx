@@ -23,7 +23,7 @@ const ChoicesSection = () => {
         </div>
         <div className='md:mt-[50px] mt-[30px]'>
           <div className='grid md:grid-cols-2 grid-cols-1 md:gap-8 gap-4'>
-            <Link href='/contraception-choices/outcomes/oral'>
+            <Link href='/contraception-choices/outcomes/combined'>
               <div className='bg-[url(/images/choice-one.png)] lg:h-[485px] h-[320px]  bg-contain bg-center flex items-end justify-center md:pb-[25px] pb-[20px] md:px-[40px] px-[20px] border border-[#FFF4EF] hover:border-[#CD8936] rounded-[16px] transition duration-300 group cursor-pointer'>
                 <div className='bg-[#FFF4EF] w-full text-center p-[10px] rounded-[8px] group-hover:bg-[#CD8936] transition duration-300'>
                   <div>
@@ -34,7 +34,7 @@ const ChoicesSection = () => {
                 </div>
               </div>
             </Link>
-            <Link href='/contraception-choices/outcomes/only'>
+            <Link href='/contraception-choices/outcomes/progesterone-only'>
               <div className='bg-[url(/images/choice-two.png)] lg:h-[485px] h-[320px] bg-contain bg-center flex items-end justify-center md:pb-[25px] pb-[20px] md:px-[40px] px-[20px] border border-[#FFF4EF] hover:border-[#CD8936] rounded-[16px] transition duration-300 group cursor-pointer'>
                 <div className='bg-[#FFF4EF] w-full text-center p-[10px] rounded-[8px] group-hover:bg-[#CD8936] transition duration-300'>
                   <div>

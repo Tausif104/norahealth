@@ -6,6 +6,7 @@ import {
   implantInjection,
 } from "@/data/contraception-strings";
 import Tool from "./_components/tool";
+import { notFound } from "next/navigation";
 
 export const metadata = {
   title: "Contraception Choices",
@@ -13,6 +14,11 @@ export const metadata = {
 };
 
 const OutComesPage = async ({ searchParams }) => {
+  const search = await searchParams;
+  if (!search || Object.keys(search).length === 0) {
+    notFound();
+  }
+
   const { contraceptive, myhealthtwo, myhealth, sexhealth } =
     await searchParams;
 
@@ -55,14 +61,14 @@ const OutComesPage = async ({ searchParams }) => {
               <Tool
                 img='/images/tools/oral.png'
                 name='Combined oral contraceptives'
-                url='/contraception-choices/outcomes/oral'
+                url='/contraception-choices/outcomes/combined'
               />
             </div>
             <div className={excludePop ? "hidden" : "block"}>
               <Tool
                 img='/images/tools/only.png'
                 name='Progesterone only contraceptives'
-                url='/contraception-choices/outcomes/only'
+                url='/contraception-choices/outcomes/progesterone-only'
               />
             </div>
             <div className={excludeCondom ? "hidden" : "block"}>
