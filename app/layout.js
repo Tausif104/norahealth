@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-calendar/dist/Calendar.css";
 import "./globals.css";
+import Script from "next/script";
 
 const dmSams = DM_Sans({
   subsets: ["latin"],
