@@ -24,6 +24,16 @@ const AdminNavigation = ({ userId }) => {
             {/* Scrollable buttons */}
             <Button
               variant={
+                path.toString() === `/admin/${userId}/account`
+                  ? "default"
+                  : "outline"
+              }
+              asChild
+            >
+              <Link href={`/admin/${userId}/account`}>Account Info</Link>
+            </Button>
+            <Button
+              variant={
                 path.toString() === `/admin/${userId}/records`
                   ? "default"
                   : "outline"

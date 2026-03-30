@@ -1,0 +1,73 @@
+import { getUserAccountInfobyid } from '@/actions/account.action';
+import React from 'react';
+import AdminNavigation from '../_components/admin-navigation';
+
+const page = async ({ params }) => {
+  const { id } = await params;
+  const { success, user } = await getUserAccountInfobyid(id);
+
+  if (!success) {
+    return <div className="text-center text-red-500">User not found</div>;
+  }
+
+  return (
+    <div className="container mx-auto p-10">
+        <div className='flex items-center gap-4 mb-4'>
+                <AdminNavigation userId={id} />
+              </div>
+   
+
+      <div className=" rounded-lg p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="w-full lg:w-1/3">
+            <img
+              src={user.account?.profileImage || '/images/profile-placeholder.png'}
+              alt="Profile"
+              className="w-32 h-32 rounded-full mx-auto mb-4"
+            />
+            <div className="text-center">
+              <h2 className="text-xl font-medium">{user.account?.firstName} {user.account?.lastName}</h2>
+              <p className="text-gray-500">{user.email}</p>
+            </div>
+          </div>
+
+          <div className="w-full lg:w-2/3">
+            <h2 className="text-2xl font-semibold mb-4">Account Information</h2>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <p className="text-gray-600">Phone Number</p>
+                <p className="text-gray-800">{user.account?.phoneNumber}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-600">Second Email</p>
+                <p className="text-gray-800">{user.account?.secondEmail}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-600">Date of Birth</p>
+                <p className="text-gray-800">{new Date(user.account?.dob).toLocaleDateString()}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-600">NHS Number</p>
+                <p className="text-gray-800">{user.account?.nhsNumber || 'N/A'}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-600">Address</p>
+                <p className="text-gray-800">{user.account?.address}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-600">Zip Code</p>
+                <p className="text-gray-800">{user.account?.zipCode}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-600">Delivery Address</p>
+                <p className="text-gray-800">{user.account?.deliveryAddress || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default page;

@@ -212,3 +212,39 @@ export const updateAccountAction = async (prevState, formData) => {
     };
   }
 };
+
+export const getUserAccountInfobyid = async (userId) => {
+  const user = await prisma.user.findUnique({
+    where: { id: Number(userId) },
+    select: {
+      id: true,
+      email: true,
+      account: {
+        select: {
+          firstName: true,
+          lastName: true,
+          phoneNumber: true,
+          secondEmail: true,
+          dob: true,
+          nhsNumber: true,
+          address: true,
+          zipCode: true,
+          profileImage: true,
+          deliveryAddress: true,
+        }
+      }
+    },
+  });
+
+  if (!user) {
+    return {
+      success: false,
+      message: "User not found",
+    };
+  }
+
+  return {
+    success: true,
+    user: user,
+  };
+};
