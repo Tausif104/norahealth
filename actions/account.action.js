@@ -204,3 +204,99 @@ export const getUserAccountInfobyid = async (userId) => {
     user: user,
   };
 };
+
+// update account
+export const updateAccountAction = async (prevState, formData) => {
+  const payload = await loggedInUserAction()
+
+  if (!payload?.payload?.email) {
+    return {
+      success: false,
+      msg: 'User not found',
+    }
+  }
+
+  const loggedInUserId = payload?.payload?.id
+
+  const userId = formData.get('userId').toString()
+  const firstname = formData.get('firstname')
+  const lastName = formData.get('lastName')
+  const email = formData.get('email')
+  const phone = formData.get('phone')
+  const dob = new Date(formData.get('dob'))
+  const nhs = formData.get('nhs')
+  const address = formData.get('address')
+  const zip = formData.get('zip')
+  // const weight = formData.get('weight')
+  // const height = formData.get('height')
+  // const whdate = new Date(formData.get('whdate'))
+  // const bptop = formData.get('bptop')
+  // const bpbottom = formData.get('bpbottom')
+  // const bpdate = new Date(formData.get('bpdate'))
+  // const medicalconditions = formData.get('medicalconditions')
+  // const currentmedicines = formData.get('currentmedicines')
+
+  if (loggedInUserId.toString() !== userId) {
+    return null
+  }
+
+  const updatedAcount = await prisma.account.upsert({
+    where: {
+      userId: loggedInUserId,
+    },
+
+    update: {
+      // personal
+      firstName: firstname,
+      lastName: lastName,
+      phoneNumber: phone,
+      secondEmail: email,
+      dob: dob,
+      nhsNumber: nhs,
+      address: address,
+      zipCode: zip,
+
+      // health
+      // weight: weight,
+      // height: height,
+      // weightHeightCheckDate: whdate,
+      // bpTop: bptop,
+      // bpBottom: bpbottom,
+      // bpCheckDate: bpdate,
+      // medicalConditions: medicalconditions,
+      // currentMedicines: currentmedicines,
+    },
+
+    create: {
+      userId: loggedInUserId,
+      // personal
+      firstName: firstname,
+      lastName: lastName,
+      phoneNumber: phone,
+      secondEmail: email,
+      dob: dob,
+      nhsNumber: nhs,
+      address: address,
+      zipCode: zip,
+
+      // health
+      // weight: weight,
+      // height: height,
+      // weightHeightCheckDate: whdate,
+      // bpTop: bptop,
+      // bpBottom: bpbottom,
+      // bpCheckDate: bpdate,
+      // medicalConditions: medicalconditions,
+      // currentMedicines: currentmedicines,
+    },
+  })
+
+  revalidatePath('/profile')
+
+  if (updatedAcount) {
+    return {
+      msg: 'Account Updated!',
+      success: true,
+    }
+  }
+}
