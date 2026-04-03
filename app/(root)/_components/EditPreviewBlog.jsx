@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { decode } from "html-entities";
 
 import { startTransition, use, useContext, useEffect, useState } from "react";
@@ -180,8 +180,16 @@ const EditSeeBlog = () => {
     const formData = new FormData();
     formData.append("id", blogData.id);
     formData.append("title", blogData.title);
+    formData.append("postSlug", blogData.postSlug || "");
+    formData.append("bannerAltText", blogData.bannerAltText || "");
+    formData.append("metaTitle", blogData.metaTitle || "");
+    formData.append("metaDescription", blogData.metaDescription || "");
+    formData.append("canonicalUrl", blogData.canonicalUrl || "");
     formData.append("shortDesc", blogData.shortDesc);
-    formData.append("bannerImage", blogData.image);
+    formData.append(
+      "bannerImage",
+      blogData.bannerImage || blogData.image || "",
+    );
 
     // formData.append("blogCategoryId", blogData.categoryId);
 
@@ -223,7 +231,7 @@ const EditSeeBlog = () => {
     >
       <input type='hidden' name='title' value={blogData.title} />
       <input type='hidden' name='shortDesc' value={blogData.shortDesc} />
-      <input type='hidden' name='image' value={blogData.image} />
+      <input type='hidden' name='image' value={blogData.bannerImage || blogData.image || ""} />
       <input
         type='hidden'
         name='content'
@@ -239,9 +247,9 @@ const EditSeeBlog = () => {
         </Link>
       </div>
 
-      {blogData.bannerImage && (
+      {(blogData.bannerImage || blogData.image) && (
         <img
-          src={blogData.bannerImage}
+          src={blogData.bannerImage || blogData.image}
           alt={blogData.title}
           className='w-full h-[400px] object-cover mb-6 border border-white/10 rounded-lg'
         />
@@ -268,3 +276,5 @@ const EditSeeBlog = () => {
 };
 
 export default EditSeeBlog;
+
+

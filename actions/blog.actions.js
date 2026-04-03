@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 import { loggedInUserAction } from "./user.action";
@@ -29,7 +29,7 @@ function getString(v) {
 
 //     const posts = await prisma.post.findMany({
 //       where: {
-//         authorId: Number(user?.payload?.id), // ✅ only this author’s posts
+//         authorId: Number(user?.payload?.id), // âœ… only this authorâ€™s posts
 //       },
 //       orderBy: { createdAt: "desc" },
 //       include: {
@@ -60,7 +60,7 @@ function getString(v) {
 //       },
 //     });
 
-//     // Parse content string → object
+//     // Parse content string â†’ object
 //     const postsWithContentObj = posts.map((post) => ({
 //       ...post,
 //       content: post.content ? JSON.parse(post.content) : null,
@@ -123,8 +123,8 @@ export const postList = async () => {
 
     const posts = await prisma.post.findMany({
       where: isAdmin
-        ? {} // ✅ fetch ALL posts
-        : { authorId: Number(id) }, // ✅ only own posts
+        ? {} // âœ… fetch ALL posts
+        : { authorId: Number(id) }, // âœ… only own posts
 
       orderBy: { createdAt: "desc" },
 
@@ -185,7 +185,7 @@ export const postCreate = async (_prevState, formData) => {
     const metaDescription = getString(formData.get("metaDescription"));
     const canonicalUrl = getString(formData.get("canonicalUrl"));
     const shortDesc = getString(formData.get("shortDesc"));
-    const bannerImage = getString(formData.get("bannerImage")); // ✅ now stored
+    const bannerImage = getString(formData.get("bannerImage")); // âœ… now stored
     // const content = parseContent(formData);
     // const contentRaw = formData.get("content");
     const contentRaw = getString(formData.get("content"));
@@ -203,7 +203,7 @@ export const postCreate = async (_prevState, formData) => {
       return { success: false, msg: "Post with this title already exists" };
     }
 
-    // 🔍 Check existing slug
+    // ðŸ” Check existing slug
     const existingSlug = await prisma.post.findUnique({ where: { postSlug } });
     if (existingSlug) {
       return {
@@ -257,7 +257,7 @@ export const postCreate = async (_prevState, formData) => {
 
 //     const title = getString(formData.get("title"));
 //     const shortDesc = getString(formData.get("shortDesc"));
-//     const bannerImage = getString(formData.get("bannerImage")); // ✅ now stored
+//     const bannerImage = getString(formData.get("bannerImage")); // âœ… now stored
 //     // const content = parseContent(formData);
 //     // const contentRaw = formData.get("content");
 //     const contentRaw = getString(formData.get("content"));
@@ -314,6 +314,11 @@ export const postUpdate = async (_prevState, formData) => {
     if (!id) return { success: false, msg: "Post id is required" };
 
     const title = getString(formData.get("title"));
+    const postSlug = getString(formData.get("postSlug"));
+    const bannerAltText = getString(formData.get("bannerAltText"));
+    const metaTitle = getString(formData.get("metaTitle"));
+    const metaDescription = getString(formData.get("metaDescription"));
+    const canonicalUrl = getString(formData.get("canonicalUrl"));
     const shortDesc = getString(formData.get("shortDesc"));
     const contentRaw = getString(formData.get("content"));
 
@@ -322,10 +327,36 @@ export const postUpdate = async (_prevState, formData) => {
     const data = {};
 
     if (title) data.title = title;
+    if (formData.has("postSlug")) {
+      if (!postSlug) {
+        return { success: false, msg: "Post slug is required" };
+      }
+
+      const existingSlug = await prisma.post.findFirst({
+        where: {
+          postSlug,
+          NOT: { id },
+        },
+      });
+
+      if (existingSlug) {
+        return {
+          success: false,
+          msg: "This post slug is already in use. Please choose a different one.",
+        };
+      }
+
+      data.postSlug = postSlug;
+    }
+
+    if (formData.has("bannerAltText")) data.bannerAltText = bannerAltText || null;
+    if (formData.has("metaTitle")) data.metaTitle = metaTitle || null;
+    if (formData.has("metaDescription")) data.metaDescription = metaDescription || null;
+    if (formData.has("canonicalUrl")) data.canonicalUrl = canonicalUrl || null;
     if (shortDesc) data.shortDesc = shortDesc;
     if (contentRaw) data.content = contentRaw;
 
-    // ✅ SAFE banner image update
+    // âœ… SAFE banner image update
     if (typeof bannerImageRaw === "string" && bannerImageRaw.trim() !== "") {
       data.bannerImage = bannerImageRaw.trim();
     }
@@ -634,3 +665,4 @@ export async function toggleCommentApproval(commentId, approved) {
     return { success: false, msg: "Failed to update comment status" };
   }
 }
+

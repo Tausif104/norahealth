@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { getPostById } from "@/actions/blog.actions";
 import EditBlog from "@/app/(root)/_components/EditBlog";
@@ -21,7 +21,7 @@ const Page = () => {
       console.log(id, result);
 
       if (result.success) {
-        setBlogData(result.post);
+        setBlogData({ ...result.post, image: result.post.bannerImage, bannerImage: result.post.bannerImage });
       } else {
         toast.error(result.msg);
       }
@@ -48,3 +48,4 @@ const Page = () => {
 };
 
 export default Page;
+

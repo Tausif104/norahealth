@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { loggedInUserAction } from "./user.action";
 import { prisma } from "@/lib/client/prisma";
+import { getAdminUser } from "./admin.action";
 
 // create account action
 export const createAccountAction = async (prevState, formData) => {
@@ -115,99 +116,54 @@ export const getUserAccount = async () => {
 };
 
 // update account
-export const updateAccountAction = async (prevState, formData) => {
-  const payload = await loggedInUserAction();
+export const updateAccountByAdmin = async (prevState, formData) => {
+  const userId = Number(formData.get("userId"));
+  const firstName = formData.get("firstName");
+  const lastName = formData.get("lastName");
+  const dob = new Date(formData.get("dob"));
+  const phoneNumber = formData.get("phoneNumber");
+  const nhsNumber = formData.get("nhsNumber");
+  const address = formData.get("address");
+  const zipCode = formData.get("zipCode");
+  const deliveryAddress = formData.get("deliveryAddress");
 
-  if (!payload?.payload?.email) {
+  console.log("formDAta", formData);
+  
+
+  const user = await getAdminUser();
+
+  const isAdmin = user?.admin?.isAdmin || false;
+
+  if (!isAdmin) {
+    return { success: false, message: "Unauthorized. User is not admin" };
+  }
+
+  if (!firstName || !lastName || !dob || !phoneNumber) {
     return {
+      msg: "Please insert all the fields",
       success: false,
-      msg: "User not found",
     };
   }
 
-  const loggedInUserId = payload?.payload?.id;
-
-  const userId = formData.get("userId").toString();
-  const firstname = formData.get("firstname");
-  const lastName = formData.get("lastName");
-  const email = formData.get("email");
-  const phone = formData.get("phone");
-  const dob = new Date(formData.get("dob"));
-  const nhs = formData.get("nhs");
-  const address = formData.get("address");
-  const zip = formData.get("zip");
-  const deliveryAddress = formData.get("deliveryAddress");
-  // const weight = formData.get('weight')
-  // const height = formData.get('height')
-  // const whdate = new Date(formData.get('whdate'))
-  // const bptop = formData.get('bptop')
-  // const bpbottom = formData.get('bpbottom')
-  // const bpdate = new Date(formData.get('bpdate'))
-  // const medicalconditions = formData.get('medicalconditions')
-  // const currentmedicines = formData.get('currentmedicines')
-
-  if (loggedInUserId.toString() !== userId) {
-    return null;
-  }
-
-  const updatedAcount = await prisma.account.upsert({
-    where: {
-      userId: loggedInUserId,
-    },
-
-    update: {
-      // personal
-      firstName: firstname,
-      lastName: lastName,
-      phoneNumber: phone,
-      secondEmail: email,
-      dob: dob,
-      nhsNumber: nhs,
-      address: address,
-      zipCode: zip,
-      deliveryAddress: deliveryAddress,
-
-      // health
-      // weight: weight,
-      // height: height,
-      // weightHeightCheckDate: whdate,
-      // bpTop: bptop,
-      // bpBottom: bpbottom,
-      // bpCheckDate: bpdate,
-      // medicalConditions: medicalconditions,
-      // currentMedicines: currentmedicines,
-    },
-
-    create: {
-      userId: loggedInUserId,
-      // personal
-      firstName: firstname,
-      lastName: lastName,
-      phoneNumber: phone,
-      secondEmail: email,
-      dob: dob,
-      nhsNumber: nhs,
-      address: address,
-      zipCode: zip,
-      deliveryAddress: deliveryAddress,
-
-      // health
-      // weight: weight,
-      // height: height,
-      // weightHeightCheckDate: whdate,
-      // bpTop: bptop,
-      // bpBottom: bpbottom,
-      // bpCheckDate: bpdate,
-      // medicalConditions: medicalconditions,
-      // currentMedicines: currentmedicines,
+  const updatedAccount = await prisma.account.update({
+    where: { userId: userId },
+    data: {
+      firstName,
+      lastName,
+      dob,
+      phoneNumber,
+      nhsNumber,
+      address,
+      zipCode,
+      deliveryAddress,
     },
   });
 
-  revalidatePath("/profile");
+  revalidatePath(`/admin/${userId}/account`);
 
-  if (updatedAcount) {
+  if (updatedAccount) {
     return {
-      msg: "Account Updated!",
+      msg: "Account Updated",
       success: true,
     };
   }

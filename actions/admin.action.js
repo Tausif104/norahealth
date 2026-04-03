@@ -170,6 +170,60 @@ export const updateUserRoleAction = async ({ userId, newRole }) => {
   return { success: true, message: "User role updated successfully" };
 };
 
+// Action to update account by admin
+export const updateAccountByAdmin = async (prevState, formData) => {
+  const userId = Number(formData.get("userId"));
+  const firstName = formData.get("firstName");
+  const lastName = formData.get("lastName");
+  const dob = new Date(formData.get("dob"));
+  const phoneNumber = formData.get("phoneNumber");
+  const nhsNumber = formData.get("nhs");
+  const address = formData.get("address");
+  const zipCode = formData.get("zip");
+  const deliveryAddress = formData.get("deliveryAddress");
+
+
+  const user = await getAdminUser();
+
+  const isAdmin = user?.admin?.isAdmin || false;
+
+  if (!isAdmin) {
+    return { success: false, message: "Unauthorized. User is not admin" };
+  }
+
+  if (!firstName || !lastName || !dob || !phoneNumber ) {
+    return {
+      msg: "Please insert all the fields",
+      success: false,
+    };
+  }
+
+  const updatedAccount = await prisma.account.update({
+    where: { id: userId },
+    data: {
+      firstName,
+      lastName,
+      dob,
+      phoneNumber,
+      nhsNumber,
+      address,
+      zipCode,
+      deliveryAddress,
+
+   
+    },
+  });
+
+  revalidatePath(`/admin/${userId}/accounts`);
+
+  if (updatedAccount) {
+    return {
+      msg: "Account Updated",
+      success: true,
+    };
+  }
+};
+
 // delete user action
 export const deleteUserAction = async (userId) => {
   const actor = await getAdminUser();

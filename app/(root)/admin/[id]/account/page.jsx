@@ -1,6 +1,8 @@
 import { getUserAccountInfobyid } from '@/actions/account.action';
 import React from 'react';
 import AdminNavigation from '../_components/admin-navigation';
+import { formatShortDate } from '@/lib/utils';
+import { UpdateAccountForm } from '../_components/update-account';
 
 const page = async ({ params }) => {
   const { id } = await params;
@@ -15,6 +17,8 @@ const page = async ({ params }) => {
         <div className='flex items-center gap-4 mb-4'>
                 <AdminNavigation userId={id} />
               </div>
+
+              <UpdateAccountForm user={user} />
    
 
       <div className=" rounded-lg p-6">
@@ -44,7 +48,7 @@ const page = async ({ params }) => {
               </div>
               <div className="flex justify-between">
                 <p className="text-gray-600">Date of Birth</p>
-                <p className="text-gray-800">{new Date(user.account?.dob).toLocaleDateString()}</p>
+                <p className="text-gray-800">{formatShortDate(user.account?.dob)}</p>
               </div>
               <div className="flex justify-between">
                 <p className="text-gray-600">NHS Number</p>
@@ -55,7 +59,7 @@ const page = async ({ params }) => {
                 <p className="text-gray-800">{user.account?.address}</p>
               </div>
               <div className="flex justify-between">
-                <p className="text-gray-600">Zip Code</p>
+                <p className="text-gray-600">Post Code</p>
                 <p className="text-gray-800">{user.account?.zipCode}</p>
               </div>
               <div className="flex justify-between">

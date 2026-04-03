@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useContext, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -26,7 +26,7 @@ export default function EditBlog({ id, user }) {
 
   const [title, setTitle] = useState(blogData.title || "");
   const [slug, setSlug] = useState(blogData.postSlug || "");
-  const [preview, setPreview] = useState(blogData.bannerImage || "/banner.png");
+  const [preview, setPreview] = useState(blogData.bannerImage || blogData.image || "/banner.png");
   const [uploading, setUploading] = useState(false);
   const [bannerAlt, setBannerAlt] = useState(blogData.bannerAltText || "");
   const [metaTitle, setMetaTitle] = useState(blogData.metaTitle || "");
@@ -51,6 +51,16 @@ export default function EditBlog({ id, user }) {
       setBlogData((prev) => ({ ...prev, title: value }));
     }, 300)
   ).current;
+
+  useEffect(() => {
+    setTitle(blogData.title || "");
+    setSlug(blogData.postSlug || "");
+    setPreview(blogData.bannerImage || blogData.image || "/banner.png");
+    setBannerAlt(blogData.bannerAltText || "");
+    setMetaTitle(blogData.metaTitle || "");
+    setMetaDescription(blogData.metaDescription || "");
+    setCanonicalUrl(blogData.canonicalUrl || "");
+  }, [blogData]);
 
   const handleTitleChange = (e) => {
     const value = e.target.value;
@@ -86,7 +96,7 @@ export default function EditBlog({ id, user }) {
       const finalUrl = data.url || tempPreview;
       setPreview(finalUrl);
 
-      setBlogData((prev) => ({ ...prev, image: finalUrl }));
+      setBlogData((prev) => ({ ...prev, image: finalUrl, bannerImage: finalUrl }));
     } catch (err) {
       console.error(err);
       alert("Upload failed");
@@ -308,3 +318,7 @@ export default function EditBlog({ id, user }) {
     </div>
   );
 }
+
+
+
+
