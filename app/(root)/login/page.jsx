@@ -21,6 +21,7 @@ const page = async () => {
                 data processing policy
               </Link>
               <br />
+              
               Don’t have an account yet?
               <Link href='/register' className='text-[#d67b0e] underline ml-2'>
                 Sign Up

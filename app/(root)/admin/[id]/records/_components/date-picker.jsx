@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { useState } from 'react'
+import { format } from 'date-fns'
 import { ChevronDownIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -15,7 +16,7 @@ import {
 export function DatePicker({ label, value, onChange, name = 'date' }) {
   const [open, setOpen] = useState(false)
   const serializedValue = value instanceof Date && !Number.isNaN(value.getTime())
-    ? value.toISOString()
+    ? format(value, 'yyyy-MM-dd')
     : ''
 
   return (
@@ -32,7 +33,7 @@ export function DatePicker({ label, value, onChange, name = 'date' }) {
             className='w-full justify-between font-normal'
             type='button'
           >
-            {value ? value.toLocaleDateString() : 'Select date'}
+            {value ? format(value, 'dd/MM/yyyy') : 'Select date'}
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>

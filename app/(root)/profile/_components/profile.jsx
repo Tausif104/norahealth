@@ -11,6 +11,7 @@ import { updateAccountAction } from "@/actions/account.action";
 
 import { toast } from "sonner";
 import { uploadProfileImageAction } from "@/actions/user.action";
+import { format } from "date-fns";
 
 
 const Profile = ({ account }) => {
@@ -221,7 +222,17 @@ const Profile = ({ account }) => {
           </div>
           <div className='col-span-4 md:col-span-2'>
             {/* DOB / NHS */}
-            <input type='hidden' name='dob' value={dob ? dob : dateOfBirth} />
+            <input
+              type='hidden'
+              name='dob'
+              value={
+                dob
+                  ? format(dob, "yyyy-MM-dd")
+                  : dateOfBirth
+                    ? format(new Date(dateOfBirth), "yyyy-MM-dd")
+                    : ""
+              }
+            />
             <DateField
               id='dob'
               label='Date of Birth'

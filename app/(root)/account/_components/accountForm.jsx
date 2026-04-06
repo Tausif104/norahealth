@@ -6,6 +6,7 @@ import { createAccountAction } from "@/actions/account.action";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { LoaderIcon } from "lucide-react";
+import { format } from "date-fns";
 
 const AccountForm = ({ user }) => {
   const router = useRouter();
@@ -107,7 +108,11 @@ const AccountForm = ({ user }) => {
           />
         </div>
 
-        <input type='hidden' name='dob' value={dob ? dob : ""} />
+        <input
+          type='hidden'
+          name='dob'
+          value={dob ? format(dob, "yyyy-MM-dd") : ""}
+        />
         <DateField
           id='dob'
           label='Date of Birth'

@@ -5,13 +5,36 @@ import { loggedInUserAction } from "./user.action";
 import { prisma } from "@/lib/client/prisma";
 import { getAdminUser } from "./admin.action";
 
+const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+const parseDateInput = (value) => {
+  if (!value) return null;
+
+  const input = value instanceof Date ? value.toISOString() : value.toString().trim();
+  if (!input) return null;
+
+  if (DATE_ONLY_PATTERN.test(input)) {
+    const [year, month, day] = input.split("-").map(Number);
+    return new Date(Date.UTC(year, month - 1, day, 12));
+  }
+
+  const parsed = new Date(input);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return new Date(
+    Date.UTC(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate(), 12)
+  );
+};
+
 // create account action
 export const createAccountAction = async (prevState, formData) => {
   const firstname = formData.get("firstname")?.toString() || "";
   const lastname = formData.get("lastname")?.toString() || "";
   const phone = formData.get("phone")?.toString() || "";
   const secondemail = formData.get("secondemail")?.toString() || "";
-  const dob = formData.get("dob") ? new Date(formData.get("dob")) : undefined;
+  const dob = parseDateInput(formData.get("dob")) ?? undefined;
   const nhs = formData.get("nhs")?.toString() || "";
   const address = formData.get("address")?.toString() || "";
   const zip = formData.get("zip")?.toString() || "";
@@ -121,16 +144,12 @@ export const updateAccountByAdmin = async (prevState, formData) => {
   const firstName = formData.get("firstName");
   const lastName = formData.get("lastName");
   const dobValue = formData.get("dob");
-  const dob = dobValue ? new Date(dobValue) : null;
+  const dob = parseDateInput(dobValue);
   const phoneNumber = formData.get("phoneNumber");
   const nhsNumber = formData.get("nhsNumber");
   const address = formData.get("address");
   const zipCode = formData.get("zipCode");
   const deliveryAddress = formData.get("deliveryAddress");
-
-  console.log("formDAta", formData);
-  
-
   const user = await getAdminUser();
 
   const isAdmin = user?.admin?.isAdmin || false;
@@ -225,7 +244,7 @@ export const updateAccountAction = async (prevState, formData) => {
   const lastName = formData.get('lastName')
   const email = formData.get('email')
   const phone = formData.get('phone')
-  const dob = new Date(formData.get('dob'))
+  const dob = parseDateInput(formData.get('dob'))
   const nhs = formData.get('nhs')
   const address = formData.get('address')
   const zip = formData.get('zip')
