@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 import { loggedInUserAction } from "./user.action";
@@ -120,7 +120,8 @@ export const updateAccountByAdmin = async (prevState, formData) => {
   const userId = Number(formData.get("userId"));
   const firstName = formData.get("firstName");
   const lastName = formData.get("lastName");
-  const dob = new Date(formData.get("dob"));
+  const dobValue = formData.get("dob");
+  const dob = dobValue ? new Date(dobValue) : null;
   const phoneNumber = formData.get("phoneNumber");
   const nhsNumber = formData.get("nhsNumber");
   const address = formData.get("address");
@@ -138,7 +139,7 @@ export const updateAccountByAdmin = async (prevState, formData) => {
     return { success: false, message: "Unauthorized. User is not admin" };
   }
 
-  if (!firstName || !lastName || !dob || !phoneNumber) {
+  if (!firstName || !lastName || !dob || Number.isNaN(dob.getTime()) || !phoneNumber) {
     return {
       msg: "Please insert all the fields",
       success: false,
@@ -166,6 +167,7 @@ export const updateAccountByAdmin = async (prevState, formData) => {
       msg: "Account Updated",
       success: true,
     };
+
   }
 };
 
@@ -300,3 +302,4 @@ export const updateAccountAction = async (prevState, formData) => {
     }
   }
 }
+

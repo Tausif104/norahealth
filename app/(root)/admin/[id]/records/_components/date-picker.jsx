@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { ChevronDownIcon } from 'lucide-react'
@@ -12,20 +12,25 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 
-export function DatePicker({ label, value, onChange }) {
+export function DatePicker({ label, value, onChange, name = 'date' }) {
   const [open, setOpen] = useState(false)
+  const serializedValue = value instanceof Date && !Number.isNaN(value.getTime())
+    ? value.toISOString()
+    : ''
 
   return (
     <div className='flex flex-col gap-3 '>
-      <Label htmlFor='date' className='px-1'>
+      <Label htmlFor={name} className='px-1'>
         {label}
       </Label>
+      <input type='hidden' name={name} value={serializedValue} />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant='outline'
-            id='date'
+            id={name}
             className='w-full justify-between font-normal'
+            type='button'
           >
             {value ? value.toLocaleDateString() : 'Select date'}
             <ChevronDownIcon />
