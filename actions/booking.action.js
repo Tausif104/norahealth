@@ -1041,7 +1041,11 @@ export async function updateBookingStatus(formDataOrObj) {
       return { success: false, msg: "bookingStatus required" };
 
     // ✅ validate enum values
-    if (!["Incomplete", "Complete"].includes(String(bookingStatus))) {
+    if (
+      !["Incomplete", "Complete", "FailedEncounter"].includes(
+        String(bookingStatus)
+      )
+    ) {
       return { success: false, msg: "Invalid bookingStatus" };
     }
 
@@ -1067,3 +1071,4 @@ export async function updateBookingStatus(formDataOrObj) {
     return { success: false, msg: "Server error" };
   }
 }
+

@@ -193,11 +193,15 @@ const columns = [
     },
     cell: ({ row }) => {
       const s = row.getValue("bookingStatus") || "Incomplete";
-      return s === "Complete" ? (
-        <Badge className='bg-green-600 text-white'>Complete</Badge>
-      ) : (
-        <Badge className='bg-yellow-500 text-white'>Incomplete</Badge>
-      );
+      if (s === "Complete") {
+        return <Badge className='bg-green-600 text-white'>Complete</Badge>;
+      }
+      if (s === "FailedEncounter") {
+        return (
+          <Badge className='bg-red-600 text-white'>Failed Encounter</Badge>
+        );
+      }
+      return <Badge className='bg-yellow-500 text-white'>Incomplete</Badge>;
     },
   },
 
@@ -468,6 +472,7 @@ export default function AppointmentOrderTable() {
               <SelectItem value='ALL'>All</SelectItem>
               <SelectItem value='Incomplete'>Incomplete</SelectItem>
               <SelectItem value='Complete'>Complete</SelectItem>
+              <SelectItem value='FailedEncounter'>Failed Encounter</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -676,7 +681,7 @@ export default function AppointmentOrderTable() {
           <DialogHeader>
             <DialogTitle>Update Booking Status</DialogTitle>
             <DialogDescription>
-              Mark this request as Complete or Incomplete.
+              Mark this request as Complete, Incomplete, or Failed Encounter.
             </DialogDescription>
           </DialogHeader>
 
@@ -690,6 +695,9 @@ export default function AppointmentOrderTable() {
                 <SelectContent>
                   <SelectItem value='Incomplete'>Incomplete</SelectItem>
                   <SelectItem value='Complete'>Complete</SelectItem>
+                  <SelectItem value='FailedEncounter'>
+                    Failed Encounter
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -786,3 +794,4 @@ export default function AppointmentOrderTable() {
     </div>
   );
 }
+

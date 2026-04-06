@@ -161,6 +161,7 @@ model Booking {
 enum BookingStatus {
   Incomplete
   Complete
+  FailedEncounter
 }
 
 enum BookingType {
@@ -206,3 +207,4 @@ enum OcRequest {
   DIFFERENT_OC
   MORNING_AFTER_PILL
 }
+
