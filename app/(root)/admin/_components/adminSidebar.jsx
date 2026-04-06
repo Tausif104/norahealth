@@ -6,6 +6,7 @@ import {
   ClipboardClock,
   Contact,
   NotebookPen,
+  Shield,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -43,6 +44,16 @@ const AdminSidebar = () => {
         >
           <User className='w-4 h-4' />
           <span>Patients</span>
+        </Link>
+
+        <Link
+          href='/admin/profile'
+          className={`${baseClasses} ${
+            pathname === "/admin/profile" ? activeClasses : inactiveClasses
+          }`}
+        >
+          <Shield className='w-4 h-4' />
+          <span>My Profile</span>
         </Link>
 
         {/* Health Records */}
