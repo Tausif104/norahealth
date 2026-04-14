@@ -88,8 +88,8 @@ function formatDateTime(date) {
 
 
 export const orderEmailTemplate = ({ medicineName, trackingId, status }) => {
-  const whatsappLink = "https://wa.me/7724738994";
-  const whatsappNumber = "07724 738 994";
+  const whatsappLink = "https://wa.me/447440126154";
+  const whatsappNumber = "+44 7440126154";
   const supportEmail = "pharmacy.fap80@nhs.net";
 
   return `
@@ -166,7 +166,8 @@ export const orderStatusEmailTemplate = ({
   const safeStatus = escapeHtml(getStatusLabel(status));
   const safeTracking = escapeHtml(trackingId || "Pending");
 
-  const whatsappLink = "https://wa.me/7724738994";
+  const whatsappLink = "https://wa.me/447440126154";
+  const whatsappNumber = "+44 7440126154";
   const emailAddress = "pharmacy.fap80@nhs.net";
 
   return `
@@ -440,8 +441,8 @@ export async function sendBookingConfirmationEmail({
   appointment,
   notes,
 }) {
-  const whatsappLink = "https://wa.me/7724738994";
-  const whatsappNumber = "07724 738 994";
+  const whatsappLink = "https://wa.me/447440126154";
+  const whatsappNumber = "+44 7440126154";
   const supportEmail = "pharmacy.fap80@nhs.net";
 
   const html = `
@@ -523,8 +524,8 @@ export async function sendOrderBookingConfirmationEmail({
   createdAt,
   notes,
 }) {
-  const whatsappLink = "https://wa.me/7724738994";
-  const whatsappNumber = "07724 738 994";
+  const whatsappLink = "https://wa.me/447440126154";
+  const whatsappNumber = "+44 7440126154";
   const supportEmail = "pharmacy.fap80@nhs.net";
 
   const html = `
@@ -596,8 +597,8 @@ export const orderFromBookingEmailTemplate = ({
   status,
   trackingId,
 }) => {
-  const whatsappLink = "https://wa.me/7724738994";
-  const whatsappNumber = "07724 738 994";
+  const whatsappLink = "https://wa.me/447440126154";
+  const whatsappNumber = "+44 7440126154";
   const supportEmail = "pharmacy.fap80@nhs.net";
 
   return `

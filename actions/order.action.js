@@ -170,6 +170,8 @@ export async function getAllOrdersAction({
 } = {}) {
   try {
     const user = await getAdminUser();
+    // console.log("user", user);
+    
     const isAdmin = user?.admin?.isAdmin || false;
 
     if (!isAdmin) {
