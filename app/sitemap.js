@@ -36,9 +36,7 @@ const staticRoutes = [
   "/contraception-choices/step-3",
   "/contraception-choices/step-4",
   "/contraception-choices/step-5",
-  "/health",
   "/legal-policies",
-  "/reset-password",
 ];
 
 function isAllowedRoute(route) {
