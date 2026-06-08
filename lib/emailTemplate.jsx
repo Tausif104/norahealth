@@ -339,7 +339,7 @@ export const orderStatusEmailTemplate = ({
 
 //            <p>
 //            Your request is under review by our clinical team. Once completed we will post your medication to you at:
-//             <strong>${escapeHtml(deliveryAddress)}</strong>. You should receive your medicine within 3-5 working days.
+//             <strong>${escapeHtml(deliveryAddress)}</strong>.  We offer free next day delivery on all consultations completed by 1:00 p.m..
 //           </p>
 
           
@@ -553,7 +553,7 @@ export async function sendOrderBookingConfirmationEmail({
 
           <p>
             Your request is under review by our clinical team. Once completed we will post your medication to you at:
-            <strong>${escapeHtml(deliveryAddress)}</strong>. You should receive your medicine within 3-5 working days.
+            <strong>${escapeHtml(deliveryAddress)}</strong>. We offer free next day delivery on all consultations completed by 1:00 p.m.
           </p>
 
           <p style="margin-top:16px;font-size:13px;color:#555;">
