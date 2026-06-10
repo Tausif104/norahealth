@@ -132,7 +132,7 @@ export function OrderTable({ orders, userId, user }) {
           <div>
             {orderStatus === "clinicalreview" ? (
               <Badge className='bg-yellow-500 text-white'>
-                Under Clinical Review
+                Awaiting Dispatch
               </Badge>
             ) : orderStatus === "posted" ? (
               <Badge className='bg-green-500 text-white'>Posted via Royal Mail</Badge>
@@ -301,7 +301,7 @@ export function OrderTable({ orders, userId, user }) {
             <SelectContent>
               <SelectItem value={ALL_STATUS}>All Status</SelectItem>
               <SelectItem value='clinicalreview'>
-                Under Clinical Review
+                Awaiting Dispatch
               </SelectItem>
               <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
               <SelectItem value='declined'>Declined</SelectItem>
@@ -428,7 +428,7 @@ export function OrderTable({ orders, userId, user }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='clinicalreview'>
-                    Under Clinical Review
+                    Awaiting Dispatch
                   </SelectItem>
                   <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
                 </SelectContent>

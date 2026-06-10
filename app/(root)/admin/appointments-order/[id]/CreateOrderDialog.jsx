@@ -105,7 +105,7 @@ export default function CreateOrderDialog({ bookingId }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='clinicalreview'>
-                    Under Clinical Review
+                    Awaiting Dispatch
                   </SelectItem>
                   <SelectItem value='posted'>Posted</SelectItem>
                   <SelectItem value='declined'>Declined</SelectItem>

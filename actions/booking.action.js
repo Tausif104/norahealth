@@ -318,6 +318,8 @@ try {
   await sendOrderBookingConfirmationEmail({
     to: email,
     fullName,
+    firstName: user.account?.firstName,
+    phoneNumber: user.account?.phoneNumber || phoneNumber,
     serviceName,
     providerName,
     nhsService,
@@ -959,6 +961,7 @@ export async function createOrderFromBooking({
     // 1. Check user by email
     let user = await prisma.user.findUnique({
       where: { email: booking.email },
+      include: { account: true },
     });
     const password = "nora123"; // default password for new users
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -981,6 +984,7 @@ export async function createOrderFromBooking({
             },
           },
         },
+        include: { account: true },
       });
     }
 
@@ -1003,9 +1007,12 @@ export async function createOrderFromBooking({
         replyTo: "contact@norahealth.co.uk",
         html: orderFromBookingEmailTemplate({
           fullName: booking.fullName,
+          firstName: user.account?.firstName,
           medicineName: finalMedicineName,
           status: order.status,
           trackingId: order.trackingId,
+          deliveryAddress:
+            user.account?.deliveryAddress || user.account?.address,
         }),
       });
     } catch (emailErr) {

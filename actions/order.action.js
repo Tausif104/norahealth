@@ -58,7 +58,17 @@ export const createOrderByAdmin = async (prevState, formData) => {
   // 1️⃣ Get customer info
   const customer = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true },
+    select: {
+      email: true,
+      account: {
+        select: {
+          firstName: true,
+          phoneNumber: true,
+          deliveryAddress: true,
+          address: true,
+        },
+      },
+    },
   });
 
   if (!customer?.email) {
@@ -83,9 +93,10 @@ export const createOrderByAdmin = async (prevState, formData) => {
       to: customer.email,
       subject: "Your Order Has Been Confirmed",
       html: orderEmailTemplate({
-        medicineName,
-        trackingId,
-        status,
+        firstName: customer.account?.firstName,
+        phoneNumber: customer.account?.phoneNumber,
+        deliveryAddress:
+          customer.account?.deliveryAddress || customer.account?.address,
       }),
     });
   } catch (err) {
@@ -420,7 +431,16 @@ export const updateOrderStatus = async (prevState, formData) => {
   // ✅ fetch customer email/name
   const customer = await prisma.user.findUnique({
     where: { id: order.userId },
-    select: { email: true },
+    select: {
+      email: true,
+      account: {
+        select: {
+          firstName: true,
+          deliveryAddress: true,
+          address: true,
+        },
+      },
+    },
   });
 
   // ✅ send email (don’t block update if email fails)
@@ -432,11 +452,13 @@ export const updateOrderStatus = async (prevState, formData) => {
         subject: `Order #${order.id} status: ${order.status}`,
         replyTo: "contact@norahealth.co.uk",
         html: orderStatusEmailTemplate({
-          // customerName: customer.name,
+          firstName: customer.account?.firstName,
           orderId: order.id,
           status: order.status,
           medicineName: order.medicineName,
           trackingId: order.trackingId,
+          deliveryAddress:
+            customer.account?.deliveryAddress || customer.account?.address,
         }),
       });
     } catch (err) {

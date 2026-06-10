@@ -93,7 +93,7 @@ export const CreateOrderForm = () => {
                   <SelectGroup>
                     <SelectLabel>Status</SelectLabel>
                     <SelectItem value='clinicalreview'>
-                      Under Clinical Review
+                      Awaiting Dispatch
                     </SelectItem>
                     <SelectItem value='posted'>
                       Posted Via Royal Mail

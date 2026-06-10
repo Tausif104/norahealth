@@ -406,7 +406,7 @@ export default function AllOrdersTable({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='all'>All</SelectItem>
-              <SelectItem value='clinicalreview'>Under Clinical Review</SelectItem>
+              <SelectItem value='clinicalreview'>Awaiting Dispatch</SelectItem>
               <SelectItem value='posted'>Posted</SelectItem>
               <SelectItem value='declined'>Declined</SelectItem>
               {/* <SelectItem value='delivered'>Delivered</SelectItem> */}
@@ -589,7 +589,7 @@ export default function AllOrdersTable({
 
               <SelectContent>
                 <SelectItem value='clinicalreview'>
-                  Under Clinical Review
+                  Awaiting Dispatch
                 </SelectItem>
                 <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
               </SelectContent>
@@ -645,7 +645,7 @@ export default function AllOrdersTable({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='clinicalreview'>
-                  Under Clinical Review
+                  Awaiting Dispatch
                 </SelectItem>
                 <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
                 <SelectItem value='declined'>Declined</SelectItem>

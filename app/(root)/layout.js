@@ -1,5 +1,6 @@
 import Footer from "@/components/global/footer";
 import Header from "@/components/global/header";
+import WhatsAppWidget from "@/components/global/whatsapp-widget";
 import { BlogProvider } from "@/lib/BlogContext";
 import "react-datepicker/dist/react-datepicker.css";
 import GoogleTranslate from "./_components/GoogleTranslate";
@@ -31,6 +32,7 @@ export default async function RootLayout({ children }) {
       />
       <main>{children}</main>
       <Footer />
+      <WhatsAppWidget />
     </BlogProvider>
   );
 }
