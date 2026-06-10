@@ -62,7 +62,7 @@ export default function Orders({ recentOrders, pastOrders }) {
                 <div className='flex justify-end md:py-1'>
                   {order.status === "clinicalreview" && (
                     <span className='inline-flex items-center rounded-full bg-[#FAF1DE] text-[#B97E00] text-[12px] px-3 py-1 whitespace-nowrap'>
-                      Under clinical review
+                      Awaiting Dispatch
                     </span>
                   )}
 
@@ -100,7 +100,7 @@ export default function Orders({ recentOrders, pastOrders }) {
                   <span className='text-[12px] text-[#A3A3A3]'>Status:</span>
                   {order.status === "clinicalreview" && (
                     <span className='inline-flex items-center rounded-full bg-[#FAF1DE] text-[#B97E00] text-[12px] px-3 py-1 whitespace-nowrap'>
-                      Under clinical review
+                      Awaiting Dispatch
                     </span>
                   )}
 

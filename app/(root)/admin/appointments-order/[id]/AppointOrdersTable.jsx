@@ -38,7 +38,7 @@ function StatusPill({ status, trackingId }) {
   if (status === "clinicalreview") {
     return (
       <span className={`${base} bg-amber-50 text-amber-700 border-amber-200`}>
-        Under clinical review
+        Awaiting Dispatch
       </span>
     );
   }

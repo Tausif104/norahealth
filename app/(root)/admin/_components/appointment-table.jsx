@@ -614,7 +614,7 @@ export default function AppointmentOrderTable() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='clinicalreview'>
-                    Clinical Review
+                    Awaiting Dispatch
                   </SelectItem>
                   <SelectItem value='posted'>Posted</SelectItem>
                   <SelectItem value='declined'>Declined</SelectItem>

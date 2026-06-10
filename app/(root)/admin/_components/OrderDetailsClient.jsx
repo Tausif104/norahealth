@@ -31,7 +31,7 @@ export default function OrderDetailsClient({ order }) {
 
   const statusLabel =
     order.status === "clinicalreview"
-      ? "Clinical Review"
+      ? "Awaiting Dispatch"
       : order.status === "posted"
       ? "Posted"
       : order.status === "delivered"
