@@ -431,6 +431,7 @@ export function OrderTable({ orders, userId, user }) {
                     Awaiting Dispatch
                   </SelectItem>
                   <SelectItem value='posted'>Posted via Royal Mail</SelectItem>
+                  <SelectItem value='declined'>Declined</SelectItem>
                 </SelectContent>
               </Select>
 
