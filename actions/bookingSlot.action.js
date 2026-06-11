@@ -643,3 +643,101 @@ export const deleteBookingSlotsByDate = async (formDataOrObj) => {
     deletedCount: idsToDelete.length,
   };
 };
+
+/* ------------------ BULK DELETE BY DATE RANGE / MONTH ------------------ */
+/**
+ * Delete unbooked slots across an inclusive date range.
+ * Booked slots are skipped (never deleted) and reported back.
+ *
+ * Accepts object or FormData:
+ *  - { startDate: "YYYY-MM-DD", endDate: "YYYY-MM-DD" }   // range
+ *  - { month: "YYYY-MM" }                                  // whole month (shortcut)
+ */
+export const deleteBookingSlotsByRange = async (formDataOrObj) => {
+  try {
+    // read inputs (object or FormData)
+    let startRaw, endRaw, monthRaw;
+    if (formDataOrObj && typeof formDataOrObj.get === "function") {
+      startRaw = formDataOrObj.get("startDate");
+      endRaw = formDataOrObj.get("endDate");
+      monthRaw = formDataOrObj.get("month");
+    } else if (formDataOrObj) {
+      startRaw = formDataOrObj.startDate;
+      endRaw = formDataOrObj.endDate;
+      monthRaw = formDataOrObj.month;
+    }
+
+    // month shortcut -> derive start/end
+    if (monthRaw) {
+      const mParts = String(monthRaw).split("-").map(Number); // [y, m]
+      if (mParts.length !== 2 || mParts.some((p) => Number.isNaN(p))) {
+        return { success: false, msg: "Invalid month format (expected YYYY-MM)" };
+      }
+      const [my, mm] = mParts;
+      const last = new Date(Date.UTC(my, mm, 0)).getUTCDate(); // day 0 of next month = last day
+      startRaw = `${my}-${String(mm).padStart(2, "0")}-01`;
+      endRaw = `${my}-${String(mm).padStart(2, "0")}-${String(last).padStart(2, "0")}`;
+    }
+
+    if (!startRaw || !endRaw) {
+      return { success: false, msg: "startDate and endDate (or month) required" };
+    }
+
+    const sParts = String(startRaw).split("-").map(Number);
+    const eParts = String(endRaw).split("-").map(Number);
+    if (
+      sParts.length !== 3 ||
+      eParts.length !== 3 ||
+      [...sParts, ...eParts].some((p) => Number.isNaN(p))
+    ) {
+      return { success: false, msg: "Invalid date format (expected YYYY-MM-DD)" };
+    }
+
+    const [sy, sm, sd] = sParts;
+    const [ey, em, ed] = eParts;
+
+    // half-open UTC interval [startOfStartDay, startOfDayAfterEnd)
+    const startOfRange = new Date(Date.UTC(sy, sm - 1, sd, 0, 0, 0, 0));
+    const endExclusive = new Date(Date.UTC(ey, em - 1, ed + 1, 0, 0, 0, 0));
+
+    if (startOfRange >= endExclusive) {
+      return { success: false, msg: "startDate must be <= endDate" };
+    }
+
+    const slots = await prisma.bookingSlot.findMany({
+      where: { slotDate: { gte: startOfRange, lt: endExclusive } },
+      select: { id: true, isBooked: true },
+    });
+
+    if (!slots.length) {
+      return { success: false, msg: "No slots found in this range" };
+    }
+
+    const deletableIds = slots.filter((s) => !s.isBooked).map((s) => s.id);
+    const skippedBooked = slots.length - deletableIds.length;
+
+    if (!deletableIds.length) {
+      return {
+        success: false,
+        msg: "No deletable slots — all slots in range are booked",
+        skippedBooked,
+      };
+    }
+
+    await prisma.bookingSlot.deleteMany({ where: { id: { in: deletableIds } } });
+
+    revalidatePath("/admin/booking-slot");
+
+    return {
+      success: true,
+      msg:
+        `Deleted ${deletableIds.length} slot(s) from ${startRaw} to ${endRaw}` +
+        (skippedBooked ? ` (skipped ${skippedBooked} booked)` : ""),
+      deletedCount: deletableIds.length,
+      skippedBooked,
+    };
+  } catch (err) {
+    console.error("deleteBookingSlotsByRange:", err);
+    return { success: false, msg: "Server error", error: err?.message };
+  }
+};

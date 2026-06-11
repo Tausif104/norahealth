@@ -2,6 +2,8 @@
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Calendar from "react-calendar";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import Link from "next/link";
 import { toast } from "sonner";
 import { PanelLeft, Trash } from "lucide-react";
@@ -12,6 +14,7 @@ import {
   getBookingSlots,
   deleteBookingSlot,
   deleteBookingSlotsByDate,
+  deleteBookingSlotsByRange,
 } from "@/actions/bookingSlot.action";
 
 import {
@@ -140,6 +143,14 @@ export default function BookingSlots() {
 
   const [timeSlots, setTimeSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+
+  // ---------- Bulk delete (month / range) ----------
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkMode, setBulkMode] = useState("month"); // "month" | "range"
+  const [bulkMonth, setBulkMonth] = useState(null); // Date (month + year)
+  const [bulkStart, setBulkStart] = useState(""); // "YYYY-MM-DD"
+  const [bulkEnd, setBulkEnd] = useState(""); // "YYYY-MM-DD"
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   function isSameDay(a, b) {
     if (!a || !b) return false;
@@ -294,6 +305,60 @@ export default function BookingSlots() {
     }
   }
 
+  // bulk delete by month or date range
+  async function handleBulkDelete() {
+    let payload;
+    let label;
+
+    if (bulkMode === "month") {
+      if (!bulkMonth) {
+        toast.error("Pick a month");
+        return;
+      }
+      const ym = `${bulkMonth.getFullYear()}-${String(
+        bulkMonth.getMonth() + 1
+      ).padStart(2, "0")}`; // "YYYY-MM"
+      payload = { month: ym };
+      label = ym;
+    } else {
+      if (!bulkStart || !bulkEnd) {
+        toast.error("Pick a start and end date");
+        return;
+      }
+      if (bulkStart > bulkEnd) {
+        toast.error("Start date must be before end date");
+        return;
+      }
+      payload = { startDate: bulkStart, endDate: bulkEnd };
+      label = `${bulkStart} → ${bulkEnd}`;
+    }
+
+    const proceed = await confirm({
+      title: "Delete slots in bulk?",
+      description: `Delete all UNBOOKED slots for ${label}? Booked slots are kept. This cannot be undone.`,
+    });
+    if (!proceed) return;
+
+    setBulkLoading(true);
+    try {
+      const res = await deleteBookingSlotsByRange(payload);
+      if (!res?.success) {
+        toast.error(res?.msg || "Bulk delete failed");
+        return;
+      }
+      toast.success(res.msg);
+      setBulkOpen(false);
+      await fetchBookableDates();
+      await fetchSlotsForDate(value);
+      setSelectedSlot(null);
+    } catch (err) {
+      console.error("deleteBookingSlotsByRange error", err);
+      toast.error("Bulk delete failed");
+    } finally {
+      setBulkLoading(false);
+    }
+  }
+
   return (
     <div className='bg-[#f4e7e1] rounded-2xl overflow-hidden flex flex-col md:flex-row h-full'>
       {/* Left: react-calendar */}
@@ -321,7 +386,93 @@ export default function BookingSlots() {
           >
             Create Bulk Slot
           </Link>
+          <button
+            onClick={() => setBulkOpen((o) => !o)}
+            className='bg-red-600 hover:bg-black px-3 py-2 w-fit rounded-lg flex items-center justify-center text-white text-[12px] md:text-[16px] font-medium tracking-widest'
+          >
+            Bulk Delete
+          </button>
         </div>
+
+        {/* Bulk delete panel (by month or date range) */}
+        {bulkOpen && (
+          <div className='mb-4 p-4 rounded-lg border border-[#DFCAB0] bg-white'>
+            <div className='flex items-center gap-4 mb-3'>
+              <label className='flex items-center gap-2 text-sm font-medium'>
+                <input
+                  type='radio'
+                  name='bulkMode'
+                  checked={bulkMode === "month"}
+                  onChange={() => setBulkMode("month")}
+                />
+                By Month
+              </label>
+              <label className='flex items-center gap-2 text-sm font-medium'>
+                <input
+                  type='radio'
+                  name='bulkMode'
+                  checked={bulkMode === "range"}
+                  onChange={() => setBulkMode("range")}
+                />
+                By Date Range
+              </label>
+            </div>
+
+            {bulkMode === "month" ? (
+              <div className='flex flex-col gap-1 mb-3'>
+                <span className='text-xs text-gray-600'>Month</span>
+                <DatePicker
+                  selected={bulkMonth}
+                  onChange={(date) => setBulkMonth(date)}
+                  dateFormat='MMMM yyyy'
+                  showMonthYearPicker
+                  placeholderText='Select month'
+                  className='border rounded px-2 py-1 text-sm w-full'
+                />
+              </div>
+            ) : (
+              <div className='flex flex-col sm:flex-row gap-3 mb-3'>
+                <div className='flex flex-col gap-1'>
+                  <span className='text-xs text-gray-600'>From</span>
+                  <input
+                    type='date'
+                    value={bulkStart}
+                    onChange={(e) => setBulkStart(e.target.value)}
+                    className='border rounded px-2 py-1 text-sm'
+                  />
+                </div>
+                <div className='flex flex-col gap-1'>
+                  <span className='text-xs text-gray-600'>To</span>
+                  <input
+                    type='date'
+                    value={bulkEnd}
+                    onChange={(e) => setBulkEnd(e.target.value)}
+                    className='border rounded px-2 py-1 text-sm'
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className='flex items-center gap-2'>
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkLoading}
+                className='bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white text-sm px-3 py-2 rounded'
+              >
+                {bulkLoading ? "Deleting..." : "Delete Slots"}
+              </button>
+              <button
+                onClick={() => setBulkOpen(false)}
+                className='text-sm px-3 py-2 rounded border'
+              >
+                Cancel
+              </button>
+            </div>
+            <p className='text-xs text-gray-500 mt-2'>
+              Only unbooked slots are deleted. Booked slots are kept.
+            </p>
+          </div>
+        )}
         <div className='calendar-wrapper'>
           <Calendar
             onChange={onDateChange}

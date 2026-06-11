@@ -209,12 +209,10 @@ const ConfirmOrder = ({ userDetails }) => {
 
               <div className='bg-[#F4E7E1] p-4 rounded-2xl'>
                 <div className='space-y-1'>
-                  <p className='text-sm'>
-                    Once your order has been placed, your contraception tablets
-                    will be securely and discreetly dispatched, and should
-                    arrive within 3–5 working days.
+                  <p className='text-base'>
+                   After you place your order one of our clinicians will get in touch for a quick consultation. Next day delivery is available on all consultations complete by 1pm.
                   </p>
-                  <p className='text-sm'>
+                  {/* <p className='text-sm '>
                     If you require your medication sooner, please contact us and
                     we will do our best to accommodate your request.
                   </p>
@@ -222,7 +220,7 @@ const ConfirmOrder = ({ userDetails }) => {
                     If you are due for your annual review, we may be able to
                     complete this promptly and conveniently over the phone
                     without delaying your tablets.
-                  </p>
+                  </p> */}
                 </div>
                 {/* <h3 className='text-xl font-medium mb-2'>
                   Order Contraception

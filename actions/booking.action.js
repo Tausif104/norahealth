@@ -733,6 +733,10 @@ export const createBookingSlots = async (formOrObj) => {
     return { success: false, msg: "No input provided" };
   }
 
+  // 🔒 fixed business rule: slots are always 1 hour, capacity 6
+  intervalMinutes = 60;
+  const SLOT_CAPACITY = 6;
+
   if (!slotDate || !Array.isArray(ranges) || ranges.length === 0) {
     return {
       success: false,
@@ -886,6 +890,7 @@ export const createBookingSlots = async (formOrObj) => {
       startTime: st,
       endTime: `${eh}:${em}`,
       isBooked: false,
+      maxCapacity: SLOT_CAPACITY, // 6 users per 1h slot
     };
   });
 
@@ -1049,9 +1054,13 @@ export async function updateBookingStatus(formDataOrObj) {
 
     // ✅ validate enum values
     if (
-      !["Incomplete", "Complete", "FailedEncounter"].includes(
-        String(bookingStatus)
-      )
+      ![
+        "Incomplete",
+        "FirstCallAttempted",
+        "SecondCallAttempted",
+        "Complete",
+        "FailedEncounter",
+      ].includes(String(bookingStatus))
     ) {
       return { success: false, msg: "Invalid bookingStatus" };
     }

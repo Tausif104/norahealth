@@ -123,14 +123,15 @@ model Health {
 }
 
 model BookingSlot {
-  id        Int       @id @default(autoincrement())
-  slotDate  DateTime  @db.Date // the calendar day
-  startTime String // "09:00"
-  endTime   String // "09:10"
-  isBooked  Boolean   @default(false)
-  bookings  Booking[]
+  id          Int       @id @default(autoincrement())
+  slotDate    DateTime  @db.Date // the calendar day
+  startTime   String // "08:00"
+  endTime     String // "09:00"
+  isBooked    Boolean   @default(false) // legacy flag; now = "slot full"
+  maxCapacity Int? // null = legacy single-booking slot (treat as 1); new 1h slots = 6
+  bookings    Booking[]
 
-  @@unique([slotDate, startTime, endTime]) // ✅ add this
+  @@unique([slotDate, startTime, endTime])
   @@index([slotDate, startTime])
 }
 
@@ -160,6 +161,8 @@ model Booking {
 
 enum BookingStatus {
   Incomplete
+  FirstCallAttempted
+  SecondCallAttempted
   Complete
   FailedEncounter
 }

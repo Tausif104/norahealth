@@ -57,7 +57,7 @@ function eachDayInclusive(start, end) {
   return out;
 }
 
-export default function BulkCreateSlotsPanel({ defaultInterval = 10 }) {
+export default function BulkCreateSlotsPanel() {
   const today = useMemo(() => {
     const t = new Date();
     return startOfDay(t);
@@ -71,7 +71,6 @@ export default function BulkCreateSlotsPanel({ defaultInterval = 10 }) {
     { id: Date.now() + 1, startTime: "15:00", endTime: "18:00" },
   ]);
 
-  const [intervalMinutes, setIntervalMinutes] = useState(defaultInterval);
   const [skipWeekends, setSkipWeekends] = useState(true);
 
   const [loading, setLoading] = useState(false);
@@ -140,7 +139,6 @@ export default function BulkCreateSlotsPanel({ defaultInterval = 10 }) {
         const res = await createBookingSlots({
           slotDate, // <-- IMPORTANT
           ranges: cleanRanges,
-          intervalMinutes: Number(intervalMinutes || defaultInterval),
         });
 
         if (!res?.success) {
@@ -273,17 +271,11 @@ export default function BulkCreateSlotsPanel({ defaultInterval = 10 }) {
           <Button type='button' variant='outline' onClick={addRange}>
             + Add range
           </Button>
-
-          <div className='flex-1'>
-            <label className='block text-xs'>Interval (minutes)</label>
-            <Input
-              type='number'
-              min='1'
-              value={intervalMinutes}
-              onChange={(e) => setIntervalMinutes(Number(e.target.value))}
-            />
-          </div>
         </div>
+
+        <p className='text-xs text-muted-foreground mb-4'>
+          Each slot is 1 hour and allows up to 6 bookings.
+        </p>
 
         <Button
           onClick={handleSubmit}

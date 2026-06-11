@@ -177,6 +177,16 @@ const columns = [
           <Badge className='bg-red-600 text-white'>Failed Encounter</Badge>
         );
       }
+      if (s === "FirstCallAttempted") {
+        return (
+          <Badge className='bg-orange-500 text-white'>1st Call Attempted</Badge>
+        );
+      }
+      if (s === "SecondCallAttempted") {
+        return (
+          <Badge className='bg-orange-500 text-white'>2nd Call Attempted</Badge>
+        );
+      }
       return <Badge className='bg-yellow-500 text-white'>Incomplete</Badge>;
     },
   },
@@ -435,6 +445,12 @@ export default function AppointmentOrderTable() {
             <SelectContent>
               <SelectItem value='ALL'>All</SelectItem>
               <SelectItem value='Incomplete'>Incomplete</SelectItem>
+              <SelectItem value='FirstCallAttempted'>
+                1st Call Attempted
+              </SelectItem>
+              <SelectItem value='SecondCallAttempted'>
+                2nd Call Attempted
+              </SelectItem>
               <SelectItem value='Complete'>Complete</SelectItem>
               <SelectItem value='FailedEncounter'>Failed Encounter</SelectItem>
             </SelectContent>
@@ -642,7 +658,8 @@ export default function AppointmentOrderTable() {
           <DialogHeader>
             <DialogTitle>Update Booking Status</DialogTitle>
             <DialogDescription>
-              Mark this request as Complete, Incomplete, or Failed Encounter.
+              Mark this request as Incomplete, 1st/2nd Call Attempted,
+              Complete, or Failed Encounter.
             </DialogDescription>
           </DialogHeader>
 
@@ -655,6 +672,12 @@ export default function AppointmentOrderTable() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='Incomplete'>Incomplete</SelectItem>
+                  <SelectItem value='FirstCallAttempted'>
+                    1st Call Attempted
+                  </SelectItem>
+                  <SelectItem value='SecondCallAttempted'>
+                    2nd Call Attempted
+                  </SelectItem>
                   <SelectItem value='Complete'>Complete</SelectItem>
                   <SelectItem value='FailedEncounter'>
                     Failed Encounter

@@ -8,12 +8,11 @@ import { Input } from "@/components/ui/input";
 import { createBookingSlots } from "@/actions/booking.action";
 import { toast } from "sonner";
 
-export default function CreateSlotsPanel({ defaultInterval = 10 }) {
+export default function CreateSlotsPanel() {
   const [date, setDate] = useState(new Date()); // selected date (Date object)
   const [ranges, setRanges] = useState([
     { id: Date.now(), startTime: "09:00", endTime: "12:00" },
   ]);
-  const [intervalMinutes, setIntervalMinutes] = useState(defaultInterval);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -93,7 +92,6 @@ export default function CreateSlotsPanel({ defaultInterval = 10 }) {
     const payload = {
       slotDate: formatDateYYYYMMDD(date),
       ranges: ranges.map(({ startTime, endTime }) => ({ startTime, endTime })),
-      intervalMinutes: Number(intervalMinutes || defaultInterval),
     };
 
     try {
@@ -172,16 +170,11 @@ export default function CreateSlotsPanel({ defaultInterval = 10 }) {
           <Button variant='outline' onClick={addRange}>
             + Add range
           </Button>
-          <div className='flex-1'>
-            <label className='block text-xs'>Interval (minutes)</label>
-            <Input
-              type='number'
-              min='1'
-              value={intervalMinutes}
-              onChange={(e) => setIntervalMinutes(Number(e.target.value))}
-            />
-          </div>
         </div>
+
+        <p className='text-xs text-muted-foreground mb-4'>
+          Each slot is 1 hour and allows up to 6 bookings.
+        </p>
 
         <div>
           <Button
