@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createBookingOrder } from "@/actions/booking.action";
 import { toast } from "sonner";
+import SlotPicker from "../../_components/slot-picker";
 
 const ConfirmOrder = ({ userDetails }) => {
   const originalSubmitWrapRef = useRef(null);
@@ -28,35 +29,36 @@ const ConfirmOrder = ({ userDetails }) => {
     email: userDetails?.email || "",
     phoneNumber: userDetails?.account?.phoneNumber || "",
     ocRequest: "SAME_OC",
-    appointmentRequest: "false", // ✅ default false
+    appointmentRequest: "true", // booking always picks a slot now
     notes: "",
     date: today,
   });
+
+  // selected appointment slot: { date: "YYYY-MM-DD", time: "HH:MM", label }
+  const [slot, setSlot] = useState(null);
 
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  function getTodayDate() {
-    return new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-  }
-
-  function getCurrentTime() {
-    const now = new Date();
-    return now.toTimeString().slice(0, 5); // HH:mm
-  }
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (!slot?.date || !slot?.time) {
+      toast.error("Please select an appointment date and time slot.");
+      return;
+    }
+
     setSubmitting(true);
 
     try {
       const formData = new FormData();
 
       Object.entries(form).forEach(([key, value]) => formData.set(key, value));
-      // ✅ FORCE booking date & time
-      formData.set("bookingdate", getTodayDate());
-      formData.set("bookingtime", getCurrentTime());
+      // ✅ selected appointment slot (date + 1-hour time)
+      formData.set("bookingdate", slot.date);
+      formData.set("bookingtime", slot.time);
 
       formData.set("serviceName", "Oral Contraception");
       formData.set("providerName", "Manor Chemist");
@@ -136,7 +138,7 @@ const ConfirmOrder = ({ userDetails }) => {
         <form onSubmit={handleSubmit} ref={formRef}>
           <div className='grid lg:grid-cols-3 gap-8 bg-[#FAF9F8] p-4 2xl:p-8 rounded-2xl'>
             {/* LEFT */}
-            <div className='lg:col-span-2 space-y-5'>
+            <div className='lg:col-span-2 min-w-0 space-y-5'>
               <Input
                 label='Name'
                 name='fullName'
@@ -170,17 +172,27 @@ const ConfirmOrder = ({ userDetails }) => {
                 ]}
               />
 
-              {/* Appointment Request */}
-              <RadioGroup
-                label='Would you like to request an appointment?'
-                name='appointmentRequest'
-                value={form.appointmentRequest}
-                onChange={handleChange}
-                options={[
-                  { label: "No", value: "false" }, // ✅ boolean string
-                  { label: "Yes", value: "true" }, // ✅ boolean string
-                ]}
-              />
+              {/* Appointment slot picker (date + 1-hour slot, max 6 per slot) */}
+              <div>
+                <SlotPicker value={slot} onSelect={setSlot} />
+                <p className='mt-2 text-sm'>
+                  {slot ? (
+                    <span className='text-[#0D060C]'>
+                      Selected:{" "}
+                      <strong>
+                        {new Date(slot.date).toLocaleDateString("en-GB", {
+                          weekday: "long",
+                          day: "numeric",
+                          month: "short",
+                        })}{" "}
+                        • {slot.label}
+                      </strong>
+                    </span>
+                  ) : (
+                    <span className='text-red-600'>No slot selected yet.</span>
+                  )}
+                </p>
+              </div>
 
               <div>
                 <label className='block mb-2'>Notes (Optional)</label>
@@ -196,7 +208,7 @@ const ConfirmOrder = ({ userDetails }) => {
             </div>
 
             {/* RIGHT */}
-            <div className='space-y-5'>
+            <div className='min-w-0 space-y-5'>
               <div className='booking-img max-[1367px]:max-h-40  overflow-hidden rounded-2xl'>
                 <Image
                   src='/images/booking.png'
@@ -319,7 +331,7 @@ const RadioGroup = ({ label, name, value, onChange, options }) => (
             onChange={onChange}
             className='hidden peer'
           />
-          <span className="w-6 h-6 rounded-full border border-[#cd8936] peer-checked:border-[#cd8936] relative after:content-[''] after:w-4 after:h-4 after:bg-[#cd8936] after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 peer-checked:after:block after:hidden"></span>
+          <span className="shrink-0 w-6 h-6 rounded-full border border-[#cd8936] peer-checked:border-[#cd8936] relative after:content-[''] after:w-4 after:h-4 after:bg-[#cd8936] after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 peer-checked:after:block after:hidden"></span>
 
           <span className='text-[#0D060C]'> {opt.label}</span>
         </label>

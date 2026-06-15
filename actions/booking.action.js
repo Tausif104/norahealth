@@ -24,6 +24,43 @@ function addMinutes(date, minutes) {
   return new Date(date.getTime() + minutes * 60 * 1000);
 }
 
+/**
+ * Race-safe slot booking. Locks the slot row (FOR UPDATE) so concurrent
+ * bookers serialize; rejects once booked count reaches capacity.
+ * maxCapacity null = legacy single-booking slot (capacity 1).
+ * Throws "SLOT_NOT_FOUND" / "SLOT_FULL". Returns the created Booking.
+ */
+async function bookSlotWithCapacity(slotId, bookingData) {
+  return prisma.$transaction(async (tx) => {
+    const locked = await tx.$queryRaw`
+      SELECT id, "maxCapacity"
+      FROM "BookingSlot"
+      WHERE id = ${slotId}
+      FOR UPDATE
+    `;
+    if (locked.length === 0) throw new Error("SLOT_NOT_FOUND");
+
+    const capacity = locked[0].maxCapacity ?? 1;
+
+    const current = await tx.booking.count({ where: { slotId } });
+    if (current >= capacity) throw new Error("SLOT_FULL");
+
+    const created = await tx.booking.create({
+      data: { ...bookingData, slot: { connect: { id: slotId } } },
+    });
+
+    // flip isBooked when this booking fills the slot (back-compat flag)
+    if (current + 1 >= capacity) {
+      await tx.bookingSlot.update({
+        where: { id: slotId },
+        data: { isBooked: true },
+      });
+    }
+
+    return created;
+  });
+}
+
 export async function createBooking(formData) {
   try {
     if (!(formData instanceof FormData)) {
@@ -86,7 +123,7 @@ export async function createBooking(formData) {
 
     const slotDate = parseYMDtoDate(bookingdate);
     const appointmentStart = combineDateTime(bookingdate, bookingtime);
-    const appointmentEnd = addMinutes(appointmentStart, 10); // 10-minute slot
+    const appointmentEnd = addMinutes(appointmentStart, 60); // 1-hour slot
 
     const slot = await prisma.bookingSlot.findFirst({
       where: {
@@ -103,37 +140,37 @@ export async function createBooking(formData) {
       };
     }
 
-    if (slot.isBooked) {
-      return {
-        success: false,
-        msg: "This time slot has already been booked.",
-        data: null,
-      };
-    }
-
     const bookingType = "Booking";
 
-    const [updatedSlot, booking] = await prisma.$transaction([
-      prisma.bookingSlot.update({
-        where: { id: slot.id },
-        data: { isBooked: true },
-      }),
-      prisma.booking.create({
-        data: {
-          fullName,
-          email,
-          phoneNumber,
-          notes,
-          // ocRequest,
-          bookingType,
-          serviceName,
-          providerName,
-          nhsService,
-          appointment: appointmentStart,
-          slot: { connect: { id: slot.id } },
-        },
-      }),
-    ]);
+    // 🔒 race-safe capacity booking (max 6 per slot)
+    let booking;
+    try {
+      booking = await bookSlotWithCapacity(slot.id, {
+        fullName,
+        email,
+        phoneNumber,
+        notes,
+        bookingType,
+        serviceName,
+        providerName,
+        nhsService,
+        appointment: appointmentStart,
+      });
+    } catch (e) {
+      if (e.message === "SLOT_FULL") {
+        return { success: false, msg: "This time slot is full.", data: null };
+      }
+      if (e.message === "SLOT_NOT_FOUND") {
+        return {
+          success: false,
+          msg: "Selected time is no longer available.",
+          data: null,
+        };
+      }
+      throw e;
+    }
+
+    const updatedSlot = { id: slot.id };
 
     // 👉 Try to create Google Calendar event, but don't break booking if it fails
     try {
@@ -226,6 +263,9 @@ export async function createBookingOrder(formData) {
     const providerName = formData.get("providerName")?.toString().trim();
     const nhsService = formData.get("nhsService")?.toString().trim();
 
+    const bookingdate = formData.get("bookingdate")?.toString(); // "YYYY-MM-DD"
+    const bookingtime = formData.get("bookingtime")?.toString(); // "HH:MM"
+
     if (
       !fullName ||
       !email ||
@@ -237,6 +277,14 @@ export async function createBookingOrder(formData) {
       return {
         success: false,
         msg: "Please fill in all required fields.",
+        data: null,
+      };
+    }
+
+    if (!bookingdate || !bookingtime) {
+      return {
+        success: false,
+        msg: "Please select an appointment date and time.",
         data: null,
       };
     }
@@ -293,11 +341,29 @@ export async function createBookingOrder(formData) {
     //   });
     // }
 
-    // ✅ Your existing booking creation (optional: always create booking)
-    const now = new Date();
+    // ✅ resolve the selected 1-hour slot
+    const slotDate = parseYMDtoDate(bookingdate);
+    const appointmentStart = combineDateTime(bookingdate, bookingtime);
+
+    const slot = await prisma.bookingSlot.findFirst({
+      where: { slotDate, startTime: bookingtime },
+    });
+
+    if (!slot) {
+      return {
+        success: false,
+        msg: "Selected time is no longer available.",
+        data: null,
+      };
+    }
+
+    const now = appointmentStart;
     const bookingType = "Order";
-    const booking = await prisma.booking.create({
-      data: {
+
+    // 🔒 race-safe capacity booking (max 6 per slot)
+    let booking;
+    try {
+      booking = await bookSlotWithCapacity(slot.id, {
         fullName,
         email,
         phoneNumber,
@@ -307,10 +373,22 @@ export async function createBookingOrder(formData) {
         serviceName,
         providerName,
         nhsService,
-        appointment: now,
+        appointment: appointmentStart,
         bookingType,
-      },
-    });
+      });
+    } catch (e) {
+      if (e.message === "SLOT_FULL") {
+        return { success: false, msg: "This time slot is full.", data: null };
+      }
+      if (e.message === "SLOT_NOT_FOUND") {
+        return {
+          success: false,
+          msg: "Selected time is no longer available.",
+          data: null,
+        };
+      }
+      throw e;
+    }
 
 
     // ✅ send confirmation email (non-blocking)

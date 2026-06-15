@@ -367,20 +367,31 @@ export async function getBookingSlots(formDataOrDate) {
     const rows = await prisma.bookingSlot.findMany({
       where: {
         slotDate,
-        isBooked: false,
       },
       orderBy: {
         startTime: "asc",
       },
+      include: { _count: { select: { bookings: true } } },
     });
 
-    const slots = rows.map((row) => ({
-      id: row.id,
-      label: `${row.startTime} - ${row.endTime}`,
-      startTime: row.startTime,
-      endTime: row.endTime,
-      slotDate: dateStr,
-    }));
+    // capacity-aware: a slot is full once booked count reaches capacity.
+    // Full slots are returned too (not hidden) so the picker can show them
+    // line-through + disabled. (maxCapacity null = legacy slot -> capacity 1)
+    const slots = rows.map((row) => {
+      const capacity = row.maxCapacity ?? 1;
+      const booked = row._count.bookings;
+      return {
+        id: row.id,
+        label: `${row.startTime} - ${row.endTime}`,
+        startTime: row.startTime,
+        endTime: row.endTime,
+        slotDate: dateStr,
+        capacity,
+        booked,
+        remaining: Math.max(0, capacity - booked),
+        isFull: booked >= capacity,
+      };
+    });
 
     return {
       success: true,
