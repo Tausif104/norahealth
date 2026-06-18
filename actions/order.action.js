@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { loggedInUserAction } from "./user.action";
 import { Resend } from "resend";
 import { orderEmailTemplate, orderStatusEmailTemplate } from "@/lib/emailTemplate";
+import { createRoyalMailOrder, isRoyalMailConfigured } from "@/lib/royalMail";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 // Build date range filter by createdAt
@@ -415,9 +416,57 @@ export const updateOrderStatus = async (prevState, formData) => {
   //   return { success: false, msg: "Tracking ID is required for posted/delivered status." };
   // }
 
+  // ✅ load existing order (need userId + current trackingId before deciding on Royal Mail)
+  const existing = await prisma.order.findUnique({
+    where: { id: Number(orderId) },
+  });
+  if (!existing) {
+    return { success: false, msg: "Order not found" };
+  }
+
+  // ✅ fetch customer email/name + address fields (needed for Royal Mail recipient)
+  const customer = await prisma.user.findUnique({
+    where: { id: existing.userId },
+    select: {
+      email: true,
+      account: {
+        select: {
+          firstName: true,
+          lastName: true,
+          phoneNumber: true,
+          deliveryAddress: true,
+          address: true,
+          zipCode: true,
+        },
+      },
+    },
+  });
+
   // Build update data conditionally
   const data = { status };
   if (trackingId) data.trackingId = trackingId;
+
+  // 📦 Royal Mail: when an order is marked "posted" and has no tracking number yet,
+  // create the shipment via Click & Drop and store the returned tracking number.
+  let rmWarning = null;
+  const effectiveTracking = trackingId || existing.trackingId;
+  if (status === "posted" && !effectiveTracking && isRoyalMailConfigured()) {
+    try {
+      const { trackingNumber } = await createRoyalMailOrder({
+        order: existing,
+        customer,
+      });
+      if (trackingNumber) {
+        data.trackingId = trackingNumber;
+      } else {
+        rmWarning =
+          "Royal Mail order created but returned no tracking number (check service code).";
+      }
+    } catch (err) {
+      console.error("Royal Mail order creation failed:", err);
+      rmWarning = "Status updated, but Royal Mail tracking could not be generated.";
+    }
+  }
 
   const order = await prisma.order.update({
     where: { id: Number(orderId) },
@@ -427,21 +476,6 @@ export const updateOrderStatus = async (prevState, formData) => {
   if (!order) {
     return { success: false, msg: "Order not found" };
   }
-
-  // ✅ fetch customer email/name
-  const customer = await prisma.user.findUnique({
-    where: { id: order.userId },
-    select: {
-      email: true,
-      account: {
-        select: {
-          firstName: true,
-          deliveryAddress: true,
-          address: true,
-        },
-      },
-    },
-  });
 
   // ✅ send email (don’t block update if email fails)
   if (customer?.email) {
@@ -469,7 +503,12 @@ export const updateOrderStatus = async (prevState, formData) => {
   revalidatePath(`/admin`);
   revalidatePath(`/admin/orders`);
 
-  return { success: true, msg: "Order Status Updated Successfully" };
+  return {
+    success: true,
+    msg: rmWarning || "Order Status Updated Successfully",
+    trackingId: order.trackingId,
+    warning: rmWarning || undefined,
+  };
 };
 
 export const deleteOrder = async (formData) => {
