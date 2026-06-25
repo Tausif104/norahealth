@@ -103,6 +103,7 @@ model Account {
   zipCode         String
   profileImage    String?
   deliveryAddress String?
+  deliveryZipCode String?
   userId          Int      @unique
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -39,6 +39,7 @@ export const createAccountAction = async (prevState, formData) => {
   const address = formData.get("address")?.toString() || "";
   const zip = formData.get("zip")?.toString() || "";
   const deliveryAddress = formData.get("deliveryAddress")?.toString() || "";
+  const deliveryZip = formData.get("deliveryZip")?.toString() || "";
 
   if (
     !firstname ||
@@ -48,7 +49,8 @@ export const createAccountAction = async (prevState, formData) => {
     !dob ||
     !address ||
     !zip ||
-    !deliveryAddress
+    !deliveryAddress ||
+    !deliveryZip
   ) {
     return {
       success: false,
@@ -85,6 +87,7 @@ export const createAccountAction = async (prevState, formData) => {
       address: address,
       zipCode: zip,
       deliveryAddress: deliveryAddress,
+      deliveryZipCode: deliveryZip,
     },
 
     create: {
@@ -100,6 +103,7 @@ export const createAccountAction = async (prevState, formData) => {
       address: address,
       zipCode: zip,
       deliveryAddress: deliveryAddress,
+      deliveryZipCode: deliveryZip,
     },
   });
 

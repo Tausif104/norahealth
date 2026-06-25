@@ -28,7 +28,7 @@ const ConfirmOrder = ({ userDetails }) => {
     fullName,
     email: userDetails?.email || "",
     phoneNumber: userDetails?.account?.phoneNumber || "",
-    ocRequest: "SAME_OC",
+    ocRequest: "",
     appointmentRequest: "true", // booking always picks a slot now
     notes: "",
     date: today,
@@ -47,6 +47,11 @@ const ConfirmOrder = ({ userDetails }) => {
 
     if (!slot?.date || !slot?.time) {
       toast.error("Please select an appointment date and time slot.");
+      return;
+    }
+
+    if (!form.ocRequest) {
+      toast.error("Please select an oral contraceptive (OC) request.");
       return;
     }
 
@@ -166,8 +171,14 @@ const ConfirmOrder = ({ userDetails }) => {
                 value={form.ocRequest}
                 onChange={handleChange}
                 options={[
-                  { label: "Same OC", value: "SAME_OC" },
-                  { label: "Different OC", value: "DIFFERENT_OC" },
+                  {
+                    label: "A daily oral contraceptive I am currently taking",
+                    value: "SAME_OC",
+                  },
+                  {
+                    label: "I would like to start new oral contraception",
+                    value: "DIFFERENT_OC",
+                  },
                   { label: "Morning After Pill", value: "MORNING_AFTER_PILL" },
                 ]}
               />

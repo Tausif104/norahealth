@@ -168,9 +168,12 @@ const AccountForm = ({ user }) => {
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>
-        {/* Zip code → 25% */}
-        <div className='md:col-span-4'>
-          <label className='block text-base mb-2 text-[#0D060C]' htmlFor='zip'>
+        {/* Delivery Address → 75% */}
+        <div className='md:col-span-3'>
+          <label
+            className='block text-base mb-2 text-[#0D060C]'
+            htmlFor='deliveryAddress'
+          >
             Delivery Address
           </label>
           <input
@@ -178,6 +181,23 @@ const AccountForm = ({ user }) => {
             name='deliveryAddress'
             id='deliveryAddress'
             placeholder='Delivery Address'
+            className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
+          />
+        </div>
+
+        {/* Delivery Post code → 25% */}
+        <div className='md:col-span-1'>
+          <label
+            className='block text-base mb-2 text-[#0D060C]'
+            htmlFor='deliveryZip'
+          >
+            Delivery Post code
+          </label>
+          <input
+            type='text'
+            name='deliveryZip'
+            id='deliveryZip'
+            placeholder='Delivery Post code'
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>

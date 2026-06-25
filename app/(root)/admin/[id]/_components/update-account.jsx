@@ -142,11 +142,11 @@ export const UpdateAccountForm = ({ user }) => {
             </div>
 
             <div className="grid gap-3">
-              <Label htmlFor="zipCode">Zip Code</Label>
+              <Label htmlFor="zipCode">Post Code</Label>
               <Input
                 id="zipCode"
                 name="zipCode"
-                placeholder="Zip Code"
+                placeholder="Post Code"
                 value={zipCode}
                 onChange={(e) => setZipCode(e.target.value)}
               />
