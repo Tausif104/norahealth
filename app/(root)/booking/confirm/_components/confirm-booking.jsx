@@ -1,7 +1,7 @@
 "use client";
 
 import { useBooking } from "@/lib/BookingContext";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
@@ -9,14 +9,28 @@ import { useRouter } from "next/navigation";
 import { createBooking } from "@/actions/booking.action";
 import { toast } from "sonner";
 
+const OC_OPTIONS = [
+  {
+    label: "I would like to order a pill which I am currently taking",
+    value: "SAME_OC",
+  },
+  {
+    label: "I would like to start a new type of pill",
+    value: "DIFFERENT_OC",
+  },
+  {
+    label: "I would like the Morning After Pill (aka Plan B)",
+    value: "MORNING_AFTER_PILL",
+  },
+];
+
 const ConfirmBooking = ({ userDetails }) => {
   const originalSubmitWrapRef = useRef(null);
   const formRef = useRef(null);
   const [showStickySubmit, setShowStickySubmit] = useState(false);
-  const { bookingData, setBookingData } = useBooking();
+  const { bookingData } = useBooking();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
-  const isLoggedIn = Boolean(userDetails?.account);
 
   const fullNameFromAccount = userDetails?.account
     ? [userDetails.account.firstName, userDetails.account.lastName]
@@ -28,6 +42,8 @@ const ConfirmBooking = ({ userDetails }) => {
     fullName: fullNameFromAccount,
     email: userDetails?.email || "",
     phoneNumber: userDetails?.account?.phoneNumber || "",
+    ocRequest: "",
+    notes: "",
   });
 
   function handleChange(e) {
@@ -43,16 +59,13 @@ const ConfirmBooking = ({ userDetails }) => {
 
   function formatBookingDate(dateStr, timeStr) {
     if (!dateStr || !timeStr) return "";
-
     const [year, month, day] = dateStr.split("-").map(Number);
     const date = new Date(year, month - 1, day);
-
     const formatted = date.toLocaleDateString("en-GB", {
       weekday: "long",
       day: "numeric",
       month: "short",
     });
-
     return `${formatted}, ${timeStr}`;
   }
 
@@ -66,31 +79,22 @@ const ConfirmBooking = ({ userDetails }) => {
     setSubmitting(true);
     try {
       const formData = new FormData(e.currentTarget);
-
-      // ensure date & time go with the form
-      formData.set("bookingdate", bookingData.bookingdate); // "YYYY-MM-DD"
-      formData.set("bookingtime", bookingData.bookingtime); // "HH:MM"
-
-      // default values for these (match what you show on right card)
-      if (!formData.get("serviceName")) {
+      formData.set("bookingdate", bookingData.bookingdate);
+      formData.set("bookingtime", bookingData.bookingtime);
+      if (!formData.get("serviceName"))
         formData.set("serviceName", "Oral Contraception");
-      }
-      if (!formData.get("providerName")) {
+      if (!formData.get("providerName"))
         formData.set("providerName", "Manor Chemist");
-      }
-      if (!formData.get("nhsService")) {
+      if (!formData.get("nhsService"))
         formData.set("nhsService", "NHS Service");
-      }
 
       const res = await createBooking(formData);
-
       if (!res.success) {
         toast.error(res.msg || "Booking failed.");
         return;
       }
-
       toast.success("Your appointment has been booked.");
-      router.push("/"); // or wherever you want
+      router.push("/");
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong while booking.");
@@ -98,44 +102,31 @@ const ConfirmBooking = ({ userDetails }) => {
       setSubmitting(false);
     }
   }
+
   useEffect(() => {
-    // Only for < 1024px
     const mql = window.matchMedia("(max-width: 1023px)");
 
     const setupObserver = () => {
-      // On desktop, never show sticky
       if (!mql.matches) {
         setShowStickySubmit(false);
         return;
       }
-
       const target = originalSubmitWrapRef.current;
       if (!target) return;
 
       const observer = new IntersectionObserver(
-        ([entry]) => {
-          // If original submit is visible -> hide sticky
-          // If not visible -> show sticky
-          setShowStickySubmit(!entry.isIntersecting);
-        },
-        {
-          // Adjust if you want it to hide a bit earlier/later
-          threshold: 0.1,
-        }
+        ([entry]) => setShowStickySubmit(!entry.isIntersecting),
+        { threshold: 0.1 }
       );
-
       observer.observe(target);
       return () => observer.disconnect();
     };
 
     let cleanup = setupObserver();
-
     const onResizeChange = () => {
       if (cleanup) cleanup();
       cleanup = setupObserver();
     };
-
-    // modern browser support
     mql.addEventListener?.("change", onResizeChange);
     window.addEventListener("resize", onResizeChange);
 
@@ -147,235 +138,103 @@ const ConfirmBooking = ({ userDetails }) => {
   }, []);
 
   return (
-    <section className='py-8'>
-      <div className='container custom-container mx-auto sm:px-4 px-[24px]'>
-        <Link
-          href='/booking'
-          className='flex items-center gap-1.5 text-[#3A3D42] mb-6'
-        >
-          <ArrowLeft /> Back
-        </Link>
-
+    <section className="py-8">
+      <div className="container custom-container mx-auto sm:px-4 px-[24px]">
         <form onSubmit={handleSubmit} ref={formRef}>
-          <div className='grid grid-cols-1 lg:grid-cols-3 bg-[#FAF9F8] rounded-2xl p-6 md:p-[30px] 2xl:p-[50px] gap-[30px]'>
-            <div className='lg:col-span-2 space-y-5'>
-              <div>
-                <label
-                  htmlFor='name'
-                  className='block text-base mb-2 text-[#0D060C]'
-                >
-                  Name
-                </label>
-                <input
-                  id='name'
-                  name='fullName'
-                  type='text'
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 bg-[#FAF9F8] rounded-[12px] p-4 md:p-6 2xl:p-8">
+            {/* LEFT */}
+            <div className="lg:col-span-2 min-w-0 flex flex-col gap-8">
+              <Link
+                href="/booking"
+                className="flex items-center gap-[7px] text-[#3A3D42] w-fit"
+              >
+                <ArrowLeft className="size-6" strokeWidth={1.8} />
+                <span className="text-base tracking-[-0.3px]">Back</span>
+              </Link>
+
+              <div className="flex flex-col gap-4">
+                <Input
+                  label="Name"
+                  name="fullName"
                   value={form.fullName}
                   onChange={handleChange}
-                  placeholder='Enter your full name'
-                  className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
-                  required
+                  placeholder="Enter your full name"
                 />
-              </div>
-              <div>
-                <label
-                  htmlFor='email'
-                  className='block text-base mb-2 text-[#0D060C]'
-                >
-                  Email
-                </label>
-                <input
-                  id='email'
-                  name='email'
-                  type='email'
+                <Input
+                  label="Email"
+                  name="email"
+                  type="email"
                   value={form.email}
                   onChange={handleChange}
-                  placeholder='Enter your email'
-                  className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
-                  required
+                  placeholder="Enter your email"
                 />
-              </div>
-              <div>
-                <label
-                  htmlFor='phone'
-                  className='block text-base mb-2 text-[#0D060C]'
-                >
-                  Phone number
-                </label>
-                <input
-                  id='phone'
-                  name='phoneNumber'
-                  type='tel'
+                <Input
+                  label="Phone number"
+                  name="phoneNumber"
+                  type="tel"
                   value={form.phoneNumber}
                   onChange={handleChange}
-                  placeholder='Phone number'
-                  className='bg-white border border-[#EEE0CF] text-black w-full py-[17px] px-[16px] rounded-[6px]'
-                  required
+                  placeholder="Phone number"
                 />
-              </div>
-              <div>
-                <label
-                  htmlFor='notes'
-                  className='block text-base mb-2 text-[#0D060C]'
-                >
-                  Notes (Optional)
-                </label>
-                <textarea
-                  id='notes'
-                  name='notes'
-                  rows={6}
-                  placeholder='Please indicate which contraceptive medicine you are currently on'
-                  className='bg-white border border-[#EEE0CF] text-black w-full py-4.25 px-4 rounded-[6px]'
+
+                <RadioGroup
+                  label="Please choose one or more of the options below"
+                  name="ocRequest"
+                  value={form.ocRequest}
+                  onChange={handleChange}
+                  options={OC_OPTIONS}
                 />
               </div>
 
-              <div className='space-y-4 hidden'>
-                <label className='block text-base text-[#3A3D42]'>
-                  Oral Contraceptive (OC) Request
-                </label>
-
-                <div className='flex items-center gap-6'>
-                  {/* Same OC */}
-                  <label className='flex items-center gap-2 cursor-pointer'>
-                    <input
-                      type='radio'
-                      name='ocRequest'
-                      value='SAME_OC'
-                      className='hidden peer'
-                      onChange={(e) =>
-                        setBookingData({
-                          ...bookingData,
-                          ocRequest: e.target.value,
-                        })
-                      }
-                    />
-                    <span className="w-6 h-6 rounded-full border border-[#0D060C] peer-checked:border-[#0D060C] relative after:content-[''] after:w-4 after:h-4 after:bg-[#0D060C] after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 peer-checked:after:block after:hidden"></span>
-                    <span className='text-[#0D060C]'>Same OC</span>
-                  </label>
-
-                  {/* Different OC */}
-                  <label className='flex items-center gap-2 cursor-pointer'>
-                    <input
-                      type='radio'
-                      name='ocRequest'
-                      value='DIFFERENT_OC'
-                      className='hidden peer'
-                      onChange={(e) =>
-                        setBookingData({
-                          ...bookingData,
-                          ocRequest: e.target.value,
-                        })
-                      }
-                    />
-                    <span className="w-6 h-6 rounded-full border border-[#cd8936] peer-checked:border-[#cd8936] relative after:content-[''] after:w-4 after:h-4 after:bg-theme after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 peer-checked:after:block after:hidden"></span>
-                    <span className='text-[#0D060C]'>Different OC</span>
-                  </label>
-                </div>
-              </div>
+              <Notes value={form.notes} onChange={handleChange} />
             </div>
 
-            <div className='flex flex-col gap-5 lg:col-span-1'>
-              <div className='booking-img max-[1367px]:max-h-40  overflow-hidden rounded-2xl'>
+            {/* RIGHT */}
+            <div className="min-w-0 flex flex-col gap-4">
+              <div className="booking-img order-2 lg:order-1 max-[1367px]:max-h-40 overflow-hidden rounded-[16px]">
                 <Image
-                  src='/images/booking.png'
+                  src="/images/booking.png"
                   width={370}
                   height={200}
-                  alt='booking'
-                  className='rounded-2xl w-full'
+                  alt="booking"
+                  className="rounded-[16px] w-full"
                 />
               </div>
-              <div className='bg-[#F4E7E1] rounded-2xl p-[20px] 2xl:p-[24px_24px]'>
-                <h2 className=' text-[#0D060C] text-[18px] md:text-[24px] font-medium pb-2 2xl:pb-5 border-b border-[#CE893646] mb-3'>
+
+              <div className="order-1 lg:order-2 bg-[#F4E7E1] rounded-[16px] p-4 2xl:p-6">
+                <h2 className="text-[#0D060C] text-[18px] md:text-[24px] font-medium pb-2 2xl:pb-5 border-b border-[#CE893646] mb-3">
                   Oral Contraception
                 </h2>
-                <div className='space-y-2 2xl:space-y-5 mb-3'>
-                  <div className='text-[#3A3D42] flex items-start gap-2'>
-                    <span>Date:</span>{" "}
-                    <span className='text-[#0D060C] font-medium'>
-                      {formatBookingDate(
-                        bookingData?.bookingdate,
-                        bookingData?.bookingtime
-                      )}
-                    </span>
-                  </div>
-                  <div className='text-[#3A3D42] flex items-start gap-2'>
-                    <span>Provider:</span>{" "}
-                    <span className='text-[#0D060C] font-medium'>
-                      Manor Chemist
-                    </span>
-                  </div>
-                  <div className='text-[#3A3D42] flex items-start gap-2'>
-                    <span>NHS Service:</span>
-                    <span className='text-[#0D060C] font-medium'>
-                      NHS Service
-                    </span>
-                  </div>
+                <div className="space-y-2 2xl:space-y-4 mb-4">
+                  <SummaryRow
+                    label="Date:"
+                    value={formatBookingDate(
+                      bookingData?.bookingdate,
+                      bookingData?.bookingtime
+                    )}
+                  />
+                  <SummaryRow label="Provider:" value="Manor Chemist" />
+                  <SummaryRow label="NHS Service:" value="NHS Service" />
                 </div>
 
-                {/* Hidden fields for service/provider/nhs if you want to store them */}
-                <input
-                  type='hidden'
-                  name='serviceName'
-                  value='Oral Contraception'
-                />
-                <input
-                  type='hidden'
-                  name='providerName'
-                  value='Manor Chemist'
-                />
-                <input type='hidden' name='nhsService' value='NHS Service' />
-                {/* bookingdate / bookingtime get set in handleSubmit from context */}
+                <input type="hidden" name="serviceName" value="Oral Contraception" />
+                <input type="hidden" name="providerName" value="Manor Chemist" />
+                <input type="hidden" name="nhsService" value="NHS Service" />
 
-                {/* <button
-                  type='submit'
-                  disabled={submitting}
-                  className=' text-white cursor-pointer inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 w-full disabled:opacity-60 disabled:cursor-not-allowed'
-                >
-                  <span className='flex items-center justify-center'>
-                    <span>
-                      {submitting ? "Confirming..." : "Confirm Booking"}
-                    </span>
-                    <span className='ml-2 -rotate-45 group-hover:rotate-0 transition duration-300'>
-                      {submitting ? "" : <ArrowRight />}
-                    </span>
-                  </span>
-                </button> */}
                 <div ref={originalSubmitWrapRef}>
-                  <button
-                    type='submit'
-                    disabled={submitting}
-                    className='text-white cursor-pointer inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 w-full disabled:opacity-60 disabled:cursor-not-allowed'
-                  >
-                    <span className='flex items-center justify-center'>
-                      <span>
-                        {submitting ? "Confirming..." : "Confirm Booking"}
-                      </span>
-                      <span className='ml-2 -rotate-45 group-hover:rotate-0 transition duration-300'>
-                        {submitting ? "" : <ArrowRight />}
-                      </span>
-                    </span>
-                  </button>
+                  <SubmitButton submitting={submitting} />
                 </div>
-                {/* Mobile sticky submit (shows only when original submit is NOT visible) */}
-                <div
-                  className={[
-                    "lg:hidden fixed left-0 right-0 bottom-20 sm:bottom-5 z-50 p-3 px-[44px]",
-                    "container custom-container mx-auto",
-                    showStickySubmit ? "block" : "hidden",
-                  ].join(" ")}
-                >
-                  <button
-                    type='submit'
-                    disabled={submitting}
-                    className='w-full text-white bg-theme text-[16px] font-medium py-4 rounded-full disabled:opacity-60 disabled:cursor-not-allowed'
-                    onClick={() => {
-                      // optional: ensure required fields show validation nicely
-                      // (the button is inside the same form, so normal submit works too)
-                    }}
-                  >
-                    {submitting ? "Confirming..." : "Confirm Booking"}
-                  </button>
-                </div>
+              </div>
+
+              {/* Mobile sticky submit */}
+              <div
+                className={[
+                  "lg:hidden fixed left-0 right-0 bottom-20 sm:bottom-5 z-50 p-3 px-[44px]",
+                  "container custom-container mx-auto",
+                  showStickySubmit ? "block" : "hidden",
+                ].join(" ")}
+              >
+                <SubmitButton submitting={submitting} />
               </div>
             </div>
           </div>
@@ -384,5 +243,83 @@ const ConfirmBooking = ({ userDetails }) => {
     </section>
   );
 };
+
+/* ---------- Reusable pieces ---------- */
+
+const Input = ({ label, ...props }) => (
+  <div className="flex flex-col gap-2">
+    <label className="text-sm text-[#3A3D42] tracking-[-0.2px]">{label}</label>
+    <input
+      {...props}
+      required
+      className="bg-white border border-[#EEE0CF] text-[#0D060C] placeholder:text-[#0D060C] text-sm tracking-[-0.2px] w-full px-5 py-3.5 rounded-[8px] outline-none focus:border-[#CE8936] transition"
+    />
+  </div>
+);
+
+const RadioGroup = ({ label, name, value, onChange, options }) => (
+  <div className="flex flex-col gap-5">
+    <p className="text-sm text-[#3A3D42] tracking-[-0.2px]">{label}</p>
+    <div className="flex flex-wrap content-center items-center gap-3">
+      {options.map((opt) => (
+        <label
+          key={opt.value}
+          className="flex items-start gap-2 cursor-pointer max-w-[310px]"
+        >
+          <input
+            type="radio"
+            name={name}
+            value={opt.value}
+            checked={value === opt.value}
+            onChange={onChange}
+            className="hidden peer"
+          />
+          <span className="shrink-0 size-6 rounded-full border border-[#CE8936] relative after:content-[''] after:size-4 after:bg-[#CE8936] after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:hidden peer-checked:after:block" />
+          <span className="text-xs leading-5 tracking-[-0.2px] text-[#3A3D42] peer-checked:text-[#0D060C]">
+            {opt.label}
+          </span>
+        </label>
+      ))}
+    </div>
+  </div>
+);
+
+const Notes = ({ value, onChange }) => (
+  <div className="flex flex-col gap-[11px]">
+    <label className="text-sm font-medium text-[#0D060C] tracking-[-0.2px]">
+      Notes (Optional)
+    </label>
+    <textarea
+      name="notes"
+      rows={4}
+      value={value}
+      onChange={onChange}
+      placeholder="Please indicate which contraceptive medicine you are currently on"
+      className="border border-[#D9D9D9] rounded-[8px] px-4 pt-[15px] pb-4 text-sm tracking-[-0.2px] text-[#0D060C] placeholder:text-[#3A3D42]/50 w-full outline-none focus:border-[#CE8936] transition resize-none"
+    />
+  </div>
+);
+
+const SummaryRow = ({ label, value }) => (
+  <div className="text-[#3A3D42] flex items-start gap-2">
+    <span>{label}</span>
+    <span className="text-[#0D060C] font-medium">{value}</span>
+  </div>
+);
+
+const SubmitButton = ({ submitting }) => (
+  <button
+    type="submit"
+    disabled={submitting}
+    className="group w-full bg-theme text-white text-base font-medium py-3 px-[18px] rounded-full hover:bg-[#491F40] transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+  >
+    <span className="flex items-center justify-center gap-1.5">
+      {submitting ? "Confirming…" : "Confirm booking"}
+      {!submitting && (
+        <ArrowUpRight className="size-5 group-hover:rotate-45 transition duration-300" />
+      )}
+    </span>
+  </button>
+);
 
 export default ConfirmBooking;

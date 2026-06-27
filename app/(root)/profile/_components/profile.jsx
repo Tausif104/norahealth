@@ -34,6 +34,7 @@ const Profile = ({ account }) => {
     zipCode,
     profileImage,
     deliveryAddress,
+    deliveryZipCode,
   } = account;
 
   // ---------- Account update action ----------
@@ -294,7 +295,7 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
-          <div className='col-span-4 md:col-span-4'>
+          <div className='col-span-4 md:col-span-3'>
             <label
               htmlFor='deliveryAddress'
               className='block text-base mb-2 text-[#0D060C]'
@@ -306,6 +307,22 @@ const Profile = ({ account }) => {
               type='text'
               defaultValue={deliveryAddress}
               name='deliveryAddress'
+              placeholder='Wellin Lane, Edwalton, United Kingdom'
+              className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
+            />
+          </div>
+          <div className='col-span-4 md:col-span-1'>
+            <label
+              htmlFor='deliveryZip'
+              className='block text-base mb-2 text-[#0D060C]'
+            >
+              Delivery Post code
+            </label>
+            <input
+              id='deliveryZip'
+              type='text'
+              defaultValue={deliveryZipCode}
+              name='deliveryZip'
               placeholder='NG12 4AS'
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />

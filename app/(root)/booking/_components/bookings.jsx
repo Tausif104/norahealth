@@ -2,11 +2,19 @@ import { Clock, MapPin, WalletMinimal } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import BookingCalander from "./booking-calander";
+import BookingsMobile from "./bookings-mobile";
 
 const Bookings = () => {
   return (
     <section className='section-padding'>
       <div className='container custom-container mx-auto sm:px-0 px-[24px]'>
+        {/* Mobile (Figma) */}
+        <div className='md:hidden'>
+          <BookingsMobile />
+        </div>
+
+        {/* Tablet / desktop (unchanged) */}
+        <div className='hidden md:block'>
         <h2 className='text-center text-[#1F2122] text-[18px] md:text-[24px] font-semibold max-w-[680px] mx-auto mb-[40px]'>
           Book a free telephone appointment in just a few clicks to discuss your
           contraceptive needs.
@@ -44,6 +52,7 @@ const Bookings = () => {
           <div className='lg:col-span-2'>
             <BookingCalander />
           </div>
+        </div>
         </div>
       </div>
     </section>

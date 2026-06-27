@@ -4,6 +4,12 @@ import { prisma } from "@/lib/client/prisma";
 import CreateOrderDialog from "./CreateOrderDialog";
 import AppointmentOrdersTable from "./AppointOrdersTable";
 
+const OC_REQUEST_LABELS = {
+  SAME_OC: "I would like to order a pill which I am currently taking",
+  DIFFERENT_OC: "I would like to start a new type of pill",
+  MORNING_AFTER_PILL: "I would like the Morning After Pill (aka Plan B)",
+};
+
 export default async function AppointmentOrderDetailsPage({ params }) {
   const param = await params;
   const booking = await prisma.booking.findUnique({
@@ -89,7 +95,8 @@ export default async function AppointmentOrderDetailsPage({ params }) {
             <b>NHS Service:</b> {booking.nhsService}
           </p>
           <p>
-            <b>OC Requested:</b> {booking.ocRequest}
+            <b>OC Requested:</b>{" "}
+            {OC_REQUEST_LABELS[booking.ocRequest] || booking.ocRequest || "—"}
           </p>
           <p>
             <b>Appointment Requested:</b>{" "}

@@ -252,6 +252,8 @@ export const updateAccountAction = async (prevState, formData) => {
   const nhs = formData.get('nhs')
   const address = formData.get('address')
   const zip = formData.get('zip')
+  const deliveryAddress = formData.get('deliveryAddress')
+  const deliveryZip = formData.get('deliveryZip')
   // const weight = formData.get('weight')
   // const height = formData.get('height')
   // const whdate = new Date(formData.get('whdate'))
@@ -280,6 +282,8 @@ export const updateAccountAction = async (prevState, formData) => {
       nhsNumber: nhs,
       address: address,
       zipCode: zip,
+      deliveryAddress: deliveryAddress,
+      deliveryZipCode: deliveryZip,
 
       // health
       // weight: weight,
@@ -303,6 +307,8 @@ export const updateAccountAction = async (prevState, formData) => {
       nhsNumber: nhs,
       address: address,
       zipCode: zip,
+      deliveryAddress: deliveryAddress,
+      deliveryZipCode: deliveryZip,
 
       // health
       // weight: weight,
