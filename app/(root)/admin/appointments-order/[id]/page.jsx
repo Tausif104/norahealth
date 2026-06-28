@@ -96,7 +96,11 @@ export default async function AppointmentOrderDetailsPage({ params }) {
           </p>
           <p>
             <b>OC Requested:</b>{" "}
-            {OC_REQUEST_LABELS[booking.ocRequest] || booking.ocRequest || "—"}
+            {Array.isArray(booking.ocRequest) && booking.ocRequest.length > 0
+              ? booking.ocRequest
+                  .map((oc) => OC_REQUEST_LABELS[oc] || oc)
+                  .join(", ")
+              : OC_REQUEST_LABELS[booking.ocRequest] || booking.ocRequest || "—"}
           </p>
           <p>
             <b>Appointment Requested:</b>{" "}

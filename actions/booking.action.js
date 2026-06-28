@@ -254,9 +254,15 @@ export async function createBookingOrder(formData) {
     const phoneNumber = formData.get("phoneNumber")?.toString().trim();
     const notes = formData.get("notes")?.toString().trim() || null;
 
-    const ocRaw = formData.get("ocRequest");
-    const ocRequest =
-      typeof ocRaw === "string" ? ocRaw.trim().toUpperCase() : null;
+    const OC_VALUES = ["SAME_OC", "DIFFERENT_OC", "MORNING_AFTER_PILL"];
+    const ocRequest = [
+      ...new Set(
+        formData
+          .getAll("ocRequest")
+          .map((v) => v?.toString().trim().toUpperCase())
+          .filter(Boolean)
+      ),
+    ];
     const appointmentRequest = formData.get("appointmentRequest") === "true";
 
     const serviceName = formData.get("serviceName")?.toString().trim();
@@ -290,7 +296,8 @@ export async function createBookingOrder(formData) {
     }
 
     if (
-      !["SAME_OC", "DIFFERENT_OC", "MORNING_AFTER_PILL"].includes(ocRequest)
+      ocRequest.length === 0 ||
+      !ocRequest.every((v) => OC_VALUES.includes(v))
     ) {
       return { success: false, msg: "Invalid OC request value.", data: null };
     }

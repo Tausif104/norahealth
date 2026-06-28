@@ -43,7 +43,7 @@ const ConfirmOrder = ({ userDetails }) => {
     fullName,
     email: userDetails?.email || "",
     phoneNumber: userDetails?.account?.phoneNumber || "",
-    ocRequest: "",
+    ocRequest: [],
     appointmentRequest: "true",
     notes: "",
     date: today,
@@ -56,6 +56,15 @@ const ConfirmOrder = ({ userDetails }) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
+  function toggleOcRequest(value) {
+    setForm((prev) => ({
+      ...prev,
+      ocRequest: prev.ocRequest.includes(value)
+        ? prev.ocRequest.filter((v) => v !== value)
+        : [...prev.ocRequest, value],
+    }));
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -63,15 +72,21 @@ const ConfirmOrder = ({ userDetails }) => {
       toast.error("Please select an appointment date and time slot.");
       return;
     }
-    if (!form.ocRequest) {
-      toast.error("Please select one of the options.");
+    if (form.ocRequest.length === 0) {
+      toast.error("Please select at least one of the options.");
       return;
     }
 
     setSubmitting(true);
     try {
       const formData = new FormData();
-      Object.entries(form).forEach(([key, value]) => formData.set(key, value));
+      Object.entries(form).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => formData.append(key, v));
+        } else {
+          formData.set(key, value);
+        }
+      });
       formData.set("bookingdate", slot.date);
       formData.set("bookingtime", slot.time);
       formData.set("serviceName", "Oral Contraception");
@@ -165,11 +180,11 @@ const ConfirmOrder = ({ userDetails }) => {
                   placeholder="Phone number"
                 />
 
-                <RadioGroup
+                <CheckboxGroup
                   label="Please choose one or more of the options below"
                   name="ocRequest"
                   value={form.ocRequest}
-                  onChange={handleChange}
+                  onToggle={toggleOcRequest}
                   options={OC_OPTIONS}
                 />
               </div>
@@ -236,7 +251,7 @@ const Input = ({ label, ...props }) => (
   </div>
 );
 
-const RadioGroup = ({ label, name, value, onChange, options }) => (
+const CheckboxGroup = ({ label, name, value, onToggle, options }) => (
   <div className="flex flex-col gap-5">
     <p className="text-sm text-[#3A3D42] tracking-[-0.2px]">{label}</p>
     <div className="flex flex-wrap content-center items-center gap-3">
@@ -246,15 +261,15 @@ const RadioGroup = ({ label, name, value, onChange, options }) => (
           className="flex items-start gap-2 cursor-pointer max-w-[310px]"
         >
           <input
-            type="radio"
+            type="checkbox"
             name={name}
             value={opt.value}
-            checked={value === opt.value}
-            onChange={onChange}
+            checked={value.includes(opt.value)}
+            onChange={() => onToggle(opt.value)}
             className="hidden peer"
           />
-          <span className="shrink-0 size-6 rounded-full border border-[#CE8936] relative after:content-[''] after:size-4 after:bg-[#CE8936] after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:hidden peer-checked:after:block" />
-          <span className="text-xs leading-5 tracking-[-0.2px] text-[#3A3D42] peer-checked:text-[#0D060C]">
+          <span className="shrink-0 size-6 rounded-[6px] border border-[#CE8936] relative transition-colors peer-checked:bg-[#CE8936] after:content-[''] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-[60%] after:w-[11px] after:h-[6px] after:border-l-2 after:border-b-2 after:border-white after:-rotate-45 after:hidden peer-checked:after:block" />
+          <span className="text-sm leading-5 tracking-[-0.2px] text-[#3A3D42] peer-checked:text-[#0D060C]">
             {opt.label}
           </span>
         </label>

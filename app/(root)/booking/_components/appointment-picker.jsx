@@ -1,33 +1,30 @@
-"use client";
+'use client'
 
-import {
-  getBookableDates,
-  getBookingSlots,
-} from "@/actions/bookingSlot.action";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
-import React, { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
+import { getBookableDates, getBookingSlots } from '@/actions/bookingSlot.action'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Image from 'next/image'
+import React, { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 /* ---------- date helpers ---------- */
 function startOfDay(d) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
 }
 function addDays(d, n) {
-  const x = new Date(d);
-  x.setDate(x.getDate() + n);
-  return startOfDay(x);
+  const x = new Date(d)
+  x.setDate(x.getDate() + n)
+  return startOfDay(x)
 }
 function formatYMD(date) {
-  if (!date) return null;
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  if (!date) return null
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 function parseYMD(ymd) {
-  const [y, m, d] = ymd.split("-").map(Number);
-  return new Date(y, m - 1, d);
+  const [y, m, d] = ymd.split('-').map(Number)
+  return new Date(y, m - 1, d)
 }
 function isSameDay(a, b) {
   return (
@@ -36,23 +33,23 @@ function isSameDay(a, b) {
     a.getFullYear() === b.getFullYear() &&
     a.getMonth() === b.getMonth() &&
     a.getDate() === b.getDate()
-  );
+  )
 }
-const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 
 /* ---------- delivery badge ---------- */
 // Earlier windows ship next day (24h); later windows ship in 48h.
 function badgeSrc(startTime, state) {
-  const hour = Number((startTime || "13:00").split(":")[0]);
-  const turn = hour < 13 ? "24" : "48";
-  return `/images/booking/badge-${turn}-${state}.svg`;
+  const hour = Number((startTime || '13:00').split(':')[0])
+  const turn = hour < 13 ? '24' : '48'
+  return `/images/booking/badge-${turn}-${state}.svg`
 }
 
 /* "09:00" -> "9:00" */
 function fmt(hhmm) {
-  if (!hhmm) return "";
-  const [hh, mm] = hhmm.split(":");
-  return `${Number(hh)}:${mm}`;
+  if (!hhmm) return ''
+  const [hh, mm] = hhmm.split(':')
+  return `${Number(hh)}:${mm}`
 }
 
 /**
@@ -61,235 +58,234 @@ function fmt(hhmm) {
  * Calls onSelect({ date: "YYYY-MM-DD", time: "HH:MM", label }).
  */
 export default function AppointmentPicker({ value, onSelect }) {
-  const today = useMemo(() => startOfDay(new Date()), []);
-  const [weekStart, setWeekStart] = useState(today);
-  const [selectedDate, setSelectedDate] = useState(today);
-  const [bookableStrings, setBookableStrings] = useState([]);
-  const [timeSlots, setTimeSlots] = useState([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
+  const today = useMemo(() => startOfDay(new Date()), [])
+  const [weekStart, setWeekStart] = useState(today)
+  const [selectedDate, setSelectedDate] = useState(today)
+  const [bookableStrings, setBookableStrings] = useState([])
+  const [timeSlots, setTimeSlots] = useState([])
+  const [loadingSlots, setLoadingSlots] = useState(false)
 
   const bookableDates = useMemo(
     () => bookableStrings.map(parseYMD),
-    [bookableStrings]
-  );
+    [bookableStrings],
+  )
 
   const week = useMemo(
     () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
-    [weekStart]
-  );
+    [weekStart],
+  )
 
   const monthLabel = useMemo(
     () =>
-      week[0].toLocaleDateString("en-GB", { month: "long", year: "numeric" }),
-    [week]
-  );
+      week[0].toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
+    [week],
+  )
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       try {
-        const res = await getBookableDates();
+        const res = await getBookableDates()
         if (!res?.success) {
-          toast.error(res?.msg || "Failed to load available days.");
-          return;
+          toast.error(res?.msg || 'Failed to load available days.')
+          return
         }
-        setBookableStrings(res.data || []);
+        setBookableStrings(res.data || [])
       } catch (err) {
-        console.error(err);
-        toast.error("Could not load available days.");
+        console.error(err)
+        toast.error('Could not load available days.')
       }
-    })();
-  }, []);
+    })()
+  }, [])
 
   function isBookable(date) {
-    if (date < today) return false;
-    if (isSameDay(date, today)) return true;
-    return bookableDates.some((d) => isSameDay(d, date));
+    if (date < today) return false
+    if (isSameDay(date, today)) return true
+    return bookableDates.some((d) => isSameDay(d, date))
   }
 
-  const selectedIsBookable = isBookable(selectedDate);
+  const selectedIsBookable = isBookable(selectedDate)
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       if (!selectedIsBookable) {
-        setTimeSlots([]);
-        return;
+        setTimeSlots([])
+        return
       }
-      setLoadingSlots(true);
+      setLoadingSlots(true)
       try {
-        const res = await getBookingSlots(formatYMD(selectedDate));
-        setTimeSlots(res?.success ? res.data || [] : []);
-        if (!res?.success) toast.error(res?.msg || "Failed to load slots");
+        const res = await getBookingSlots(formatYMD(selectedDate))
+        setTimeSlots(res?.success ? res.data || [] : [])
+        if (!res?.success) toast.error(res?.msg || 'Failed to load slots')
       } catch (err) {
-        console.error(err);
-        setTimeSlots([]);
+        console.error(err)
+        setTimeSlots([])
       } finally {
-        setLoadingSlots(false);
+        setLoadingSlots(false)
       }
-    })();
-  }, [selectedDate, selectedIsBookable]);
+    })()
+  }, [selectedDate, selectedIsBookable])
 
-  const isToday = isSameDay(selectedDate, today);
-  const nowMins = new Date().getHours() * 60 + new Date().getMinutes();
+  const isToday = isSameDay(selectedDate, today)
+  const nowMins = new Date().getHours() * 60 + new Date().getMinutes()
   const slots = useMemo(
     () =>
       timeSlots.map((s) => {
-        const [h, m] = (s.startTime || "0:0").split(":").map(Number);
-        return { ...s, isPast: isToday && h * 60 + m <= nowMins };
+        const [h, m] = (s.startTime || '0:0').split(':').map(Number)
+        return { ...s, isPast: isToday && h * 60 + m <= nowMins }
       }),
-    [timeSlots, isToday, nowMins]
-  );
+    [timeSlots, isToday, nowMins],
+  )
 
   function pickSlot(s) {
-    if (s.isPast || s.isFull) return;
+    if (s.isPast || s.isFull) return
     onSelect?.({
       date: formatYMD(selectedDate),
       time: s.startTime,
       label: s.label,
-    });
+    })
   }
 
   return (
-    <div className="flex flex-col items-center lg:items-stretch gap-6">
-      <p className="text-sm text-center text-[#2B3244] w-full">
-        Choose an Appointment
+    <div className='flex flex-col items-center lg:items-stretch gap-6'>
+      <p className='text-sm text-center text-[#2B3244] w-full'>
+        Book a Telephone Appointment
       </p>
 
       {/* Calendar card: month nav + week strip */}
-      <div className="w-full max-w-[305px] lg:max-w-none rounded-[12px] border border-[#CE8936] px-3 py-4 lg:px-5 lg:py-5">
-        <div className="flex flex-col gap-[15px]">
-          <div className="flex items-center justify-between">
+      <div className='w-full rounded-[12px] border border-[#CE8936] px-3 py-4 lg:px-5 lg:py-5'>
+        <div className='flex flex-col gap-[15px]'>
+          <div className='flex items-center justify-between'>
             <button
-              type="button"
-              aria-label="Previous week"
+              type='button'
+              aria-label='Previous week'
               onClick={() => setWeekStart((w) => addDays(w, -7))}
               disabled={addDays(weekStart, -7) < today}
-              className="grid size-[15px] place-items-center text-black disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+              className='grid size-[15px] place-items-center text-black disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed'
             >
-              <ChevronLeft className="size-[15px]" strokeWidth={2} />
+              <ChevronLeft className='size-[15px]' strokeWidth={2} />
             </button>
-            <p className="text-xs font-medium leading-5 text-black">
+            <p className='text-xs font-medium leading-5 text-black'>
               {monthLabel}
             </p>
             <button
-              type="button"
-              aria-label="Next week"
+              type='button'
+              aria-label='Next week'
               onClick={() => setWeekStart((w) => addDays(w, 7))}
-              className="grid size-[15px] place-items-center text-black cursor-pointer"
+              className='grid size-[15px] place-items-center text-black cursor-pointer'
             >
-              <ChevronRight className="size-[15px]" strokeWidth={2} />
+              <ChevronRight className='size-[15px]' strokeWidth={2} />
             </button>
           </div>
 
-          <div className="flex items-center gap-[4.486px] lg:gap-2 lg:justify-between">
+          <div className='flex items-center gap-[4.486px] lg:gap-2 lg:justify-between'>
             {week.map((d) => {
-              const active = isSameDay(d, selectedDate);
-              const disabled = !isBookable(d);
+              const active = isSameDay(d, selectedDate)
+              const disabled = !isBookable(d)
               return (
                 <button
-                  type="button"
+                  type='button'
                   key={formatYMD(d)}
                   onClick={() => !disabled && setSelectedDate(d)}
                   disabled={disabled}
                   className={[
-                    "flex flex-col items-center gap-[4.486px] overflow-hidden rounded-[4.486px] px-[10px] py-[9px] w-[37px] lg:w-auto lg:flex-1 lg:py-3 uppercase transition cursor-pointer",
+                    'flex flex-col items-center gap-[4.486px] overflow-hidden rounded-[4.486px] px-[10px] py-[9px] w-[37px] lg:w-auto lg:flex-1 lg:py-3 uppercase transition cursor-pointer',
                     active
-                      ? "bg-[#CE8936] text-white border border-transparent"
-                      : "border-[0.561px] border-[#E6E6E6] text-[#3A3D42]",
+                      ? 'bg-[#CE8936] text-white border border-transparent'
+                      : 'border-[0.561px] border-[#E6E6E6] text-[#3A3D42]',
                     disabled &&
-                      "opacity-40 cursor-not-allowed hover:border-[#E6E6E6]",
+                      'opacity-40 cursor-not-allowed hover:border-[#E6E6E6]',
                   ]
                     .filter(Boolean)
-                    .join(" ")}
+                    .join(' ')}
                 >
-                  <span className="text-[8px] leading-[7.851px]">
+                  <span className='text-[8px] leading-[7.851px]'>
                     {WEEKDAYS[d.getDay()]}
                   </span>
-                  <span className="text-[14px] font-bold leading-[11.776px]">
+                  <span className='text-[14px] font-bold leading-[11.776px]'>
                     {d.getDate()}
                   </span>
                 </button>
-              );
+              )
             })}
           </div>
         </div>
       </div>
 
-      <p className="text-xs font-medium text-center text-black max-w-[230px] leading-5">
+      <p className='text-xs font-medium text-center text-black max-w-[230px] leading-5'>
         Free next day delivery available on all appointments completed before
         1pm
       </p>
 
       {/* Time-window grid */}
-      <div className="w-full">
+      <div className='w-full'>
         {!selectedIsBookable ? (
-          <p className="text-center text-xs text-[#6B7280]">
+          <p className='text-center text-xs text-[#6B7280]'>
             No availability on this date. Try another day.
           </p>
         ) : loadingSlots ? (
-          <p className="text-center text-xs text-[#6B7280]">
+          <p className='text-center text-xs text-[#6B7280]'>
             Loading time slots…
           </p>
         ) : slots.length === 0 ? (
-          <p className="text-center text-xs text-[#6B7280]">
+          <p className='text-center text-xs text-[#6B7280]'>
             No time slots for this date.
           </p>
         ) : (
-          <div className="grid grid-cols-3 gap-[6px]">
+          <div className='grid grid-cols-3 gap-[6px]'>
             {slots.map((s) => {
-              const disabled = s.isPast || s.isFull;
+              const disabled = s.isPast || s.isFull
               const active =
                 value &&
                 value.time === s.startTime &&
-                value.date === formatYMD(selectedDate);
-              const state = disabled ? "gray" : active ? "white" : "orange";
+                value.date === formatYMD(selectedDate)
+              const state = disabled ? 'gray' : active ? 'white' : 'orange'
               return (
                 <button
-                  type="button"
+                  type='button'
                   key={s.id}
                   onClick={() => pickSlot(s)}
                   disabled={disabled}
                   title={
                     s.isFull
-                      ? "Fully booked"
+                      ? 'Fully booked'
                       : s.isPast
-                      ? "Time has passed"
-                      : undefined
+                        ? 'Time has passed'
+                        : undefined
                   }
                   className={[
-                    "flex flex-col items-center justify-end gap-1 rounded-[8px] px-3 py-1.5 transition cursor-pointer",
-                    disabled &&
-                      "bg-[#F0F0F0] cursor-not-allowed",
-                    active && "bg-[#D6866B]",
-                    !disabled && !active && "border border-[#CE8936]",
+                    'flex flex-col items-center justify-end gap-1 rounded-[8px] px-3 py-1.5 transition cursor-pointer',
+                    disabled && 'bg-[#F0F0F0] cursor-not-allowed',
+                    active && 'bg-[#D6866B]',
+                    !disabled && !active && 'border border-[#CE8936]',
                   ]
                     .filter(Boolean)
-                    .join(" ")}
+                    .join(' ')}
                 >
                   <Image
                     src={badgeSrc(s.startTime, state)}
-                    alt=""
+                    alt=''
                     width={28}
                     height={24}
-                    className="h-6 w-auto"
+                    className='h-6 w-auto'
                   />
                   <span
                     className={[
-                      "text-xs text-center tracking-[-0.2px] whitespace-nowrap",
+                      'text-xs text-center tracking-[-0.2px] whitespace-nowrap',
                       disabled
-                        ? "text-[#A3A3A3] line-through"
+                        ? 'text-[#A3A3A3] line-through'
                         : active
-                        ? "text-white"
-                        : "text-[#0D060C]",
-                    ].join(" ")}
+                          ? 'text-white'
+                          : 'text-[#0D060C]',
+                    ].join(' ')}
                   >
                     {fmt(s.startTime)} - {fmt(s.endTime)}
                   </span>
                 </button>
-              );
+              )
             })}
           </div>
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -142,7 +142,7 @@ model Booking {
   email       String
   phoneNumber String
   notes       String?
-  ocRequest   OcRequest?
+  ocRequest   OcRequest[]
 
   serviceName        String
   providerName       String
