@@ -64,9 +64,11 @@ export const createOrderByAdmin = async (prevState, formData) => {
       account: {
         select: {
           firstName: true,
+          lastName: true,
           phoneNumber: true,
           deliveryAddress: true,
           address: true,
+          deliveryZipCode: true,
         },
       },
     },
@@ -84,6 +86,27 @@ export const createOrderByAdmin = async (prevState, formData) => {
       status,
     },
   });
+
+  // 📦 Royal Mail: when an order is created as "Awaiting Dispatch" (clinicalreview)
+  // and has no tracking number yet, create the shipment via Click & Drop and store
+  // the returned tracking number.
+  if (order && status === "clinicalreview" && !trackingId && isRoyalMailConfigured()) {
+    try {
+      const { trackingNumber } = await createRoyalMailOrder({
+        order,
+        customer,
+      });
+      if (trackingNumber) {
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { trackingId: trackingNumber },
+        });
+      }
+    } catch (err) {
+      console.error("Royal Mail order creation failed:", err);
+      // order is created, so we don’t fail the action
+    }
+  }
 
 
 
@@ -436,7 +459,7 @@ export const updateOrderStatus = async (prevState, formData) => {
           phoneNumber: true,
           deliveryAddress: true,
           address: true,
-          zipCode: true,
+          deliveryZipCode: true,
         },
       },
     },
@@ -479,11 +502,18 @@ export const updateOrderStatus = async (prevState, formData) => {
 
   // ✅ send email (don’t block update if email fails)
   if (customer?.email) {
+    const s = String(order.status || "").toLowerCase();
+    const emailSubject =
+      s === "declined"
+        ? "Contraception Request Declined"
+        : s === "posted"
+        ? "Contraception Posted"
+        : `Order #${order.id} status: ${order.status}`;
     try {
       await resend.emails.send({
         from: "Nora Health <contact@norahealth.co.uk>",
         to: customer.email,
-        subject: `Order #${order.id} status: ${order.status}`,
+        subject: emailSubject,
         replyTo: "contact@norahealth.co.uk",
         html: orderStatusEmailTemplate({
           firstName: customer.account?.firstName,

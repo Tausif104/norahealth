@@ -32,6 +32,7 @@ export const UpdateAccountForm = ({ user }) => {
   const [nhsNumber, setNhsNumber] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [deliveryZipCode, setDeliveryZipCode] = useState("");
   const [open, setOpen] = useState(false);
 
   const initialState = {
@@ -65,6 +66,7 @@ export const UpdateAccountForm = ({ user }) => {
         setNhsNumber(user.data.nhsNumber || "");
         setZipCode(user.data.zipCode || "");
         setDeliveryAddress(user.data.deliveryAddress || "");
+        setDeliveryZipCode(user.data.deliveryZipCode || "");
       }
     };
     fetchUserData();
@@ -110,7 +112,6 @@ export const UpdateAccountForm = ({ user }) => {
             </div>
 
             <div className="grid gap-3">
-              <Label htmlFor="dob">Date of Birth</Label>
               <DatePicker
                 name="dob"
                 value={dob}
@@ -171,6 +172,17 @@ export const UpdateAccountForm = ({ user }) => {
                 placeholder="Delivery Address"
                 value={deliveryAddress}
                 onChange={(e) => setDeliveryAddress(e.target.value)}
+              />
+            </div>
+
+            <div className="grid gap-3 sm:col-span-2">
+              <Label htmlFor="deliveryZipCode">Delivery Post Code</Label>
+              <Input
+                id="deliveryZipCode"
+                name="deliveryZipCode"
+                placeholder="Delivery Post Code"
+                value={deliveryZipCode}
+                onChange={(e) => setDeliveryZipCode(e.target.value)}
               />
             </div>
           </div>

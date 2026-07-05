@@ -193,10 +193,11 @@ export const orderStatusEmailTemplate = ({
       </a>.
     </p>`;
 
-  let title = "Order Status Updated";
+  let title = "Contraception Update";
   let inner;
 
   if (s === "declined") {
+    title = "Contraception Request Declined";
     inner = `
       <p style="margin:0 0 12px;">Hi ${name},</p>
       <p style="margin:0 0 12px;">
@@ -214,6 +215,7 @@ export const orderStatusEmailTemplate = ({
       <p style="margin:0;">We&#39;ll do our very best to sort this out quickly for you.</p>
     `;
   } else if (s === "posted") {
+    title = "Contraception Posted";
     inner = `
       <p style="margin:0 0 12px;">Hi ${name},</p>
       <p style="margin:0 0 12px;">
@@ -572,6 +574,7 @@ export async function sendBookingConfirmationEmail({
   await resend.emails.send({
     from: "Nora Health <contact@norahealth.co.uk>",
     to,
+    bcc: "pharmacy.fap80@nhs.net",
     subject: "Your Appointment Is Confirmed",
     replyTo: "contact@norahealth.co.uk",
     html,
@@ -601,6 +604,7 @@ export async function sendOrderBookingConfirmationEmail({
   await resend.emails.send({
     from: "Nora Health <contact@norahealth.co.uk>",
     to,
+    bcc: "pharmacy.fap80@nhs.net",
     subject: "Your Contraceptive Order Has Been Received",
     replyTo: "contact@norahealth.co.uk",
     html,

@@ -107,7 +107,12 @@ export default async function AppointmentOrderDetailsPage({ params }) {
             {booking.appointmentRequest ? "Yes" : "No"}
           </p>
           <p>
-            <b>Requested Date:</b> {formatDate(booking.appointment)}
+            <b>Requested Date:</b> {formatDate(booking.appointment)}{" "}
+            {booking.slot
+              ? `at ${booking.slot.startTime}${
+                  booking.slot.endTime ? ` – ${booking.slot.endTime}` : ""
+                }`
+              : ""}
           </p>
         </section>
       )}

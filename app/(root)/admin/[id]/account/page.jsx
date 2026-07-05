@@ -66,6 +66,10 @@ const page = async ({ params }) => {
                 <p className="text-gray-600">Delivery Address</p>
                 <p className="text-gray-800">{user.account?.deliveryAddress || 'N/A'}</p>
               </div>
+              <div className="flex justify-between">
+                <p className="text-gray-600">Delivery Post Code</p>
+                <p className="text-gray-800">{user.account?.deliveryZipCode || 'N/A'}</p>
+              </div>
             </div>
           </div>
         </div>

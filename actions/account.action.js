@@ -154,6 +154,7 @@ export const updateAccountByAdmin = async (prevState, formData) => {
   const address = formData.get("address");
   const zipCode = formData.get("zipCode");
   const deliveryAddress = formData.get("deliveryAddress");
+  const deliveryZipCode = formData.get("deliveryZipCode");
   const user = await getAdminUser();
 
   const isAdmin = user?.admin?.isAdmin || false;
@@ -169,9 +170,9 @@ export const updateAccountByAdmin = async (prevState, formData) => {
     };
   }
 
-  const updatedAccount = await prisma.account.update({
+  const updatedAccount = await prisma.account.upsert({
     where: { userId: userId },
-    data: {
+    update: {
       firstName,
       lastName,
       dob,
@@ -180,6 +181,20 @@ export const updateAccountByAdmin = async (prevState, formData) => {
       address,
       zipCode,
       deliveryAddress,
+      deliveryZipCode,
+    },
+    create: {
+      userId,
+      firstName,
+      lastName,
+      dob,
+      phoneNumber,
+      nhsNumber,
+      address,
+      zipCode,
+      deliveryAddress,
+      deliveryZipCode,
+      secondEmail: "",
     },
   });
 
@@ -212,6 +227,7 @@ export const getUserAccountInfobyid = async (userId) => {
           zipCode: true,
           profileImage: true,
           deliveryAddress: true,
+          deliveryZipCode: true,
         }
       }
     },

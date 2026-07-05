@@ -161,7 +161,7 @@ function currentMinutes() {
     fetchSlots();
   }, [value, selectedDateIsBookable]);
 
-  function handleSlotSelect(slotId) {
+  function handleSlotSelect(slot) {
     if (!selectedDateIsBookable) {
       toast.error("That date has no availability. Please choose another day.");
       return;
@@ -172,12 +172,13 @@ function currentMinutes() {
       return;
     }
 
-    setSelectedSlot(slotId);
+    setSelectedSlot(slot.startTime);
 
     const booking = {
       ...(bookingData ?? {}),
       bookingdate: formatYMD(value), // "YYYY-MM-DD"
-      bookingtime: slotId, // "HH:MM"
+      bookingtime: slot.startTime, // "HH:MM"
+      bookingendtime: slot.endTime, // "HH:MM"
     };
 
     setBookingData(booking);
@@ -244,7 +245,7 @@ const visibleSlots = useMemo(() => {
               return (
                 <button
                   key={slot.id}
-                  onClick={() => handleSlotSelect(slot.startTime)}
+                  onClick={() => handleSlotSelect(slot)}
                   className={`w-full cursor-pointer text-center p-3 rounded-md border transition focus:outline-none flex items-center justify-center text-base font-medium text-black
                     ${
                       isActive

@@ -178,10 +178,12 @@ export default function BookingsMobile() {
       toast.error("Please select an available date and time slot.");
       return;
     }
+    const selected = slots.find((s) => s.startTime === selectedSlot);
     setBookingData({
       ...(bookingData ?? {}),
       bookingdate: formatYMD(selectedDate),
       bookingtime: selectedSlot,
+      bookingendtime: selected?.endTime,
       ...form,
     });
     router.push("/booking/confirm");

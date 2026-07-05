@@ -9,21 +9,6 @@ import { useRouter } from "next/navigation";
 import { createBooking } from "@/actions/booking.action";
 import { toast } from "sonner";
 
-const OC_OPTIONS = [
-  {
-    label: "I would like to order a pill which I am currently taking",
-    value: "SAME_OC",
-  },
-  {
-    label: "I would like to start a new type of pill",
-    value: "DIFFERENT_OC",
-  },
-  {
-    label: "I would like the Morning After Pill (aka Plan B)",
-    value: "MORNING_AFTER_PILL",
-  },
-];
-
 const ConfirmBooking = ({ userDetails }) => {
   const originalSubmitWrapRef = useRef(null);
   const formRef = useRef(null);
@@ -42,7 +27,6 @@ const ConfirmBooking = ({ userDetails }) => {
     fullName: fullNameFromAccount,
     email: userDetails?.email || "",
     phoneNumber: userDetails?.account?.phoneNumber || "",
-    ocRequest: "",
     notes: "",
   });
 
@@ -57,8 +41,16 @@ const ConfirmBooking = ({ userDetails }) => {
     }
   }, [bookingData, router]);
 
-  function formatBookingDate(dateStr, timeStr) {
-    if (!dateStr || !timeStr) return "";
+  function to12h(timeStr) {
+    if (!timeStr) return "";
+    const [h, m] = timeStr.split(":").map(Number);
+    const period = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
+    return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
+  }
+
+  function formatBookingDate(dateStr, startStr, endStr) {
+    if (!dateStr || !startStr) return "";
     const [year, month, day] = dateStr.split("-").map(Number);
     const date = new Date(year, month - 1, day);
     const formatted = date.toLocaleDateString("en-GB", {
@@ -66,7 +58,10 @@ const ConfirmBooking = ({ userDetails }) => {
       day: "numeric",
       month: "short",
     });
-    return `${formatted}, ${timeStr}`;
+    const timeRange = endStr
+      ? `${to12h(startStr)} – ${to12h(endStr)}`
+      : to12h(startStr);
+    return `${formatted}, ${timeRange}`;
   }
 
   async function handleSubmit(e) {
@@ -176,14 +171,6 @@ const ConfirmBooking = ({ userDetails }) => {
                   onChange={handleChange}
                   placeholder="Phone number"
                 />
-
-                <RadioGroup
-                  label="Please choose one or more of the options below"
-                  name="ocRequest"
-                  value={form.ocRequest}
-                  onChange={handleChange}
-                  options={OC_OPTIONS}
-                />
               </div>
 
               <Notes value={form.notes} onChange={handleChange} />
@@ -210,7 +197,8 @@ const ConfirmBooking = ({ userDetails }) => {
                     label="Date:"
                     value={formatBookingDate(
                       bookingData?.bookingdate,
-                      bookingData?.bookingtime
+                      bookingData?.bookingtime,
+                      bookingData?.bookingendtime
                     )}
                   />
                   <SummaryRow label="Provider:" value="Manor Chemist" />
@@ -254,33 +242,6 @@ const Input = ({ label, ...props }) => (
       required
       className="bg-white border border-[#EEE0CF] text-[#0D060C] placeholder:text-[#0D060C] text-sm tracking-[-0.2px] w-full px-5 py-3.5 rounded-[8px] outline-none focus:border-[#CE8936] transition"
     />
-  </div>
-);
-
-const RadioGroup = ({ label, name, value, onChange, options }) => (
-  <div className="flex flex-col gap-5">
-    <p className="text-sm text-[#3A3D42] tracking-[-0.2px]">{label}</p>
-    <div className="flex flex-wrap content-center items-center gap-3">
-      {options.map((opt) => (
-        <label
-          key={opt.value}
-          className="flex items-start gap-2 cursor-pointer max-w-[310px]"
-        >
-          <input
-            type="radio"
-            name={name}
-            value={opt.value}
-            checked={value === opt.value}
-            onChange={onChange}
-            className="hidden peer"
-          />
-          <span className="shrink-0 size-6 rounded-full border border-[#CE8936] relative after:content-[''] after:size-4 after:bg-[#CE8936] after:rounded-full after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:hidden peer-checked:after:block" />
-          <span className="text-xs leading-5 tracking-[-0.2px] text-[#3A3D42] peer-checked:text-[#0D060C]">
-            {opt.label}
-          </span>
-        </label>
-      ))}
-    </div>
   </div>
 );
 

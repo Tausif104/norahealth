@@ -21,7 +21,8 @@ const HomePage = () => {
       <ChoicesSection />
       <Benifits />
       {/* <Stories /> */}
-      <ReviewsSection />
+      {/* <ReviewsSection /> */}
+      
       <Faq />
     </>
   );
