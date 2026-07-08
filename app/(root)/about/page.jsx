@@ -4,7 +4,7 @@ import Mission from "./_components/mission";
 import TeamSection from "./_components/team";
 import VideoSection from "../_components/video";
 import StatisticsBoxes from "./_components/statistics";
-import ReviewsSection from "./_components/reviews";
+import GoogleReviews from "../_components/google-reviews";
 export const metadata = {
   title: "About Us",
   description: "Free Oral Contraception, Delivered to Your Door",
@@ -19,7 +19,7 @@ const AboutPage = () => {
       <TeamSection />
       <VideoSection />
       <StatisticsBoxes />
-      {/* <ReviewsSection /> */}
+      <GoogleReviews />
     </>
   );
 };

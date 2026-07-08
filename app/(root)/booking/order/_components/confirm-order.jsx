@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
@@ -25,9 +25,7 @@ const OC_OPTIONS = [
 ];
 
 const ConfirmOrder = ({ userDetails }) => {
-  const originalSubmitWrapRef = useRef(null);
   const formRef = useRef(null);
-  const [showStickySubmit, setShowStickySubmit] = useState(false);
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -98,7 +96,7 @@ const ConfirmOrder = ({ userDetails }) => {
         toast.error(res.msg || "Order failed");
         return;
       }
-      toast.success("Contraceptives ordered successfully");
+      toast.success("Your request has been safely received. Please look out for an email from us shortly.");
       router.push("/profile/orders");
     } catch (err) {
       toast.error("Something went wrong");
@@ -106,40 +104,6 @@ const ConfirmOrder = ({ userDetails }) => {
       setSubmitting(false);
     }
   }
-
-  useEffect(() => {
-    const mql = window.matchMedia("(max-width: 1023px)");
-
-    const setupObserver = () => {
-      if (!mql.matches) {
-        setShowStickySubmit(false);
-        return;
-      }
-      const target = originalSubmitWrapRef.current;
-      if (!target) return;
-
-      const observer = new IntersectionObserver(
-        ([entry]) => setShowStickySubmit(!entry.isIntersecting),
-        { threshold: 0.1 }
-      );
-      observer.observe(target);
-      return () => observer.disconnect();
-    };
-
-    let cleanup = setupObserver();
-    const onResizeChange = () => {
-      if (cleanup) cleanup();
-      cleanup = setupObserver();
-    };
-    mql.addEventListener?.("change", onResizeChange);
-    window.addEventListener("resize", onResizeChange);
-
-    return () => {
-      if (cleanup) cleanup();
-      mql.removeEventListener?.("change", onResizeChange);
-      window.removeEventListener("resize", onResizeChange);
-    };
-  }, []);
 
   return (
     <section className="py-8">
@@ -150,13 +114,13 @@ const ConfirmOrder = ({ userDetails }) => {
             <div className="lg:col-span-2 min-w-0 flex flex-col gap-8">
               <Link
                 href="/booking"
-                className="flex items-center gap-[7px] text-[#3A3D42] w-fit"
+                className="order-1 flex items-center gap-[7px] text-[#3A3D42] w-fit"
               >
                 <ArrowLeft className="size-6" strokeWidth={1.8} />
                 <span className="text-base tracking-[-0.3px]">Back</span>
               </Link>
 
-              <div className="flex flex-col gap-4">
+              <div className="order-3 lg:order-2 flex flex-col gap-4">
                 <Input
                   label="Name"
                   name="fullName"
@@ -189,9 +153,13 @@ const ConfirmOrder = ({ userDetails }) => {
                 />
               </div>
 
-              <Notes value={form.notes} onChange={handleChange} />
+              <div className="order-4 lg:order-3">
+                <Notes value={form.notes} onChange={handleChange} />
+              </div>
 
-              <AppointmentPicker value={slot} onSelect={setSlot} />
+              <div className="order-2 lg:order-4">
+                <AppointmentPicker value={slot} onSelect={setSlot} />
+              </div>
             </div>
 
             {/* RIGHT */}
@@ -214,19 +182,6 @@ const ConfirmOrder = ({ userDetails }) => {
                     available on all consultations complete by 1pm.
                   </p>
 
-                  <div ref={originalSubmitWrapRef}>
-                    <SubmitButton submitting={submitting} />
-                  </div>
-                </div>
-
-                {/* Mobile sticky submit */}
-                <div
-                  className={[
-                    "lg:hidden fixed left-0 right-0 bottom-20 sm:bottom-5 z-50 p-3 px-[44px]",
-                    "container custom-container mx-auto",
-                    showStickySubmit ? "block" : "hidden",
-                  ].join(" ")}
-                >
                   <SubmitButton submitting={submitting} />
                 </div>
               </div>

@@ -7,7 +7,7 @@ import ChoicesSection from "./_components/choices";
 import Benifits from "./_components/benifits";
 import Stories from "./_components/stories";
 import Faq from "./_components/faq";
-import ReviewsSection from "./about/_components/reviews";
+import GoogleReviews from "./_components/google-reviews";
 import VideoSectionHome from "./_components/videoHome";
 
 const HomePage = () => {
@@ -21,8 +21,8 @@ const HomePage = () => {
       <ChoicesSection />
       <Benifits />
       {/* <Stories /> */}
-      {/* <ReviewsSection /> */}
-      
+      <GoogleReviews />
+
       <Faq />
     </>
   );

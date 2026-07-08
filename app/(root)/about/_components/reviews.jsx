@@ -5,9 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import Slider from "react-slick";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import ReviewItem from "@/components/global/review-item";
-import { testimonials } from "@/data/testimonials";
 
-const ReviewsSection = () => {
+const ReviewsSection = ({ reviews = [] }) => {
   const sliderRef = useRef(null);
   const [isClient, setIsClient] = useState(false);
 
@@ -77,7 +76,7 @@ const ReviewsSection = () => {
     ],
   };
 
-  if (!isClient) {
+  if (!isClient || reviews.length === 0) {
     return null;
   }
 
@@ -106,7 +105,7 @@ const ReviewsSection = () => {
 
         <div className='review-slide'>
           <Slider ref={sliderRef} {...settings}>
-            {testimonials.map((item) => (
+            {reviews.map((item) => (
               <ReviewItem key={item.id} item={item} />
             ))}
           </Slider>

@@ -64,6 +64,7 @@ export default function AppointmentPicker({ value, onSelect }) {
   const [bookableStrings, setBookableStrings] = useState([])
   const [timeSlots, setTimeSlots] = useState([])
   const [loadingSlots, setLoadingSlots] = useState(false)
+  const [autoSelected, setAutoSelected] = useState(false)
 
   const bookableDates = useMemo(
     () => bookableStrings.map(parseYMD),
@@ -136,6 +137,44 @@ export default function AppointmentPicker({ value, onSelect }) {
     [timeSlots, isToday, nowMins],
   )
 
+  // Default: pre-select the next available slot on the next available day.
+  useEffect(() => {
+    if (autoSelected || value) return
+    if (loadingSlots || !bookableStrings.length) return
+
+    const avail = slots.find((s) => !s.isPast && !s.isFull)
+    if (avail) {
+      onSelect?.({
+        date: formatYMD(selectedDate),
+        time: avail.startTime,
+        label: avail.label,
+      })
+      setAutoSelected(true)
+      return
+    }
+
+    // No slot on this day → jump to the next bookable day.
+    const next = bookableDates
+      .filter((d) => d > selectedDate)
+      .sort((a, b) => a - b)[0]
+    if (next) {
+      setSelectedDate(next)
+      if (next >= addDays(weekStart, 7)) setWeekStart(next)
+    } else {
+      setAutoSelected(true) // nothing available anywhere
+    }
+  }, [
+    slots,
+    loadingSlots,
+    autoSelected,
+    value,
+    bookableStrings,
+    bookableDates,
+    selectedDate,
+    weekStart,
+    onSelect,
+  ])
+
   function pickSlot(s) {
     if (s.isPast || s.isFull) return
     onSelect?.({
@@ -177,7 +216,7 @@ export default function AppointmentPicker({ value, onSelect }) {
             </button>
           </div>
 
-          <div className='flex items-center gap-[4.486px] lg:gap-2 lg:justify-between'>
+          <div className='flex items-center justify-between gap-[4.486px] lg:gap-2'>
             {week.map((d) => {
               const active = isSameDay(d, selectedDate)
               const disabled = !isBookable(d)
@@ -188,7 +227,7 @@ export default function AppointmentPicker({ value, onSelect }) {
                   onClick={() => !disabled && setSelectedDate(d)}
                   disabled={disabled}
                   className={[
-                    'flex flex-col items-center gap-[4.486px] overflow-hidden rounded-[4.486px] px-[10px] py-[9px] w-[37px] lg:w-auto lg:flex-1 lg:py-3 uppercase transition cursor-pointer',
+                    'flex flex-1 min-w-0 flex-col items-center gap-[4.486px] overflow-hidden rounded-[4.486px] px-1 py-[9px] lg:px-[10px] lg:py-3 uppercase transition cursor-pointer',
                     active
                       ? 'bg-[#CE8936] text-white border border-transparent'
                       : 'border-[0.561px] border-[#E6E6E6] text-[#3A3D42]',

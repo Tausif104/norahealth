@@ -21,6 +21,7 @@ function formatDate(date) {
   return new Date(date).toLocaleString("en-GB", {
     dateStyle: "full",
     timeStyle: "short",
+    timeZone: "UTC", // stored UTC wall-clock == UK time the user picked
   });
 }
 
@@ -38,6 +39,7 @@ function formatDateTime(date) {
   return new Date(date).toLocaleString("en-GB", {
     dateStyle: "full",
     timeStyle: "short",
+    timeZone: "UTC", // stored UTC wall-clock == UK time the user picked
   });
 }
 // export const orderEmailTemplate = ({ medicineName, trackingId, status }) =>

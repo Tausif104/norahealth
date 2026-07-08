@@ -155,8 +155,23 @@ const columns = [
 
   {
     accessorKey: "appointment",
-    header: "Requested Date",
-    cell: ({ row }) => formatDate(row.getValue("appointment")),
+    header: "Appt Date",
+    cell: ({ row }) => {
+      const appt = row.getValue("appointment");
+      if (!appt) return null;
+      const start = new Date(appt);
+      const end = new Date(start.getTime() + 60 * 60 * 1000); // 1-hour slot
+      const fmtTime = (d) =>
+        d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      return (
+        <div className='flex flex-col'>
+          <span>{formatDate(appt)}</span>
+          <span className='text-xs text-muted-foreground'>
+            {fmtTime(start)} – {fmtTime(end)}
+          </span>
+        </div>
+      );
+    },
   },
 
   // ✅ NEW: Booking Status column
