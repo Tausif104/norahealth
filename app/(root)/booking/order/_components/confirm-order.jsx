@@ -1,13 +1,19 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createBookingOrder } from "@/actions/booking.action";
 import { toast } from "sonner";
 import AppointmentPicker from "../../_components/appointment-picker";
+
+const STEPS = [
+  { key: "details", title: "Step 1: Check your details" },
+  { key: "appointment", title: "Step 2: Book your appointment" },
+  { key: "help", title: "Step 3: How can we help you?" },
+];
 
 const OC_OPTIONS = [
   {
@@ -26,8 +32,12 @@ const OC_OPTIONS = [
 
 const ConfirmOrder = ({ userDetails }) => {
   const formRef = useRef(null);
+  const stepTopRef = useRef(null);
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [step, setStep] = useState(0);
+  const isLastStep = step === STEPS.length - 1;
+  const currentKey = STEPS[step].key;
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -49,6 +59,39 @@ const ConfirmOrder = ({ userDetails }) => {
 
   const [slot, setSlot] = useState(null);
 
+  // Auto-scroll to the top of the active step whenever it changes
+  useEffect(() => {
+    stepTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [step]);
+
+  // Validate only the fields belonging to the current step
+  function validateStep() {
+    if (currentKey === "details") {
+      if (!form.fullName.trim() || !form.email.trim() || !form.phoneNumber.trim()) {
+        toast.error("Please fill in your name, email and phone number.");
+        return false;
+      }
+    }
+    if (currentKey === "appointment" && (!slot?.date || !slot?.time)) {
+      toast.error("Please select an appointment date and time slot.");
+      return false;
+    }
+    if (currentKey === "help" && form.ocRequest.length === 0) {
+      toast.error("Please select at least one of the options.");
+      return false;
+    }
+    return true;
+  }
+
+  function goNext() {
+    if (!validateStep()) return;
+    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  }
+
+  function goBack() {
+    setStep((s) => Math.max(s - 1, 0));
+  }
+
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -65,6 +108,12 @@ const ConfirmOrder = ({ userDetails }) => {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    // On non-final steps, Enter should advance rather than submit
+    if (!isLastStep) {
+      goNext();
+      return;
+    }
 
     if (!slot?.date || !slot?.time) {
       toast.error("Please select an appointment date and time slot.");
@@ -112,61 +161,88 @@ const ConfirmOrder = ({ userDetails }) => {
           Online ordering in three simple steps
         </h1>
         <form onSubmit={handleSubmit} ref={formRef}>
-          <Link
-            href="/booking"
-            className="flex items-center gap-[7px] text-[#3A3D42] w-fit mb-6"
-          >
-            <ArrowLeft className="size-6" strokeWidth={1.8} />
-            <span className="text-base tracking-[-0.3px]">Back</span>
-          </Link>
+          {/* TOP BAR — Back (left) · Progress (center) · Next (right) */}
+          <div ref={stepTopRef} className="flex flex-wrap items-center gap-4 mb-6 scroll-mt-24">
+            {step === 0 ? (
+              <Link
+                href="/booking"
+                className="flex items-center gap-[7px] text-[#3A3D42] w-fit"
+              >
+                <ArrowLeft className="size-6" strokeWidth={1.8} />
+                <span className="text-base tracking-[-0.3px]">Back</span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={goBack}
+                className="flex items-center gap-[7px] text-[#3A3D42] w-fit cursor-pointer"
+              >
+                <ArrowLeft className="size-6" strokeWidth={1.8} />
+                <span className="text-base tracking-[-0.3px]">Back</span>
+              </button>
+            )}
+
+            <div className="flex-1 flex justify-center">
+              <StepIndicator current={step} total={STEPS.length} />
+            </div>
+
+            {!isLastStep && <NextButton onClick={goNext} />}
+          </div>
 
           <div className="grid lg:grid-cols-3 gap-8 bg-[#FAF9F8] p-4 2xl:p-8 rounded-[12px]">
             {/* LEFT */}
             <div className="lg:col-span-2 min-w-0 flex flex-col gap-8">
-              {/* Step 1 — Check your details */}
-              <div className="flex flex-col gap-4">
-                <StepHeading>Step 1: Check your details</StepHeading>
-                <Input
-                  label="Name"
-                  name="fullName"
-                  value={form.fullName}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                />
-                <Input
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                />
-                <Input
-                  label="Phone number"
-                  name="phoneNumber"
-                  value={form.phoneNumber}
-                  onChange={handleChange}
-                  placeholder="Phone number"
-                />
-              </div>
+              <div key={step} className="step-animate flex flex-col gap-6">
+                <h2 className="text-base lg:text-lg font-semibold text-[#0D060C] tracking-[-0.3px] whitespace-nowrap">
+                  {STEPS[step].title}
+                </h2>
 
-              {/* Step 2 — Book your appointment */}
-              <div className="flex flex-col gap-6">
-                <StepHeading>Step 2: Book your appointment</StepHeading>
-                <AppointmentPicker value={slot} onSelect={setSlot} />
-              </div>
+                {/* STEP 1 — Personal details */}
+                {currentKey === "details" && (
+                  <div className="flex flex-col gap-4">
+                    <Input
+                      label="Name"
+                      name="fullName"
+                      value={form.fullName}
+                      onChange={handleChange}
+                      placeholder="Enter your full name"
+                    />
+                    <Input
+                      label="Email"
+                      name="email"
+                      type="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="Enter your email"
+                    />
+                    <Input
+                      label="Phone number"
+                      name="phoneNumber"
+                      value={form.phoneNumber}
+                      onChange={handleChange}
+                      placeholder="Phone number"
+                    />
+                  </div>
+                )}
 
-              {/* Step 3 — How can we help you? */}
-              <div className="flex flex-col gap-8">
-                <StepHeading>Step 3: How can we help you?</StepHeading>
-                <CheckboxGroup
-                  label="Please choose one or more of the options below"
-                  name="ocRequest"
-                  value={form.ocRequest}
-                  onToggle={toggleOcRequest}
-                  options={OC_OPTIONS}
-                />
-                <Notes value={form.notes} onChange={handleChange} />
+                {/* STEP 2 — Appointment */}
+                {currentKey === "appointment" && (
+                  <AppointmentPicker value={slot} onSelect={setSlot} />
+                )}
+
+                {/* STEP 3 — How can we help you? (options + notes) */}
+                {currentKey === "help" && (
+                  <div className="flex flex-col gap-8">
+                    <CheckboxGroup
+                      label="Please choose one or more of the options below"
+                      name="ocRequest"
+                      value={form.ocRequest}
+                      onToggle={toggleOcRequest}
+                      options={OC_OPTIONS}
+                    />
+                    <Notes value={form.notes} onChange={handleChange} />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -190,7 +266,7 @@ const ConfirmOrder = ({ userDetails }) => {
                     available on all consultations complete by 1pm.
                   </p>
 
-                  <SubmitButton submitting={submitting} />
+                  <SubmitButton submitting={submitting} disabled={!isLastStep} />
                 </div>
               </div>
             </div>
@@ -202,12 +278,6 @@ const ConfirmOrder = ({ userDetails }) => {
 };
 
 /* ---------- Reusable pieces ---------- */
-
-const StepHeading = ({ children }) => (
-  <h2 className="text-base lg:text-lg font-semibold text-[#0D060C] tracking-[-0.3px] whitespace-nowrap">
-    {children}
-  </h2>
-);
 
 const Input = ({ label, ...props }) => (
   <div className="flex flex-col gap-2">
@@ -263,10 +333,43 @@ const Notes = ({ value, onChange }) => (
   </div>
 );
 
-const SubmitButton = ({ submitting }) => (
+const StepIndicator = ({ current, total }) => (
+  <div className="flex items-center gap-2">
+    {Array.from({ length: total }).map((_, i) => (
+      <span
+        key={i}
+        className={`h-1.5 rounded-full transition-all duration-300 ${
+          i === current
+            ? "w-8 bg-[#CE8936]"
+            : i < current
+            ? "w-4 bg-[#CE8936]/50"
+            : "w-4 bg-[#EEE0CF]"
+        }`}
+      />
+    ))}
+    <span className="ml-2 text-sm text-[#3A3D42] tracking-[-0.2px]">
+      Step {current + 1} of {total}
+    </span>
+  </div>
+);
+
+const NextButton = ({ onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="group bg-theme text-white text-base font-medium py-2.5 px-7 rounded-full hover:bg-[#491F40] transition duration-300 cursor-pointer"
+  >
+    <span className="flex items-center justify-center gap-1.5">
+      Next
+      <ArrowRight className="size-5 group-hover:translate-x-1 transition duration-300" />
+    </span>
+  </button>
+);
+
+const SubmitButton = ({ submitting, disabled }) => (
   <button
     type="submit"
-    disabled={submitting}
+    disabled={submitting || disabled}
     className="group w-full bg-theme text-white text-base font-medium py-3 px-[18px] rounded-full hover:bg-[#491F40] transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
   >
     <span className="flex items-center justify-center gap-1.5">
