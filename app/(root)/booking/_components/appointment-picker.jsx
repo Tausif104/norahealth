@@ -186,10 +186,6 @@ export default function AppointmentPicker({ value, onSelect }) {
 
   return (
     <div className='flex flex-col items-center lg:items-stretch gap-6'>
-      <p className='text-sm text-center text-[#2B3244] w-full'>
-        Book a Telephone Appointment
-      </p>
-
       {/* Calendar card: month nav + week strip */}
       <div className='w-full rounded-[12px] border border-[#CE8936] px-3 py-4 lg:px-5 lg:py-5'>
         <div className='flex flex-col gap-[15px]'>
