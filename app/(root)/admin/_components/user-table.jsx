@@ -423,7 +423,7 @@ export function UserTable({ users, admin }) {
   });
 
   return (
-    <div className='w-full flex-1 min-w-0 overflow-x-hidden p-4 sm:p-6 lg:p-10'>
+    <div className='w-full flex-1 min-w-0 overflow-x-hidden p-6 lg:p-10'>
       <div className='flex justify-between items-center'>
         {" "}
         {/* HEADER */}
@@ -443,9 +443,39 @@ export function UserTable({ users, admin }) {
           </h2>
         </div>
       </div>
-      <div className='flex flex-wrap items-center gap-3 py-4'>
-        <CreateUserForm />
-        <div className='flex items-center w-full sm:w-auto sm:flex-1'>
+      <div className='flex flex-col gap-3 py-4 sm:flex-row sm:items-center'>
+        {/* Mobile: Create (left) + Columns (right) on one row.
+            Desktop: sm:contents flattens this so all three share one row. */}
+        <div className='flex items-center justify-between gap-3 sm:contents'>
+          <CreateUserForm />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='outline' className='sm:order-last'>
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className='capitalize'
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className='flex items-center w-full sm:flex-1'>
           <input
             value={table.getColumn("email")?.getFilterValue() ?? ""}
             onChange={(e) =>
@@ -455,32 +485,6 @@ export function UserTable({ users, admin }) {
             className='w-full sm:w-[260px] bg-white rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-200'
           />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='ml-auto'>
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className='capitalize'
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
       <div className='w-full overflow-x-auto rounded-md border'>
         <Table>
