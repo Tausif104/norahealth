@@ -31,9 +31,19 @@ const Toaster = ({
           "--normal-bg": "var(--popover)",
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
-          "--border-radius": "var(--radius)"
+          "--border-radius": "var(--radius)",
+          // Keep the toast inside the viewport on mobile so long
+          // messages wrap instead of being cut off at the screen edge.
+          "--width": "min(356px, calc(100vw - 2rem))",
         }
       }
+      toastOptions={{
+        classNames: {
+          toast: "!w-full",
+          title: "!whitespace-normal break-words",
+          description: "!whitespace-normal break-words",
+        },
+      }}
       {...props} />
   );
 }
