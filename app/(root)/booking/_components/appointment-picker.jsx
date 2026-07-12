@@ -39,10 +39,12 @@ const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 
 /* ---------- delivery badge ---------- */
 // Earlier windows ship next day (24h); later windows ship in 48h.
-function badgeSrc(startTime, state) {
+function turnHours(startTime) {
   const hour = Number((startTime || '13:00').split(':')[0])
-  const turn = hour < 13 ? '24' : '48'
-  return `/images/booking/badge-${turn}-${state}.svg`
+  return hour < 13 ? '24' : '48'
+}
+function badgeSrc(startTime, state) {
+  return `/images/booking/badge-${turnHours(startTime)}-${state}.svg`
 }
 
 /* "09:00" -> "9:00" */
@@ -57,7 +59,11 @@ function fmt(hhmm) {
  * grid of one-hour windows badged with their delivery turnaround.
  * Calls onSelect({ date: "YYYY-MM-DD", time: "HH:MM", label }).
  */
-export default function AppointmentPicker({ value, onSelect }) {
+export default function AppointmentPicker({
+  value,
+  onSelect,
+  autoSelectSlot = true,
+}) {
   const today = useMemo(() => startOfDay(new Date()), [])
   const [weekStart, setWeekStart] = useState(today)
   const [selectedDate, setSelectedDate] = useState(today)
@@ -144,11 +150,16 @@ export default function AppointmentPicker({ value, onSelect }) {
 
     const avail = slots.find((s) => !s.isPast && !s.isFull)
     if (avail) {
-      onSelect?.({
-        date: formatYMD(selectedDate),
-        time: avail.startTime,
-        label: avail.label,
-      })
+      // Keep navigating to a day that HAS availability, but only pre-select a
+      // time slot when autoSelectSlot is enabled. When disabled, the user must
+      // pick a time themselves (so they can't skip the step without choosing).
+      if (autoSelectSlot) {
+        onSelect?.({
+          date: formatYMD(selectedDate),
+          time: avail.startTime,
+          label: avail.label,
+        })
+      }
       setAutoSelected(true)
       return
     }
@@ -173,6 +184,7 @@ export default function AppointmentPicker({ value, onSelect }) {
     selectedDate,
     weekStart,
     onSelect,
+    autoSelectSlot,
   ])
 
   function pickSlot(s) {
@@ -251,6 +263,22 @@ export default function AppointmentPicker({ value, onSelect }) {
         1pm
       </p>
 
+      {/* Legend: what the 24h / 48h labels on each slot mean */}
+      <div className='flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px]'>
+        <span className='inline-flex items-center gap-1.5'>
+          <span className='rounded-full bg-[#E7F4EC] px-2 py-0.5 font-semibold text-[#1F7A45]'>
+            24h
+          </span>
+          <span className='text-[#3A3D42]'>Next-day delivery</span>
+        </span>
+        <span className='inline-flex items-center gap-1.5'>
+          <span className='rounded-full bg-[#FBEEDD] px-2 py-0.5 font-semibold text-[#B5751B]'>
+            48h
+          </span>
+          <span className='text-[#3A3D42]'>2-day delivery</span>
+        </span>
+      </div>
+
       {/* Time-window grid */}
       <div className='w-full'>
         {!selectedIsBookable ? (
@@ -274,6 +302,7 @@ export default function AppointmentPicker({ value, onSelect }) {
                 value.time === s.startTime &&
                 value.date === formatYMD(selectedDate)
               const state = disabled ? 'gray' : active ? 'white' : 'orange'
+              const turn = turnHours(s.startTime)
               return (
                 <button
                   type='button'
@@ -296,13 +325,27 @@ export default function AppointmentPicker({ value, onSelect }) {
                     .filter(Boolean)
                     .join(' ')}
                 >
-                  <Image
-                    src={badgeSrc(s.startTime, state)}
-                    alt=''
-                    width={28}
-                    height={24}
-                    className='h-6 w-auto'
-                  />
+                  <span
+                    className={[
+                      'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold leading-none',
+                      disabled
+                        ? 'bg-[#E5E5E5] text-[#A3A3A3]'
+                        : active
+                          ? 'bg-white/25 text-white'
+                          : turn === '24'
+                            ? 'bg-[#E7F4EC] text-[#1F7A45]'
+                            : 'bg-[#FBEEDD] text-[#B5751B]',
+                    ].join(' ')}
+                  >
+                    <Image
+                      src={badgeSrc(s.startTime, state)}
+                      alt={`${turn} hour delivery`}
+                      width={16}
+                      height={16}
+                      className='h-4 w-auto'
+                    />
+                    {turn}h
+                  </span>
                   <span
                     className={[
                       'text-xs text-center tracking-[-0.2px] whitespace-nowrap',

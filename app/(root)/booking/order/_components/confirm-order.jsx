@@ -227,7 +227,11 @@ const ConfirmOrder = ({ userDetails }) => {
 
                 {/* STEP 2 — Appointment */}
                 {currentKey === "appointment" && (
-                  <AppointmentPicker value={slot} onSelect={setSlot} />
+                  <AppointmentPicker
+                    value={slot}
+                    onSelect={setSlot}
+                    autoSelectSlot={false}
+                  />
                 )}
 
                 {/* STEP 3 — How can we help you? (options + notes) */}
