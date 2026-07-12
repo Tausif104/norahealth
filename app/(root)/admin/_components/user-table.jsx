@@ -423,7 +423,7 @@ export function UserTable({ users, admin }) {
   });
 
   return (
-    <div className='w-full p-10'>
+    <div className='w-full flex-1 min-w-0 overflow-x-hidden p-4 sm:p-6 lg:p-10'>
       <div className='flex justify-between items-center'>
         {" "}
         {/* HEADER */}
@@ -443,16 +443,16 @@ export function UserTable({ users, admin }) {
           </h2>
         </div>
       </div>
-      <div className='flex items-center py-4'>
+      <div className='flex flex-wrap items-center gap-3 py-4'>
         <CreateUserForm />
-        <div className='flex items-center py-4 w-full max-w-sm ml-4'>
+        <div className='flex items-center w-full sm:w-auto sm:flex-1'>
           <input
             value={table.getColumn("email")?.getFilterValue() ?? ""}
             onChange={(e) =>
               table.getColumn("email")?.setFilterValue(e.target.value)
             }
             placeholder='Search by email...'
-            className='w-[260px] bg-white rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-200'
+            className='w-full sm:w-[260px] bg-white rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-200'
           />
         </div>
         <DropdownMenu>
@@ -482,7 +482,7 @@ export function UserTable({ users, admin }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className='overflow-hidden rounded-md border'>
+      <div className='w-full overflow-x-auto rounded-md border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
