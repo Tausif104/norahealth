@@ -340,9 +340,9 @@ export default function AppointmentPicker({
                     <Image
                       src={badgeSrc(s.startTime, state)}
                       alt={`${turn} hour delivery`}
-                      width={16}
-                      height={16}
-                      className='h-4 w-4 shrink-0 object-contain'
+                      width={40}
+                      height={30}
+                      className='h-auto w-5 shrink-0 object-contain'
                     />
                     {turn}h
                   </span>
