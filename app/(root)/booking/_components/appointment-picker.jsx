@@ -342,7 +342,7 @@ export default function AppointmentPicker({
                       alt={`${turn} hour delivery`}
                       width={16}
                       height={16}
-                      className='h-4 w-auto'
+                      className='h-4 w-4 shrink-0 object-contain'
                     />
                     {turn}h
                   </span>
