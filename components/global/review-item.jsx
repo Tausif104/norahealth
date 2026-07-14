@@ -2,8 +2,8 @@ import Image from 'next/image'
 
 const ReviewItem = ({ item }) => {
   return (
-    <div className='theme-shadow'>
-      <ul className='flex items-center gap-1 mb-3'>
+    <div className='theme-shadow flex h-full flex-col'>
+      <ul className='flex items-center gap-1 mb-3 shrink-0'>
         {Array.from({ length: item.rating }).map((_, index) => (
           <li key={index}>
             <Image
@@ -16,9 +16,11 @@ const ReviewItem = ({ item }) => {
         ))}
       </ul>
 
-      <p className='text-[#0D060C] text-[20px]'>{item.body}</p>
+      <p className='review-scroll text-[#0D060C] text-[20px] flex-1 min-h-0 overflow-y-auto pr-2'>
+        {item.body}
+      </p>
 
-      <div className='mt-[30px] flex items-center gap-3'>
+      <div className='mt-5 flex items-center gap-3 shrink-0'>
         {item.photo && (
           <Image
             src={item.photo}

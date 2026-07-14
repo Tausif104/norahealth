@@ -226,9 +226,26 @@ ul.slick-dots .slick-active button {
   background-color: #fff;
   margin: 20px 10px;
   border-radius: 16px;
-  padding: 50px 30px;
+  padding: 40px 30px;
   border: 1px solid #ce8a3696;
-  min-height: 350px;
+  height: 420px; /* fixed height so all cards match; long reviews scroll inside */
+  box-sizing: border-box;
+}
+
+/* Thin, themed scrollbar for long reviews inside the fixed-height card */
+.review-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #ce8936 transparent;
+}
+.review-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.review-scroll::-webkit-scrollbar-thumb {
+  background-color: #ce8936;
+  border-radius: 8px;
+}
+.review-scroll::-webkit-scrollbar-track {
+  background: transparent;
 }
 .react-datepicker-wrapper {
   width: 100%;
