@@ -186,7 +186,11 @@ const ConfirmOrder = ({ userDetails }) => {
               <StepIndicator current={step} total={STEPS.length} />
             </div>
 
-            {!isLastStep && <NextButton onClick={goNext} />}
+            {isLastStep ? (
+              <SubmitButton submitting={submitting} />
+            ) : (
+              <NextButton onClick={goNext} />
+            )}
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8 bg-[#FAF9F8] p-4 2xl:p-8 rounded-[12px]">
@@ -252,7 +256,7 @@ const ConfirmOrder = ({ userDetails }) => {
 
             {/* RIGHT */}
             <div className="min-w-0 flex flex-col gap-4">
-              <div className="booking-img order-2 lg:order-1 max-[1367px]:max-h-40 overflow-hidden rounded-[16px]">
+              <div className="booking-img max-[1367px]:max-h-40 overflow-hidden rounded-[16px]">
                 <Image
                   src="/images/booking.png"
                   width={370}
@@ -260,18 +264,6 @@ const ConfirmOrder = ({ userDetails }) => {
                   alt="booking"
                   className="rounded-[16px] w-full"
                 />
-              </div>
-
-              <div className="order-1 lg:order-2 bg-[#F4E7E1] p-4 rounded-[16px]">
-                <div className="flex flex-col gap-6">
-                  <p className="text-sm text-[#3A3D42] tracking-[-0.2px] leading-[22px]">
-                    After you place your order one of our clinicians will get in
-                    touch for a quick consultation. Next day delivery is
-                    available on all consultations complete by 1pm.
-                  </p>
-
-                  <SubmitButton submitting={submitting} disabled={!isLastStep} />
-                </div>
               </div>
             </div>
           </div>
@@ -370,11 +362,11 @@ const NextButton = ({ onClick }) => (
   </button>
 );
 
-const SubmitButton = ({ submitting, disabled }) => (
+const SubmitButton = ({ submitting }) => (
   <button
     type="submit"
-    disabled={submitting || disabled}
-    className="group w-full bg-theme text-white text-base font-medium py-3 px-[18px] rounded-full hover:bg-[#491F40] transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+    disabled={submitting}
+    className="group bg-theme text-white text-base font-medium py-2.5 px-7 rounded-full hover:bg-[#491F40] transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
   >
     <span className="flex items-center justify-center gap-1.5">
       {submitting ? "Confirming…" : "Confirm booking"}
