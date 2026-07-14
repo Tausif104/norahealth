@@ -47,7 +47,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LoaderIcon, MoreHorizontal, PanelLeft } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  LoaderIcon,
+  MoreHorizontal,
+  PanelLeft,
+} from "lucide-react";
 
 import { formatDate } from "@/lib/utils";
 import { useAdmin } from "@/lib/adminContext";
@@ -64,13 +70,21 @@ import {
   updateOrderStatus,
 } from "@/actions/order.action";
 
-/* -------------------------------------------------------------------------- */
-/*  Sticky right column helpers (so Actions stays visible on horizontal scroll) */
-/* -------------------------------------------------------------------------- */
-const STICKY_RIGHT_TH =
-  "sticky right-0 z-40 bg-[#faf9f8] border-l min-w-[90px] shadow-[-6px_0_6px_-6px_rgba(0,0,0,0.15)]";
-const STICKY_RIGHT_TD =
-  "sticky right-0 z-30 bg-[#faf9f8] border-l min-w-[90px] shadow-[-6px_0_6px_-6px_rgba(0,0,0,0.10)]";
+/* ---------- expandable-row detail field ---------- */
+function DetailField({ label, value }) {
+  const empty =
+    value === null || value === undefined || value === "" ? true : false;
+  return (
+    <div className="flex flex-col gap-0.5">
+      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </dt>
+      <dd className="text-sm text-[#0D060C]">
+        {empty ? <span className="text-muted-foreground">—</span> : value}
+      </dd>
+    </div>
+  );
+}
 
 /* ---------- booking status badge (from appointment-order-table) ---------- */
 function BookingStatusBadge({ value }) {
@@ -181,6 +195,14 @@ export default function MergedOcOrdersTable() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pageIndex, setPageIndex] = useState(0);
+  const [expanded, setExpanded] = useState(() => new Set()); // expanded row keys
+
+  const toggleExpanded = (key) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
 
   // ----- Create Order dialog (booking rows) -----
   const [orderOpen, setOrderOpen] = useState(false);
@@ -296,7 +318,7 @@ export default function MergedOcOrdersTable() {
   ];
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
-  const COLSPAN = 11;
+  const COLSPAN = 7; // primary columns: expand, ID, Name, Email, Type, Status, Actions
 
   return (
     <div className="w-full p-6 overflow-x-auto">
@@ -405,21 +427,17 @@ export default function MergedOcOrdersTable() {
       </div>
 
       {/* TABLE */}
-      <div className="rounded-md border overflow-x-auto">
-        <Table className="min-w-max">
+      <div className="rounded-md border">
+        <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-8" />
               <TableHead>ID</TableHead>
               <TableHead>Full Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Appt Date</TableHead>
-              <TableHead>Medicine</TableHead>
-              <TableHead>Tracking ID</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className={STICKY_RIGHT_TH}>Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -437,102 +455,152 @@ export default function MergedOcOrdersTable() {
                 </TableCell>
               </TableRow>
             ) : pageRows.length ? (
-              pageRows.map((r) => (
-                <TableRow key={r.key}>
-                  <TableCell className="capitalize">{r.id}</TableCell>
-                  <TableCell>{r.fullName}</TableCell>
-                  <TableCell>
-                    {r.userId ? (
-                      <Link
-                        href={`/admin/${r.userId}/orders`}
-                        className="hover:underline"
+              pageRows.map((r) => {
+                const isOpen = expanded.has(r.key);
+                return (
+                  <React.Fragment key={r.key}>
+                    {/* PRIMARY ROW — essential columns only */}
+                    <TableRow
+                      className="cursor-pointer"
+                      data-state={isOpen ? "selected" : undefined}
+                      onClick={() => toggleExpanded(r.key)}
+                    >
+                      <TableCell className="w-8">
+                        <button
+                          type="button"
+                          aria-label={isOpen ? "Collapse" : "Expand"}
+                          className="grid size-6 place-items-center rounded hover:bg-black/5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpanded(r.key);
+                          }}
+                        >
+                          {isOpen ? (
+                            <ChevronDown className="size-4" />
+                          ) : (
+                            <ChevronRight className="size-4" />
+                          )}
+                        </button>
+                      </TableCell>
+                      <TableCell className="capitalize">{r.id}</TableCell>
+                      <TableCell>{r.fullName}</TableCell>
+                      <TableCell>
+                        {r.userId ? (
+                          <Link
+                            href={`/admin/${r.userId}/orders`}
+                            className="hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {r.email}
+                          </Link>
+                        ) : (
+                          r.email
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {r._type === "booking" ? (
+                          <Badge className="bg-[#d67b0e] text-white">
+                            Appointment
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-[#491F40] text-white">Order</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {r._type === "booking" ? (
+                          <BookingStatusBadge value={r.bookingStatus} />
+                        ) : (
+                          <OrderStatusPill
+                            status={r.status}
+                            trackingId={r.trackingId}
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell
+                        className="text-right"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        {r.email}
-                      </Link>
-                    ) : (
-                      r.email
+                        <RowActions
+                          row={r}
+                          onCreateOrder={(b) => {
+                            setSelectedBooking(b);
+                            setMedicineName("");
+                            setTrackingId("");
+                            setCreateStatus("clinicalreview");
+                            setOrderOpen(true);
+                          }}
+                          onUpdateBookingStatus={(b) => {
+                            setSelectedForBStatus(b);
+                            setBookingStatus(b.bookingStatus || "Incomplete");
+                            setBStatusOpen(true);
+                          }}
+                          onUpdateOrderStatus={(o) => {
+                            setSelectedForOStatus(o);
+                            setOrderStatus(o.status || "");
+                            setOrderTrackingId(o.trackingId || "");
+                            setOStatusOpen(true);
+                          }}
+                          onDelete={(target) => {
+                            setDeleteTarget(target);
+                            setDeleteOpen(true);
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+
+                    {/* DETAIL ROW — hidden until expanded */}
+                    {isOpen && (
+                      <TableRow className="bg-[#faf9f8] hover:bg-[#faf9f8]">
+                        <TableCell colSpan={COLSPAN} className="p-0">
+                          <dl className="grid grid-cols-2 gap-x-8 gap-y-3 px-6 py-4 sm:grid-cols-3 lg:grid-cols-5">
+                            <DetailField label="Phone" value={r.phoneNumber} />
+                            <DetailField
+                              label="Appt Date"
+                              value={
+                                r.appointment ? (
+                                  <span className="flex flex-col">
+                                    <span>{formatDate(r.appointment)}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {(() => {
+                                        const start = new Date(r.appointment);
+                                        const end = new Date(
+                                          start.getTime() + 60 * 60 * 1000,
+                                        );
+                                        const t = (d) =>
+                                          d.toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                          });
+                                        return `${t(start)} – ${t(end)}`;
+                                      })()}
+                                    </span>
+                                  </span>
+                                ) : null
+                              }
+                            />
+                            <DetailField
+                              label="Medicine"
+                              value={r.medicineName}
+                            />
+                            <DetailField
+                              label="Tracking ID"
+                              value={r.trackingId}
+                            />
+                            <DetailField
+                              label="Created"
+                              value={
+                                r.createdAt
+                                  ? formatDate(new Date(r.createdAt))
+                                  : null
+                              }
+                            />
+                          </dl>
+                        </TableCell>
+                      </TableRow>
                     )}
-                  </TableCell>
-                  <TableCell>{r.phoneNumber}</TableCell>
-                  <TableCell>
-                    {r.appointment ? (
-                      <div className="flex flex-col">
-                        <span>{formatDate(r.appointment)}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {(() => {
-                            const start = new Date(r.appointment);
-                            const end = new Date(start.getTime() + 60 * 60 * 1000);
-                            const t = (d) =>
-                              d.toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              });
-                            return `${t(start)} – ${t(end)}`;
-                          })()}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {r.medicineName || (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {r.trackingId || (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {r._type === "booking" ? (
-                      <Badge className="bg-[#d67b0e] text-white">
-                        Appointment
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-[#491F40] text-white">Order</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {r._type === "booking" ? (
-                      <BookingStatusBadge value={r.bookingStatus} />
-                    ) : (
-                      <OrderStatusPill status={r.status} trackingId={r.trackingId} />
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {r.createdAt ? formatDate(new Date(r.createdAt)) : "—"}
-                  </TableCell>
-                  <TableCell className={STICKY_RIGHT_TD}>
-                    <RowActions
-                      row={r}
-                      onCreateOrder={(b) => {
-                        setSelectedBooking(b);
-                        setMedicineName("");
-                        setTrackingId("");
-                        setCreateStatus("clinicalreview");
-                        setOrderOpen(true);
-                      }}
-                      onUpdateBookingStatus={(b) => {
-                        setSelectedForBStatus(b);
-                        setBookingStatus(b.bookingStatus || "Incomplete");
-                        setBStatusOpen(true);
-                      }}
-                      onUpdateOrderStatus={(o) => {
-                        setSelectedForOStatus(o);
-                        setOrderStatus(o.status || "");
-                        setOrderTrackingId(o.trackingId || "");
-                        setOStatusOpen(true);
-                      }}
-                      onDelete={(target) => {
-                        setDeleteTarget(target);
-                        setDeleteOpen(true);
-                      }}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))
+                  </React.Fragment>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={COLSPAN} className="text-center h-24">
