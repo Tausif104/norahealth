@@ -12,7 +12,7 @@ const ReviewsSection = ({ reviews = [] }) => {
 
   const [slidesToShow, setSlidesToShow] = useState(3);
 
-  const [rows, setRows] = useState(2);
+  const [rows, setRows] = useState(1);
 
   useEffect(() => {
     setIsClient(true);
@@ -30,7 +30,7 @@ const ReviewsSection = ({ reviews = [] }) => {
         setRows(1);
       } else {
         setSlidesToShow(3);
-        setRows(2);
+        setRows(1);
       }
     };
 
@@ -42,14 +42,14 @@ const ReviewsSection = ({ reviews = [] }) => {
   const settings = {
     dots: false,
     infinite: true,
-    speed: 500,
+    speed: 800,
     slidesToShow: slidesToShow,
     slidesToScroll: 1,
-    // autoplay: true,
+    autoplay: true,
+    autoplaySpeed: 4000,
+    pauseOnHover: true,
     arrows: false,
     rows: rows,
-    speed: 1000,
-    autoplaySpeed: 5000,
     responsive: [
       {
         breakpoint: 1199,
