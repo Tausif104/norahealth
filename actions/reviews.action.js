@@ -7,10 +7,10 @@
  */
 export async function getGoogleReviews() {
   const placeId = process.env.GOOGLE_PLACEID;
-  const apiKey = process.env.GOOLE_API_KEY; // (env has this spelling)
+  const apiKey = process.env.GOOGLE_API_KEY;
 
   if (!placeId || !apiKey) {
-    console.error("Missing GOOGLE_PLACEID or GOOLE_API_KEY");
+    console.error("Missing GOOGLE_PLACEID or GOOGLE_API_KEY");
     return { success: false, reviews: [] };
   }
 
