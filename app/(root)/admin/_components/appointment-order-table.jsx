@@ -162,7 +162,11 @@ const columns = [
       const start = new Date(appt);
       const end = new Date(start.getTime() + 60 * 60 * 1000); // 1-hour slot
       const fmtTime = (d) =>
-        d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        d.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "UTC",
+        });
       return (
         <div className='flex flex-col'>
           <span>{formatDate(appt)}</span>

@@ -570,6 +570,7 @@ export default function MergedOcOrdersTable() {
                                           d.toLocaleTimeString([], {
                                             hour: "2-digit",
                                             minute: "2-digit",
+                                            timeZone: "UTC",
                                           });
                                         return `${t(start)} – ${t(end)}`;
                                       })()}
