@@ -410,13 +410,13 @@ export default function MergedOcOrdersTable() {
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
-              <TableHead>Type</TableHead>
               <TableHead>Full Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
               <TableHead>Appt Date</TableHead>
               <TableHead>Medicine</TableHead>
               <TableHead>Tracking ID</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created</TableHead>
               <TableHead className={STICKY_RIGHT_TH}>Actions</TableHead>
@@ -440,15 +440,6 @@ export default function MergedOcOrdersTable() {
               pageRows.map((r) => (
                 <TableRow key={r.key}>
                   <TableCell className="capitalize">{r.id}</TableCell>
-                  <TableCell>
-                    {r._type === "booking" ? (
-                      <Badge className="bg-[#d67b0e] text-white">
-                        Appointment
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-[#491F40] text-white">Order</Badge>
-                    )}
-                  </TableCell>
                   <TableCell>{r.fullName}</TableCell>
                   <TableCell>
                     {r.userId ? (
@@ -492,6 +483,15 @@ export default function MergedOcOrdersTable() {
                   <TableCell>
                     {r.trackingId || (
                       <span className="text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {r._type === "booking" ? (
+                      <Badge className="bg-[#d67b0e] text-white">
+                        Appointment
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-[#491F40] text-white">Order</Badge>
                     )}
                   </TableCell>
                   <TableCell>
