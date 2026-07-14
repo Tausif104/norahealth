@@ -87,9 +87,11 @@ export const createOrderByAdmin = async (prevState, formData) => {
     },
   });
 
-  // 📦 Royal Mail: when an order is created as "Awaiting Dispatch" (clinicalreview)
-  // and has no tracking number yet, create the shipment via Click & Drop and store
-  // the returned tracking number.
+  // 📦 Auto-dispatch: when an order is created as "Awaiting Dispatch"
+  // (clinicalreview) with no manual tracking, create the shipment via Click &
+  // Drop and, ONLY if a tracking number comes back, flip it to "Posted via
+  // Royal Mail". If RM isn't configured, fails, or returns no tracking number,
+  // the order safely stays in "Awaiting Dispatch" (nothing breaks).
   if (order && status === "clinicalreview" && !trackingId && isRoyalMailConfigured()) {
     try {
       const { trackingNumber } = await createRoyalMailOrder({
@@ -99,7 +101,7 @@ export const createOrderByAdmin = async (prevState, formData) => {
       if (trackingNumber) {
         await prisma.order.update({
           where: { id: order.id },
-          data: { trackingId: trackingNumber },
+          data: { trackingId: trackingNumber, status: "posted" },
         });
       }
     } catch (err) {

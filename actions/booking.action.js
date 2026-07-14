@@ -4,6 +4,7 @@ import { prisma } from "@/lib/client/prisma";
 import { createCalendarEvent } from "@/lib/googleCalendar";
 import { revalidatePath } from "next/cache";
 import { orderFromBookingEmailTemplate, sendBookingConfirmationEmail, sendOrderBookingConfirmationEmail } from "@/lib/emailTemplate";
+import { createRoyalMailOrder, isRoyalMailConfigured } from "@/lib/royalMail";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -1088,6 +1089,37 @@ export async function createOrderFromBooking({
       },
     });
 
+    // 📦 Auto-dispatch: when the order lands in "Awaiting Dispatch"
+    // (clinicalreview) with no manual tracking, send it to Royal Mail and,
+    // ONLY if a tracking number comes back, flip it to "Posted via Royal Mail".
+    // If RM isn't configured, fails, or returns no tracking number, the order
+    // safely stays in "Awaiting Dispatch" (nothing breaks).
+    let finalStatus = order.status;
+    let finalTracking = order.trackingId;
+    if (
+      order.status === "clinicalreview" &&
+      !order.trackingId &&
+      isRoyalMailConfigured()
+    ) {
+      try {
+        const { trackingNumber } = await createRoyalMailOrder({
+          order,
+          customer: { email: booking.email, account: user.account },
+        });
+        if (trackingNumber) {
+          const updated = await prisma.order.update({
+            where: { id: order.id },
+            data: { trackingId: trackingNumber, status: "posted" },
+          });
+          finalStatus = updated.status;
+          finalTracking = updated.trackingId;
+        }
+      } catch (err) {
+        console.error("Royal Mail auto-dispatch (createOrderFromBooking) failed:", err);
+        // keep order as-is (Awaiting Dispatch)
+      }
+    }
+
     // 3️⃣ Send email (non-blocking)
     try {
       await resend.emails.send({
@@ -1099,8 +1131,8 @@ export async function createOrderFromBooking({
           fullName: booking.fullName,
           firstName: user.account?.firstName,
           medicineName: finalMedicineName,
-          status: order.status,
-          trackingId: order.trackingId,
+          status: finalStatus,
+          trackingId: finalTracking,
           deliveryAddress:
             user.account?.deliveryAddress || user.account?.address,
         }),
