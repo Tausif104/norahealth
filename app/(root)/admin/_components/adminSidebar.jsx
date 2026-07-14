@@ -91,6 +91,17 @@ const AdminSidebar = () => {
           <ClipboardClock className='w-4 h-4' />
           <span>Admin OC Orders</span>
         </Link>
+        <Link
+          href='/admin/oc-orders'
+          className={`${baseClasses} ${
+            pathname.startsWith("/admin/oc-orders")
+              ? activeClasses
+              : inactiveClasses
+          }`}
+        >
+          <ClipboardClock className='w-4 h-4' />
+          <span>OC Orders (Merged)</span>
+        </Link>
         {/* Booking Slot */}
         <Link
           href='/admin/booking-slot'
