@@ -270,6 +270,13 @@ export async function createBookingOrder(formData) {
     const providerName = formData.get("providerName")?.toString().trim();
     const nhsService = formData.get("nhsService")?.toString().trim();
 
+    // Delivery details are now editable on the booking form (pre-filled from the
+    // profile). We save any edits back to the user's account below.
+    const deliveryAddressInput =
+      formData.get("deliveryAddress")?.toString().trim() || "";
+    const deliveryPostcodeInput =
+      formData.get("deliveryPostcode")?.toString().trim() || "";
+
     const bookingdate = formData.get("bookingdate")?.toString(); // "YYYY-MM-DD"
     const bookingtime = formData.get("bookingtime")?.toString(); // "HH:MM"
 
@@ -316,6 +323,27 @@ export async function createBookingOrder(formData) {
         msg: "No account found with this email. Please login or use your registered email.",
         data: null,
       };
+    }
+
+    // Persist any delivery edits from the booking form back to the profile so
+    // the confirmation email + Royal Mail dispatch use the address the patient
+    // just entered. Only overwrite fields that were provided (never wipe).
+    if (user.account && (deliveryAddressInput || deliveryPostcodeInput)) {
+      const deliveryData = {};
+      if (deliveryAddressInput)
+        deliveryData.deliveryAddress = deliveryAddressInput;
+      if (deliveryPostcodeInput)
+        deliveryData.deliveryZipCode = deliveryPostcodeInput;
+      try {
+        await prisma.account.update({
+          where: { userId: user.id },
+          data: deliveryData,
+        });
+        user.account = { ...user.account, ...deliveryData };
+      } catch (e) {
+        console.error("Failed to save delivery details from booking:", e);
+        // don't block the order for a delivery-save failure
+      }
     }
 
     let recreatedOrder = null;

@@ -47,7 +47,8 @@ const ConfirmOrder = ({ userDetails }) => {
       }`.trim()
     : "";
 
-  // Delivery details are read-only here — they come from the user's My Profile.
+  // Pre-filled from My Profile but editable here; on submit the entered values
+  // are saved back to the user's profile (used for dispatch + the order email).
   const deliveryAddress = userDetails?.account?.deliveryAddress || "";
   const deliveryPostcode = userDetails?.account?.deliveryZipCode || "";
 
@@ -55,6 +56,8 @@ const ConfirmOrder = ({ userDetails }) => {
     fullName,
     email: userDetails?.email || "",
     phoneNumber: userDetails?.account?.phoneNumber || "",
+    deliveryAddress,
+    deliveryPostcode,
     ocRequest: [],
     appointmentRequest: "true",
     notes: "",
@@ -242,13 +245,19 @@ const ConfirmOrder = ({ userDetails }) => {
                       placeholder="Phone number"
                     />
 
-                    <ReadOnlyField
+                    <Input
                       label="Delivery address"
-                      value={deliveryAddress}
+                      name="deliveryAddress"
+                      value={form.deliveryAddress}
+                      onChange={handleChange}
+                      placeholder="Enter your delivery address"
                     />
-                    <ReadOnlyField
+                    <Input
                       label="Delivery postcode"
-                      value={deliveryPostcode}
+                      name="deliveryPostcode"
+                      value={form.deliveryPostcode}
+                      onChange={handleChange}
+                      placeholder="Enter your delivery postcode"
                     />
                   </div>
                 )}
@@ -307,16 +316,6 @@ const Input = ({ label, ...props }) => (
       required
       className="bg-white border border-[#EEE0CF] text-[#0D060C] placeholder:text-[#0D060C] text-sm tracking-[-0.2px] w-full px-5 py-3.5 rounded-[8px] outline-none focus:border-[#CE8936] transition"
     />
-  </div>
-);
-
-// Read-only display for values that come from the user's profile (not editable here).
-const ReadOnlyField = ({ label, value }) => (
-  <div className="flex flex-col gap-2">
-    <label className="text-sm text-[#3A3D42] tracking-[-0.2px]">{label}</label>
-    <div className="bg-white/60 border border-[#EEE0CF] text-[#0D060C] text-sm tracking-[-0.2px] w-full px-5 py-3.5 rounded-[8px] min-h-[46px] flex items-center">
-      {value || <span className="text-[#3A3D42]/50">Not set</span>}
-    </div>
   </div>
 );
 

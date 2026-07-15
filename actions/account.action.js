@@ -339,6 +339,7 @@ export const updateAccountAction = async (prevState, formData) => {
   })
 
   revalidatePath('/profile')
+  revalidatePath('/admin/profile')
 
   if (updatedAcount) {
     return {

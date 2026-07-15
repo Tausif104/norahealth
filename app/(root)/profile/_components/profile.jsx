@@ -81,16 +81,17 @@ const Profile = ({ account }) => {
   };
 
   // ---------- Toasts for account update ----------
+  // Depend on the whole state object (a new object is returned per submit) so
+  // the toast fires on every save — even two identical successes in a row.
   useEffect(() => {
-    if (!accountState.msg) return;
+    if (!accountState?.msg) return;
 
     if (accountState.success) {
       toast.success(accountState.msg);
     } else {
       toast.warning(accountState.msg);
     }
-    accountState.msg = "";
-  }, [accountState.msg]);
+  }, [accountState]);
 
   console.log(account, "profile");
 
@@ -327,6 +328,22 @@ const Profile = ({ account }) => {
               className='bg-white border border-[#EEE0CF] text-black w-full py-[15px] px-[16px] rounded-[6px]'
             />
           </div>
+          {/* Inline status — persistent confirmation after saving */}
+          {accountState?.msg && (
+            <div className='col-span-4 md:col-span-4'>
+              <p
+                className={`text-sm font-medium rounded-[8px] px-4 py-3 ${
+                  accountState.success
+                    ? "bg-[#E7F5EC] text-[#1B7F4B]"
+                    : "bg-[#FBEFE2] text-[#B4690E]"
+                }`}
+              >
+                {accountState.success ? "✓ " : ""}
+                {accountState.msg}
+              </p>
+            </div>
+          )}
+
           {/* Save button */}
           <div className='col-span-4 md:col-span-4'>
             <button
