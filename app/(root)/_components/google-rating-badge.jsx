@@ -17,7 +17,7 @@ const GoogleRatingBadge = () => (
     target="_blank"
     rel="noopener noreferrer"
     aria-label="See Nora Health reviews on Google"
-    className="group inline-flex flex-col items-center justify-center gap-1 rounded-[14px] border border-[#CE8936]/40 bg-white/70 px-5 py-2.5 transition duration-300 hover:border-[#CE8936] hover:bg-white"
+    className="group inline-flex flex-col items-center justify-center gap-1 rounded-[14px] border border-[#CE8936]/40 bg-transparent px-5 py-2.5 transition duration-300 hover:border-[#CE8936]"
   >
     <span className="text-[13px] font-semibold leading-none tracking-[-0.2px] text-[#491F40]">
       Google Reviews
