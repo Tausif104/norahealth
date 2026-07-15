@@ -1,4 +1,4 @@
-import Link from "next/link";
+"use client";
 
 /* "Google" wordmark in its brand colours (transparent, crisp — no image box) */
 const LETTERS = [
@@ -18,31 +18,41 @@ const Star = () => (
 
 /**
  * Google reviews trust badge — real Google colours rendered as text/SVG so it
- * is fully transparent and crisp at any size. Links to the Nora Health listing.
+ * is fully transparent and crisp at any size. Clicking smoothly scrolls to the
+ * on-page reviews (Patient Stories) section.
  */
-const GoogleRatingBadge = () => (
-  <Link
-    href="https://www.google.com/maps?cid=4341612241905128635"
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="See Nora Health reviews on Google"
-    className="inline-flex flex-col items-center justify-center gap-1 transition duration-300 hover:opacity-80"
-  >
-    <span className="font-sans text-[22px] font-bold leading-none tracking-[-0.5px]">
-      {LETTERS.map((l, i) => (
-        <span key={i} style={{ color: l.c }}>
-          {l.ch}
-        </span>
-      ))}
-    </span>
-    <span className="flex items-center gap-[2px] text-[#FBBC05]">
-      <Star />
-      <Star />
-      <Star />
-      <Star />
-      <Star />
-    </span>
-  </Link>
-);
+const GoogleRatingBadge = () => {
+  const scrollToReviews = (e) => {
+    const el = document.getElementById("reviews");
+    if (el) {
+      e.preventDefault();
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  return (
+    <a
+      href="#reviews"
+      onClick={scrollToReviews}
+      aria-label="See our Google reviews"
+      className="inline-flex flex-col items-center justify-center gap-1 transition duration-300 hover:opacity-80 cursor-pointer"
+    >
+      <span className="font-sans text-[22px] font-bold leading-none tracking-[-0.5px]">
+        {LETTERS.map((l, i) => (
+          <span key={i} style={{ color: l.c }}>
+            {l.ch}
+          </span>
+        ))}
+      </span>
+      <span className="flex items-center gap-[2px] text-[#FBBC05]">
+        <Star />
+        <Star />
+        <Star />
+        <Star />
+        <Star />
+      </span>
+    </a>
+  );
+};
 
 export default GoogleRatingBadge;

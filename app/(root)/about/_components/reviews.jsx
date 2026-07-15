@@ -81,7 +81,10 @@ const ReviewsSection = ({ reviews = [] }) => {
   }
 
   return (
-    <section className='section-bottom-padding md:pt-0 pt-[60px]'>
+    <section
+      id='reviews'
+      className='section-bottom-padding md:pt-0 pt-[60px] scroll-mt-24'
+    >
       <div className='container mx-auto custom-container sm:px-0 px-[24px]'>
         <div className='flex items-center md:justify-between justify-center md:mb-[50px] mb-[20px]'>
           <h2 className='text-heading md:text-left text-center xl:text-5xl lg:text-4xl text-2xl font-semibold leading-[1.2]'>
