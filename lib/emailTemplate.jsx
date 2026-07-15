@@ -98,6 +98,8 @@ export const orderEmailTemplate = ({
   customerName,
   phoneNumber,
   deliveryAddress,
+  callDate,
+  callTimeSlot,
 }) => {
   const whatsappLink = "https://wa.me/447440126154";
   const supportEmail = "pharmacy.fap80@nhs.net";
@@ -105,6 +107,16 @@ export const orderEmailTemplate = ({
   const name = escapeHtml(firstName || firstNameOf(customerName));
   const phone = escapeHtml(phoneNumber || "your registered number");
   const address = escapeHtml(deliveryAddress || "your delivery address");
+
+  // "As requested, we will call you on 15-Jul between 15:00 – 16:00." Only
+  // shown when we have the scheduled slot; otherwise the sentence is skipped.
+  const date = escapeHtml(callDate || "");
+  const slot = escapeHtml(callTimeSlot || "");
+  const callLine = date
+    ? `As requested, we will call you on <strong>${date}</strong>${
+        slot ? ` between <strong>${slot}</strong>` : ""
+      }. `
+    : "";
 
   return `
 <div style="font-family: Arial, sans-serif; background:#f9f9f9; padding:20px;">
@@ -132,12 +144,12 @@ export const orderEmailTemplate = ({
         </p>
 
         <p>
-          Once your consultation is complete we will post your medication to:
-          <strong>${address}</strong>.
+          ${callLine}Once your consultation is complete we will post your
+          medication to: <strong>${address}</strong>.
         </p>
 
         <p style="margin-top:16px;color:#555;font-size:13px;">
-          If you have any queries, please
+          If you have any queries or need to amend your appointment please
           <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" style="color:#cd8936;text-decoration:underline;">
             message us on WhatsApp
           </a>
@@ -594,13 +606,34 @@ export async function sendOrderBookingConfirmationEmail({
   ocRequest,
   appointmentRequest,
   deliveryAddress,
+  appointment,
+  slotStartTime,
+  slotEndTime,
   createdAt,
   notes,
 }) {
+  // "15-Jul" (DD-MMM) + "15:00 – 16:00" for the "we will call you on …" line.
+  let callDate = "";
+  let callTimeSlot = "";
+  if (appointment) {
+    callDate = new Date(appointment)
+      .toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        timeZone: "UTC", // stored UTC wall-clock == UK time the user picked
+      })
+      .replace(" ", "-"); // "15 Jul" -> "15-Jul"
+    callTimeSlot = slotStartTime
+      ? `${slotStartTime}${slotEndTime ? ` – ${slotEndTime}` : ""}`
+      : "";
+  }
+
   const html = orderEmailTemplate({
     firstName: firstName || firstNameOf(fullName),
     phoneNumber,
     deliveryAddress,
+    callDate,
+    callTimeSlot,
   });
 
   await resend.emails.send({
