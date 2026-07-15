@@ -1,5 +1,6 @@
 import OutlineBtn from "@/components/global/outline-btn";
 import PrimaryBtn from "@/components/global/primary-btn";
+import GoogleRatingBadge from "./google-rating-badge";
 import Image from "next/image";
 
 const Hero = () => {
@@ -31,9 +32,10 @@ const Hero = () => {
               and 100% confidential — empowering you to make informed choices
               about your reproductive health with complete peace of mind.
             </p>
-            <div className='flex xl:gap-5 lg:gap-4 gap-3 2xl:mt-15 md:mt-[24px] mt-[24px] sm:flex-row flex-col'>
+            <div className='flex xl:gap-5 lg:gap-4 gap-3 2xl:mt-15 md:mt-[24px] mt-[24px] sm:flex-row flex-col sm:items-center'>
               <PrimaryBtn label='Order Now' url='/booking/order' />
               <OutlineBtn label='Book Appointment' url='/booking' />
+              <GoogleRatingBadge />
             </div>
           </div>
 
