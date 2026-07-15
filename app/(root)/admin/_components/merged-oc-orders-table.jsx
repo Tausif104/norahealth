@@ -75,11 +75,11 @@ function DetailField({ label, value }) {
   const empty =
     value === null || value === undefined || value === "" ? true : false;
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex min-w-[110px] max-w-[260px] flex-col gap-0.5">
       <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </dt>
-      <dd className="text-sm text-[#0D060C]">
+      <dd className="text-sm text-[#0D060C] break-words">
         {empty ? <span className="text-muted-foreground">—</span> : value}
       </dd>
     </div>
@@ -552,7 +552,7 @@ export default function MergedOcOrdersTable() {
                     {isOpen && (
                       <TableRow className="bg-[#faf9f8] hover:bg-[#faf9f8]">
                         <TableCell colSpan={COLSPAN} className="p-0">
-                          <dl className="grid grid-cols-2 gap-x-8 gap-y-3 px-6 py-4 sm:grid-cols-3 lg:grid-cols-5">
+                          <dl className="flex flex-wrap gap-x-10 gap-y-3 px-6 py-4">
                             <DetailField label="Phone" value={r.phoneNumber} />
                             <DetailField
                               label="Appt Date"
