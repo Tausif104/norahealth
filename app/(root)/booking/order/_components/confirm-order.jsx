@@ -47,6 +47,10 @@ const ConfirmOrder = ({ userDetails }) => {
       }`.trim()
     : "";
 
+  // Delivery details are read-only here — they come from the user's My Profile.
+  const deliveryAddress = userDetails?.account?.deliveryAddress || "";
+  const deliveryPostcode = userDetails?.account?.deliveryZipCode || "";
+
   const [form, setForm] = useState({
     fullName,
     email: userDetails?.email || "",
@@ -226,6 +230,27 @@ const ConfirmOrder = ({ userDetails }) => {
                       onChange={handleChange}
                       placeholder="Phone number"
                     />
+
+                    <ReadOnlyField
+                      label="Delivery address"
+                      value={deliveryAddress}
+                    />
+                    <ReadOnlyField
+                      label="Delivery postcode"
+                      value={deliveryPostcode}
+                    />
+
+                    {(!deliveryAddress || !deliveryPostcode) && (
+                      <p className="text-xs text-[#3A3D42] tracking-[-0.2px]">
+                        Your delivery details are taken from your profile.{" "}
+                        <Link
+                          href="/profile"
+                          className="text-[#CE8936] underline"
+                        >
+                          Update in My Profile
+                        </Link>
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -283,6 +308,16 @@ const Input = ({ label, ...props }) => (
       required
       className="bg-white border border-[#EEE0CF] text-[#0D060C] placeholder:text-[#0D060C] text-sm tracking-[-0.2px] w-full px-5 py-3.5 rounded-[8px] outline-none focus:border-[#CE8936] transition"
     />
+  </div>
+);
+
+// Read-only display for values that come from the user's profile (not editable here).
+const ReadOnlyField = ({ label, value }) => (
+  <div className="flex flex-col gap-2">
+    <label className="text-sm text-[#3A3D42] tracking-[-0.2px]">{label}</label>
+    <div className="bg-white/60 border border-[#EEE0CF] text-[#0D060C] text-sm tracking-[-0.2px] w-full px-5 py-3.5 rounded-[8px] min-h-[46px] flex items-center">
+      {value || <span className="text-[#3A3D42]/50">Not set</span>}
+    </div>
   </div>
 );
 
