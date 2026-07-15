@@ -43,7 +43,8 @@ export default async function Page({ params }) {
                 secondEmail: order.user.account.secondEmail,
                 address: order.user.account.address,
                 zipCode: order.user.account.zipCode,
-                deliveryAddress: order.user?.account?.deliveryAddress
+                deliveryAddress: order.user?.account?.deliveryAddress,
+                deliveryZipCode: order.user?.account?.deliveryZipCode
               }
             : null,
         }

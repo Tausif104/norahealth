@@ -211,17 +211,6 @@ const ConfirmOrder = ({ userDetails }) => {
                 {/* STEP 1 — Personal details */}
                 {currentKey === "details" && (
                   <div className="flex flex-col gap-4">
-                    <p className="text-xs text-[#3A3D42] tracking-[-0.2px]">
-                      Visit your{" "}
-                      <Link
-                        href="/admin/profile"
-                        className="text-[#CE8936] underline"
-                      >
-                        account profile
-                      </Link>{" "}
-                      to make any changes
-                    </p>
-
                     <Input
                       label="Name"
                       name="fullName"

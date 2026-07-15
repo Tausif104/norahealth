@@ -73,6 +73,9 @@ export default async function AppointmentOrderDetailsPage({ params }) {
         <p>
           <b>Delivery Address:</b> {user?.account?.deliveryAddress ? user?.account?.deliveryAddress :"N/A" }
         </p>
+        <p>
+          <b>Delivery Post Code:</b> {user?.account?.deliveryZipCode || "N/A"}
+        </p>
       </section>
 
       {/* Slot Info */}
