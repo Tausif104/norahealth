@@ -142,6 +142,25 @@ function OrderStatusPill({ status, trackingId }) {
   );
 }
 
+/* ---------- appointment date + time-range cell ---------- */
+function ApptDateTime({ appointment }) {
+  if (!appointment) return <span className="text-muted-foreground">—</span>;
+  const start = new Date(appointment);
+  const end = new Date(start.getTime() + 60 * 60 * 1000);
+  const t = (d) =>
+    d.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "UTC",
+    });
+  return (
+    <span className="flex flex-col whitespace-nowrap">
+      <span>{formatDate(start)}</span>
+      <span className="text-xs text-muted-foreground">{`${t(start)} – ${t(end)}`}</span>
+    </span>
+  );
+}
+
 /* ---------- normalise both sources into one row shape ---------- */
 function normaliseBooking(b) {
   return {
@@ -190,7 +209,7 @@ export default function MergedOcOrdersTable() {
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
   const [typeFilter, setTypeFilter] = useState("ALL"); // ALL | booking | order
-  const [emailSearch, setEmailSearch] = useState("");
+  const [nameSearch, setNameSearch] = useState("");
 
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -273,15 +292,15 @@ export default function MergedOcOrdersTable() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [year, month, day]);
 
-  // Client-side type + email filtering on top of the merged set.
+  // Client-side type + name filtering on top of the merged set.
   const filtered = useMemo(() => {
-    const q = emailSearch.trim().toLowerCase();
+    const q = nameSearch.trim().toLowerCase();
     return rows.filter((r) => {
       if (typeFilter !== "ALL" && r._type !== typeFilter) return false;
-      if (q && !String(r.email).toLowerCase().includes(q)) return false;
+      if (q && !String(r.fullName).toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [rows, typeFilter, emailSearch]);
+  }, [rows, typeFilter, nameSearch]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePageIndex = Math.min(pageIndex, totalPages - 1);
@@ -292,7 +311,7 @@ export default function MergedOcOrdersTable() {
 
   useEffect(() => {
     setPageIndex(0);
-  }, [typeFilter, emailSearch]);
+  }, [typeFilter, nameSearch]);
 
   // ----- filter option lists -----
   const now = new Date();
@@ -318,7 +337,7 @@ export default function MergedOcOrdersTable() {
   ];
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
-  const COLSPAN = 7; // primary columns: expand, ID, Name, Email, Type, Status, Actions
+  const COLSPAN = 7; // primary cols: expand, Name, Phone, Appt, Call Status, Order Status, Actions
 
   return (
     <div className="w-full p-6 overflow-x-auto">
@@ -408,7 +427,7 @@ export default function MergedOcOrdersTable() {
               setMonth("");
               setDay("");
               setTypeFilter("ALL");
-              setEmailSearch("");
+              setNameSearch("");
             }}
           >
             Clear
@@ -419,9 +438,9 @@ export default function MergedOcOrdersTable() {
       {/* SEARCH */}
       <div className="flex items-center py-4 w-full max-w-sm">
         <input
-          value={emailSearch}
-          onChange={(e) => setEmailSearch(e.target.value)}
-          placeholder="Search by email..."
+          value={nameSearch}
+          onChange={(e) => setNameSearch(e.target.value)}
+          placeholder="Search by patient name..."
           className="w-[260px] bg-white/40 rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-200"
         />
       </div>
@@ -432,11 +451,11 @@ export default function MergedOcOrdersTable() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-8" />
-              <TableHead>ID</TableHead>
               <TableHead>Full Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Contact Number</TableHead>
+              <TableHead>Appointment Date &amp; Time</TableHead>
+              <TableHead>Call Status</TableHead>
+              <TableHead>Order Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -482,38 +501,40 @@ export default function MergedOcOrdersTable() {
                           )}
                         </button>
                       </TableCell>
-                      <TableCell className="capitalize">{r.id}</TableCell>
-                      <TableCell>{r.fullName}</TableCell>
                       <TableCell>
                         {r.userId ? (
                           <Link
                             href={`/admin/${r.userId}/orders`}
-                            className="hover:underline"
+                            className="font-medium hover:underline"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            {r.email}
+                            {r.fullName}
                           </Link>
                         ) : (
-                          r.email
+                          <span className="font-medium">{r.fullName}</span>
                         )}
                       </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {r.phoneNumber}
+                      </TableCell>
                       <TableCell>
-                        {r._type === "booking" ? (
-                          <Badge className="bg-[#d67b0e] text-white">
-                            Appointment
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-[#491F40] text-white">Order</Badge>
-                        )}
+                        <ApptDateTime appointment={r.appointment} />
                       </TableCell>
                       <TableCell>
                         {r._type === "booking" ? (
                           <BookingStatusBadge value={r.bookingStatus} />
                         ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {r._type === "order" ? (
                           <OrderStatusPill
                             status={r.status}
                             trackingId={r.trackingId}
                           />
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell
@@ -553,32 +574,14 @@ export default function MergedOcOrdersTable() {
                       <TableRow className="bg-[#faf9f8] hover:bg-[#faf9f8]">
                         <TableCell colSpan={COLSPAN} className="p-0">
                           <dl className="flex flex-wrap gap-x-10 gap-y-3 px-6 py-4">
-                            <DetailField label="Phone" value={r.phoneNumber} />
+                            <DetailField label="ID" value={r.id} />
                             <DetailField
-                              label="Appt Date"
+                              label="Type"
                               value={
-                                r.appointment ? (
-                                  <span className="flex flex-col">
-                                    <span>{formatDate(r.appointment)}</span>
-                                    <span className="text-xs text-muted-foreground">
-                                      {(() => {
-                                        const start = new Date(r.appointment);
-                                        const end = new Date(
-                                          start.getTime() + 60 * 60 * 1000,
-                                        );
-                                        const t = (d) =>
-                                          d.toLocaleTimeString([], {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                            timeZone: "UTC",
-                                          });
-                                        return `${t(start)} – ${t(end)}`;
-                                      })()}
-                                    </span>
-                                  </span>
-                                ) : null
+                                r._type === "booking" ? "Appointment" : "Order"
                               }
                             />
+                            <DetailField label="Email" value={r.email} />
                             <DetailField
                               label="Medicine"
                               value={r.medicineName}

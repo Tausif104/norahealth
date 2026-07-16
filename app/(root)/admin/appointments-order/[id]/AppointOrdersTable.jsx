@@ -77,6 +77,16 @@ export default function AppointmentOrdersTable({ orders = [] }) {
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [statusFilter, setStatusFilter] = React.useState("ALL"); // ✅ NOT empty
 
+  // Newest orders first (by Created date).
+  const data = React.useMemo(
+    () =>
+      [...orders].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ),
+    [orders]
+  );
+
   const columns = React.useMemo(
     () => [
       {
@@ -124,7 +134,7 @@ export default function AppointmentOrdersTable({ orders = [] }) {
   );
 
   const table = useReactTable({
-    data: orders,
+    data,
     columns,
     state: { columnFilters },
     onColumnFiltersChange: setColumnFilters,
