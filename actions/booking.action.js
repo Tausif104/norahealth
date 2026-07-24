@@ -1156,7 +1156,7 @@ export async function createOrderFromBooking({
       await resend.emails.send({
         from: "Nora Health <contact@norahealth.co.uk>",
         to: booking.email,
-        subject: "Your Order Has Been Created",
+        subject: "Your order has been updated",
         replyTo: "contact@norahealth.co.uk",
         html: orderFromBookingEmailTemplate({
           fullName: booking.fullName,

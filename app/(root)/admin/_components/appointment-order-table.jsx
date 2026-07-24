@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -321,8 +321,20 @@ export default function AppointmentOrderTable() {
     fetchBookings();
   }, [year, month, day]);
 
+  // Chronological order — sort by appointment date, then time (earliest first).
+  // Rows without an appointment fall to the bottom.
+  const sortedBookings = useMemo(
+    () =>
+      [...bookings].sort((a, b) => {
+        const ta = a.appointment ? new Date(a.appointment).getTime() : Infinity;
+        const tb = b.appointment ? new Date(b.appointment).getTime() : Infinity;
+        return ta - tb;
+      }),
+    [bookings],
+  );
+
   const table = useReactTable({
-    data: bookings,
+    data: sortedBookings,
     columns,
     state: {
       columnFilters,

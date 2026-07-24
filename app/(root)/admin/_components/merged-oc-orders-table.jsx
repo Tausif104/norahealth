@@ -200,6 +200,62 @@ function normaliseOrder(o) {
   };
 }
 
+/**
+ * Merge the two sources into ONE row per patient journey.
+ *
+ * A Booking (online appointment/call) and an Order (medicine dispatch) are
+ * separate DB records with no direct link — both only tie to the patient.
+ * So we group by patient (email, falling back to userId) and pair each
+ * patient's bookings and orders chronologically: booking[0]↔order[0], etc.
+ * The common case (1 booking + 1 order) collapses to a single combined row;
+ * any extra unpaired booking/order stays as its own row so nothing is hidden.
+ */
+function pairByPatient(bookings, orders) {
+  const ts = (x) => (x?.createdAt ? new Date(x.createdAt).getTime() : 0);
+  const keyOf = (r) => {
+    const email = String(r.email || "").trim().toLowerCase();
+    if (email && email !== "n/a") return `e:${email}`;
+    if (r.userId) return `u:${r.userId}`;
+    return `x:${r._type}-${r.id}`; // unique -> never merges
+  };
+
+  const groups = new Map(); // key -> { bookings, orders }
+  for (const b of bookings) {
+    const k = keyOf(b);
+    if (!groups.has(k)) groups.set(k, { bookings: [], orders: [] });
+    groups.get(k).bookings.push(b);
+  }
+  for (const o of orders) {
+    const k = keyOf(o);
+    if (!groups.has(k)) groups.set(k, { bookings: [], orders: [] });
+    groups.get(k).orders.push(o);
+  }
+
+  const rows = [];
+  for (const [k, g] of groups) {
+    const bs = [...g.bookings].sort((a, b) => ts(a) - ts(b)); // oldest first
+    const os = [...g.orders].sort((a, b) => ts(a) - ts(b));
+    const n = Math.max(bs.length, os.length);
+    for (let i = 0; i < n; i++) {
+      const booking = bs[i] || null;
+      const order = os[i] || null;
+      const primary = booking || order;
+      rows.push({
+        key: `${k}-${i}`,
+        booking,
+        order,
+        fullName: primary.fullName,
+        email: primary.email,
+        phoneNumber: primary.phoneNumber,
+        userId: primary.userId,
+        appointment: booking?.appointment || null,
+        createdAt: Math.max(ts(booking), ts(order)), // most recent activity
+      });
+    }
+  }
+  return rows;
+}
+
 const PAGE_SIZE = 10;
 
 export default function MergedOcOrdersTable() {
@@ -271,13 +327,12 @@ export default function MergedOcOrdersTable() {
       const bookings = (bookingRes?.bookings || []).map(normaliseBooking);
       const orders = (orderRes?.orders || []).map(normaliseOrder);
 
-      const merged = [...bookings, ...orders].sort((a, b) => {
-        const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return tb - ta; // newest first
-      });
+      // One combined row per patient journey (booking + its order), newest first.
+      const combined = pairByPatient(bookings, orders).sort(
+        (a, b) => b.createdAt - a.createdAt,
+      );
 
-      setRows(merged);
+      setRows(combined);
       setPageIndex(0);
     } catch (err) {
       console.error(err);
@@ -296,7 +351,8 @@ export default function MergedOcOrdersTable() {
   const filtered = useMemo(() => {
     const q = nameSearch.trim().toLowerCase();
     return rows.filter((r) => {
-      if (typeFilter !== "ALL" && r._type !== typeFilter) return false;
+      if (typeFilter === "booking" && !r.booking) return false;
+      if (typeFilter === "order" && !r.order) return false;
       if (q && !String(r.fullName).toLowerCase().includes(q)) return false;
       return true;
     });
@@ -413,8 +469,8 @@ export default function MergedOcOrdersTable() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All</SelectItem>
-              <SelectItem value="booking">Appointment (Online)</SelectItem>
-              <SelectItem value="order">Order (Admin)</SelectItem>
+              <SelectItem value="booking">With appointment</SelectItem>
+              <SelectItem value="order">With order</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -521,17 +577,17 @@ export default function MergedOcOrdersTable() {
                         <ApptDateTime appointment={r.appointment} />
                       </TableCell>
                       <TableCell>
-                        {r._type === "booking" ? (
-                          <BookingStatusBadge value={r.bookingStatus} />
+                        {r.booking ? (
+                          <BookingStatusBadge value={r.booking.bookingStatus} />
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell>
-                        {r._type === "order" ? (
+                        {r.order ? (
                           <OrderStatusPill
-                            status={r.status}
-                            trackingId={r.trackingId}
+                            status={r.order.status}
+                            trackingId={r.order.trackingId}
                           />
                         ) : (
                           <span className="text-muted-foreground">—</span>
@@ -574,21 +630,23 @@ export default function MergedOcOrdersTable() {
                       <TableRow className="bg-[#faf9f8] hover:bg-[#faf9f8]">
                         <TableCell colSpan={COLSPAN} className="p-0">
                           <dl className="flex flex-wrap gap-x-10 gap-y-3 px-6 py-4">
-                            <DetailField label="ID" value={r.id} />
-                            <DetailField
-                              label="Type"
-                              value={
-                                r._type === "booking" ? "Appointment" : "Order"
-                              }
-                            />
+                            {r.booking && (
+                              <DetailField
+                                label="Appointment ID"
+                                value={r.booking.id}
+                              />
+                            )}
+                            {r.order && (
+                              <DetailField label="Order ID" value={r.order.id} />
+                            )}
                             <DetailField label="Email" value={r.email} />
                             <DetailField
                               label="Medicine"
-                              value={r.medicineName}
+                              value={r.order?.medicineName}
                             />
                             <DetailField
                               label="Tracking ID"
-                              value={r.trackingId}
+                              value={r.order?.trackingId}
                             />
                             <DetailField
                               label="Created"
@@ -916,7 +974,7 @@ export default function MergedOcOrdersTable() {
   );
 }
 
-/* ---------- per-row actions menu (contextual by type) ---------- */
+/* ---------- per-row actions menu (combined booking + order) ---------- */
 function RowActions({
   row,
   onCreateOrder,
@@ -924,6 +982,7 @@ function RowActions({
   onUpdateOrderStatus,
   onDelete,
 }) {
+  const { booking, order } = row;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -935,37 +994,51 @@ function RowActions({
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-        {row._type === "booking" ? (
+        {booking && (
           <>
-            <DropdownMenuItem onClick={() => onCreateOrder(row)}>
-              Create Order
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onUpdateBookingStatus(row)}>
-              Update Status
+            {!order && (
+              <DropdownMenuItem onClick={() => onCreateOrder(booking)}>
+                Create Order
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem onClick={() => onUpdateBookingStatus(booking)}>
+              Update Call Status
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href={`/admin/appointments-order/${row.id}`}>
-                View Details
+              <Link href={`/admin/appointments-order/${booking.id}`}>
+                View Appointment
               </Link>
-            </DropdownMenuItem>
-          </>
-        ) : (
-          <>
-            <DropdownMenuItem asChild>
-              <Link href={`/admin/orders/${row.id}`}>View Details</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onUpdateOrderStatus(row)}>
-              Update Status
             </DropdownMenuItem>
           </>
         )}
 
-        <DropdownMenuItem
-          className="text-red-600"
-          onClick={() => onDelete({ _type: row._type, id: row.id })}
-        >
-          Delete
-        </DropdownMenuItem>
+        {order && (
+          <>
+            <DropdownMenuItem onClick={() => onUpdateOrderStatus(order)}>
+              Update Order Status
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/admin/orders/${order.id}`}>View Order</Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {booking && (
+          <DropdownMenuItem
+            className="text-red-600"
+            onClick={() => onDelete({ _type: "booking", id: booking.id })}
+          >
+            Delete Appointment
+          </DropdownMenuItem>
+        )}
+        {order && (
+          <DropdownMenuItem
+            className="text-red-600"
+            onClick={() => onDelete({ _type: "order", id: order.id })}
+          >
+            Delete Order
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
