@@ -26,6 +26,11 @@ export const menuItems = [
     link: "/blog",
   },
   {
+    id: 7,
+    label: "Articles",
+    link: "/articles",
+  },
+  {
     id: 5,
     label: "About Us",
     link: "/about",
