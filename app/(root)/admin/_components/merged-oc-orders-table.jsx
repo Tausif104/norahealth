@@ -264,7 +264,8 @@ export default function MergedOcOrdersTable() {
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
-  const [typeFilter, setTypeFilter] = useState("ALL"); // ALL | booking | order
+  const [callStatusFilter, setCallStatusFilter] = useState("ALL");
+  const [orderStatusFilter, setOrderStatusFilter] = useState("ALL");
   const [nameSearch, setNameSearch] = useState("");
 
   const [rows, setRows] = useState([]);
@@ -327,10 +328,25 @@ export default function MergedOcOrdersTable() {
       const bookings = (bookingRes?.bookings || []).map(normaliseBooking);
       const orders = (orderRes?.orders || []).map(normaliseOrder);
 
-      // One combined row per patient journey (booking + its order), newest first.
-      const combined = pairByPatient(bookings, orders).sort(
-        (a, b) => b.createdAt - a.createdAt,
-      );
+      // One combined row per patient journey (booking + its order).
+      // Newest appointment day at the top; within a day, earliest time slot
+      // first. Rows with no appointment fall to the bottom.
+      const dayOf = (d) => {
+        const x = new Date(d);
+        return Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate());
+      };
+      const minsOf = (d) => {
+        const x = new Date(d);
+        return x.getUTCHours() * 60 + x.getUTCMinutes();
+      };
+      const combined = pairByPatient(bookings, orders).sort((a, b) => {
+        const da = a.appointment ? dayOf(a.appointment) : -Infinity;
+        const db = b.appointment ? dayOf(b.appointment) : -Infinity;
+        if (db !== da) return db - da; // newest day first
+        const ta = a.appointment ? minsOf(a.appointment) : Infinity;
+        const tb = b.appointment ? minsOf(b.appointment) : Infinity;
+        return ta - tb; // earliest time slot first within the day
+      });
 
       setRows(combined);
       setPageIndex(0);
@@ -351,12 +367,20 @@ export default function MergedOcOrdersTable() {
   const filtered = useMemo(() => {
     const q = nameSearch.trim().toLowerCase();
     return rows.filter((r) => {
-      if (typeFilter === "booking" && !r.booking) return false;
-      if (typeFilter === "order" && !r.order) return false;
+      if (
+        callStatusFilter !== "ALL" &&
+        (!r.booking || r.booking.bookingStatus !== callStatusFilter)
+      )
+        return false;
+      if (
+        orderStatusFilter !== "ALL" &&
+        (!r.order || r.order.status !== orderStatusFilter)
+      )
+        return false;
       if (q && !String(r.fullName).toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [rows, typeFilter, nameSearch]);
+  }, [rows, callStatusFilter, orderStatusFilter, nameSearch]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePageIndex = Math.min(pageIndex, totalPages - 1);
@@ -367,7 +391,7 @@ export default function MergedOcOrdersTable() {
 
   useEffect(() => {
     setPageIndex(0);
-  }, [typeFilter, nameSearch]);
+  }, [callStatusFilter, orderStatusFilter, nameSearch]);
 
   // ----- filter option lists -----
   const now = new Date();
@@ -462,15 +486,42 @@ export default function MergedOcOrdersTable() {
         </div>
 
         <div>
-          <label className="block text-xs text-gray-600 mb-1">Type</label>
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-[160px] bg-white/40">
+          <label className="block text-xs text-gray-600 mb-1">Call Status</label>
+          <Select value={callStatusFilter} onValueChange={setCallStatusFilter}>
+            <SelectTrigger className="w-[170px] bg-white/40">
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All</SelectItem>
-              <SelectItem value="booking">With appointment</SelectItem>
-              <SelectItem value="order">With order</SelectItem>
+              <SelectItem value="Incomplete">Incomplete</SelectItem>
+              <SelectItem value="FirstCallAttempted">
+                1st Call Attempted
+              </SelectItem>
+              <SelectItem value="SecondCallAttempted">
+                2nd Call Attempted
+              </SelectItem>
+              <SelectItem value="Complete">Complete</SelectItem>
+              <SelectItem value="FailedEncounter">Failed Encounter</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <label className="block text-xs text-gray-600 mb-1">
+            Order Status
+          </label>
+          <Select
+            value={orderStatusFilter}
+            onValueChange={setOrderStatusFilter}
+          >
+            <SelectTrigger className="w-[170px] bg-white/40">
+              <SelectValue placeholder="All" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All</SelectItem>
+              <SelectItem value="clinicalreview">Awaiting Dispatch</SelectItem>
+              <SelectItem value="posted">Posted</SelectItem>
+              <SelectItem value="declined">Declined</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -482,7 +533,8 @@ export default function MergedOcOrdersTable() {
               setYear("");
               setMonth("");
               setDay("");
-              setTypeFilter("ALL");
+              setCallStatusFilter("ALL");
+              setOrderStatusFilter("ALL");
               setNameSearch("");
             }}
           >

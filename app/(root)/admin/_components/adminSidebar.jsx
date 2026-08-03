@@ -8,6 +8,8 @@ import {
   ClipboardClock,
   NotebookPen,
   Shield,
+  Pill,
+  Calendar,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -35,27 +37,15 @@ const NAV_ITEMS = [
       !p.startsWith("/admin/appointments-order"),
   },
   {
-    href: "/admin/appointments-order",
-    label: "Online OC Orders",
-    Icon: ClipboardClock,
-    isActive: (p) => p.startsWith("/admin/appointments-order"),
-  },
-  {
-    href: "/admin/orders",
-    label: "Admin OC Orders",
-    Icon: ClipboardClock,
-    isActive: (p) => p.startsWith("/admin/orders"),
-  },
-  {
     href: "/admin/oc-orders",
     label: "OC Orders (Merged)",
-    Icon: ClipboardClock,
+    Icon: Pill,
     isActive: (p) => p.startsWith("/admin/oc-orders"),
   },
   {
     href: "/admin/booking-slot",
     label: "Appointment Slot",
-    Icon: ClipboardClock,
+    Icon: Calendar,
     isActive: (p) => p.startsWith("/admin/booking-slot"),
   },
   {
