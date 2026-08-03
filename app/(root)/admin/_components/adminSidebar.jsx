@@ -38,7 +38,7 @@ const NAV_ITEMS = [
   },
   {
     href: "/admin/oc-orders",
-    label: "OC Orders (Merged)",
+    label: "OC Orders",
     Icon: Pill,
     isActive: (p) => p.startsWith("/admin/oc-orders"),
   },
