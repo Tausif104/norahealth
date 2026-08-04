@@ -329,8 +329,12 @@ export default function MergedOcOrdersTable() {
       const orders = (orderRes?.orders || []).map(normaliseOrder);
 
       // One combined row per patient journey (booking + its order).
-      // Newest appointment day at the top; within a day, earliest time slot
-      // first. Rows with no appointment fall to the bottom.
+      // Rank each row by its "activity day": the appointment day when there
+      // is one, otherwise the created day (so an order-only row — created
+      // directly via "Create Order" with no appointment — is still placed by
+      // its date instead of being dumped at the very bottom). Newest day
+      // first; within a day, appointment rows sort by earliest time slot and
+      // order-only rows fall in by most recent activity.
       const dayOf = (d) => {
         const x = new Date(d);
         return Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate());
@@ -339,13 +343,16 @@ export default function MergedOcOrdersTable() {
         const x = new Date(d);
         return x.getUTCHours() * 60 + x.getUTCMinutes();
       };
+      const activityMs = (r) =>
+        r.appointment ? new Date(r.appointment).getTime() : r.createdAt || 0;
       const combined = pairByPatient(bookings, orders).sort((a, b) => {
-        const da = a.appointment ? dayOf(a.appointment) : -Infinity;
-        const db = b.appointment ? dayOf(b.appointment) : -Infinity;
+        const da = a.appointment || a.createdAt ? dayOf(activityMs(a)) : -Infinity;
+        const db = b.appointment || b.createdAt ? dayOf(activityMs(b)) : -Infinity;
         if (db !== da) return db - da; // newest day first
         const ta = a.appointment ? minsOf(a.appointment) : Infinity;
         const tb = b.appointment ? minsOf(b.appointment) : Infinity;
-        return ta - tb; // earliest time slot first within the day
+        if (ta !== tb) return ta - tb; // earliest appointment slot first
+        return (b.createdAt || 0) - (a.createdAt || 0); // then newest activity
       });
 
       setRows(combined);
