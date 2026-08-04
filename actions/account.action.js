@@ -145,67 +145,79 @@ export const getUserAccount = async () => {
 // update account
 export const updateAccountByAdmin = async (prevState, formData) => {
   const userId = Number(formData.get("userId"));
-  const firstName = formData.get("firstName");
-  const lastName = formData.get("lastName");
+  const firstName = (formData.get("firstName") || "").toString().trim();
+  const lastName = (formData.get("lastName") || "").toString().trim();
   const dobValue = formData.get("dob");
   const dob = parseDateInput(dobValue);
-  const phoneNumber = formData.get("phoneNumber");
-  const nhsNumber = formData.get("nhsNumber");
-  const address = formData.get("address");
-  const zipCode = formData.get("zipCode");
-  const deliveryAddress = formData.get("deliveryAddress");
-  const deliveryZipCode = formData.get("deliveryZipCode");
+  // phoneNumber is optional (a new patient may not have one yet); the DB column
+  // is non-null, so fall back to "" instead of blocking the save.
+  const phoneNumber = (formData.get("phoneNumber") || "").toString().trim();
+  const nhsNumber = (formData.get("nhsNumber") || "").toString().trim();
+  const address = (formData.get("address") || "").toString().trim();
+  const zipCode = (formData.get("zipCode") || "").toString().trim();
+  const deliveryAddress = (formData.get("deliveryAddress") || "").toString().trim();
+  const deliveryZipCode = (formData.get("deliveryZipCode") || "").toString().trim();
   const user = await getAdminUser();
 
   const isAdmin = user?.admin?.isAdmin || false;
 
   if (!isAdmin) {
-    return { success: false, message: "Unauthorized. User is not admin" };
+    return { success: false, msg: "Unauthorized. User is not admin" };
   }
 
-  if (!firstName || !lastName || !dob || Number.isNaN(dob.getTime()) || !phoneNumber) {
+  if (!Number.isInteger(userId)) {
+    return { success: false, msg: "Invalid user." };
+  }
+
+  // Only First Name, Last Name and Date of Birth are truly required.
+  if (!firstName || !lastName || !dob || Number.isNaN(dob.getTime())) {
     return {
-      msg: "Please insert all the fields",
+      msg: "First Name, Last Name and Date of Birth are required.",
       success: false,
     };
   }
 
-  const updatedAccount = await prisma.account.upsert({
-    where: { userId: userId },
-    update: {
-      firstName,
-      lastName,
-      dob,
-      phoneNumber,
-      nhsNumber,
-      address,
-      zipCode,
-      deliveryAddress,
-      deliveryZipCode,
-    },
-    create: {
-      userId,
-      firstName,
-      lastName,
-      dob,
-      phoneNumber,
-      nhsNumber,
-      address,
-      zipCode,
-      deliveryAddress,
-      deliveryZipCode,
-      secondEmail: "",
-    },
-  });
+  try {
+    await prisma.account.upsert({
+      where: { userId: userId },
+      update: {
+        firstName,
+        lastName,
+        dob,
+        phoneNumber,
+        nhsNumber,
+        address,
+        zipCode,
+        deliveryAddress,
+        deliveryZipCode,
+      },
+      create: {
+        userId,
+        firstName,
+        lastName,
+        dob,
+        phoneNumber,
+        nhsNumber,
+        address,
+        zipCode,
+        deliveryAddress,
+        deliveryZipCode,
+        secondEmail: "",
+      },
+    });
 
-  revalidatePath(`/admin/${userId}/account`);
+    revalidatePath(`/admin/${userId}/account`);
 
-  if (updatedAccount) {
     return {
       msg: "Account Updated",
       success: true,
     };
-
+  } catch (err) {
+    console.error("updateAccountByAdmin error:", err);
+    return {
+      msg: "Failed to save account. Please try again.",
+      success: false,
+    };
   }
 };
 

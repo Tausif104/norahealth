@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { updateAccountByAdmin } from "@/actions/account.action";
 import { useState, useEffect, useActionState } from "react";
 import { LoaderIcon } from "lucide-react";
+import { toast } from "sonner";
 import { DatePicker } from "../records/_components/date-picker";
 
 export const UpdateAccountForm = ({ user }) => {
@@ -46,11 +47,14 @@ export const UpdateAccountForm = ({ user }) => {
   );
 
   useEffect(() => {
+    if (!state?.msg) return;
     if (state.success) {
+      toast.success(state.msg);
       setOpen(false);
+    } else {
+      toast.error(state.msg);
     }
-    state.success = false;
-  }, [state.success]);
+  }, [state]);
 
   useEffect(() => {
     const fetchUserData = async () => {
