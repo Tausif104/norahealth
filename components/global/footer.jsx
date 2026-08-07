@@ -24,6 +24,11 @@ const Footer = () => {
       link: "/contraception-choices/begin",
     },
     {
+      id: 7,
+      label: "Blogs",
+      link: "/blog",
+    },
+    {
       id: 5,
       label: "Policy",
       link: "/legal-policies",
