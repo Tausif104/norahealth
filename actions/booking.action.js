@@ -219,6 +219,7 @@ export async function createBooking(formData) {
     providerName,
     nhsService,
     appointment: appointmentStart,
+    appointmentEnd: appointmentEnd,
     notes,
   });
 } catch (emailError) {

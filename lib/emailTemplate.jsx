@@ -42,6 +42,28 @@ function formatDateTime(date) {
     timeZone: "UTC", // stored UTC wall-clock == UK time the user picked
   });
 }
+
+// Full date + a start–end time frame, e.g.
+// "Tuesday, 11 August 2026 at 16:00 – 17:00".
+// Appointments are 1-hour slots; if no end is given, assume start + 60 min.
+function formatAppointmentRange(start, end) {
+  const s = new Date(start);
+  const e = end ? new Date(end) : new Date(s.getTime() + 60 * 60 * 1000);
+  const day = s.toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  const t = (d) =>
+    d.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "UTC",
+    });
+  return `${day} at ${t(s)} – ${t(e)}`;
+}
 // export const orderEmailTemplate = ({ medicineName, trackingId, status }) =>
 //    `
 // <div style="font-family: Arial, sans-serif; background:#f9f9f9; padding:20px;">
@@ -521,6 +543,7 @@ export async function sendBookingConfirmationEmail({
   providerName,
   nhsService,
   appointment,
+  appointmentEnd,
   notes,
 }) {
   const whatsappLink = "https://wa.me/447440126154";
@@ -551,7 +574,7 @@ export async function sendBookingConfirmationEmail({
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td style="padding:6px 0;font-weight:bold;color:#cd8936;">Appointment:</td>
-              <td>${formatDateTime(appointment)}</td>
+              <td>${formatAppointmentRange(appointment, appointmentEnd)}</td>
             </tr>
             ${
               notes
