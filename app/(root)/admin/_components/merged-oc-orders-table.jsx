@@ -332,9 +332,10 @@ export default function MergedOcOrdersTable() {
       // Rank each row by its "activity day": the appointment day when there
       // is one, otherwise the created day (so an order-only row — created
       // directly via "Create Order" with no appointment — is still placed by
-      // its date instead of being dumped at the very bottom). Newest day
-      // first; within a day, appointment rows sort by earliest time slot and
-      // order-only rows fall in by most recent activity.
+      // its date instead of being dumped at the very bottom). Fully newest
+      // first: newest day at the top, and within a day the latest appointment
+      // time slot first; order-only rows fall to the day's bottom by most
+      // recent activity.
       const dayOf = (d) => {
         const x = new Date(d);
         return Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate());
@@ -349,9 +350,9 @@ export default function MergedOcOrdersTable() {
         const da = a.appointment || a.createdAt ? dayOf(activityMs(a)) : -Infinity;
         const db = b.appointment || b.createdAt ? dayOf(activityMs(b)) : -Infinity;
         if (db !== da) return db - da; // newest day first
-        const ta = a.appointment ? minsOf(a.appointment) : Infinity;
-        const tb = b.appointment ? minsOf(b.appointment) : Infinity;
-        if (ta !== tb) return ta - tb; // earliest appointment slot first
+        const ta = a.appointment ? minsOf(a.appointment) : -Infinity;
+        const tb = b.appointment ? minsOf(b.appointment) : -Infinity;
+        if (ta !== tb) return tb - ta; // latest appointment slot first within the day
         return (b.createdAt || 0) - (a.createdAt || 0); // then newest activity
       });
 

@@ -332,14 +332,14 @@ export default function AppointmentOrderTable() {
     fetchBookings();
   }, [year, month, day]);
 
-  // Chronological order — sort by appointment date, then time (earliest first).
+  // Newest appointment first — latest date + time at the top (fully descending).
   // Rows without an appointment fall to the bottom.
   const sortedBookings = useMemo(
     () =>
       [...bookings].sort((a, b) => {
-        const ta = a.appointment ? new Date(a.appointment).getTime() : Infinity;
-        const tb = b.appointment ? new Date(b.appointment).getTime() : Infinity;
-        return ta - tb;
+        const ta = a.appointment ? new Date(a.appointment).getTime() : -Infinity;
+        const tb = b.appointment ? new Date(b.appointment).getTime() : -Infinity;
+        return tb - ta;
       }),
     [bookings],
   );
