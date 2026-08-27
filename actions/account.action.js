@@ -30,31 +30,38 @@ const parseDateInput = (value) => {
 
 // create account action
 export const createAccountAction = async (prevState, formData) => {
-  const firstname = formData.get("firstname")?.toString() || "";
-  const lastname = formData.get("lastname")?.toString() || "";
-  const phone = formData.get("phone")?.toString() || "";
-  const secondemail = formData.get("secondemail")?.toString() || "";
+  const firstname = (formData.get("firstname") || "").toString().trim();
+  const lastname = (formData.get("lastname") || "").toString().trim();
+  const phone = (formData.get("phone") || "").toString().trim();
+  const secondemail = (formData.get("secondemail") || "").toString().trim();
   const dob = parseDateInput(formData.get("dob")) ?? undefined;
-  const nhs = formData.get("nhs")?.toString() || "";
-  const address = formData.get("address")?.toString() || "";
-  const zip = formData.get("zip")?.toString() || "";
-  const deliveryAddress = formData.get("deliveryAddress")?.toString() || "";
-  const deliveryZip = formData.get("deliveryZip")?.toString() || "";
+  const nhs = (formData.get("nhs") || "").toString().trim();
+  const address = (formData.get("address") || "").toString().trim();
+  const zip = (formData.get("zip") || "").toString().trim();
+  const deliveryAddress = (formData.get("deliveryAddress") || "").toString().trim();
+  const deliveryZip = (formData.get("deliveryZip") || "").toString().trim();
 
-  if (
-    !firstname ||
-    !lastname ||
-    !phone ||
-    !secondemail ||
-    !dob ||
-    !address ||
-    !zip ||
-    !deliveryAddress ||
-    !deliveryZip
-  ) {
+  // Tell the user exactly which required field(s) are missing, instead of a
+  // generic "Please insert all the fields" — the Date of Birth in particular
+  // shows a realistic-looking placeholder, so people think it's filled in.
+  const missing = [];
+  if (!firstname) missing.push("First name");
+  if (!lastname) missing.push("Last name");
+  if (!phone) missing.push("Phone Number");
+  if (!secondemail) missing.push("Email address");
+  if (!dob) missing.push("Date of Birth");
+  if (!address) missing.push("Address");
+  if (!zip) missing.push("Post code");
+  if (!deliveryAddress) missing.push("Delivery Address");
+  if (!deliveryZip) missing.push("Delivery Post code");
+
+  if (missing.length) {
     return {
       success: false,
-      msg: "Please insert all the fields",
+      msg:
+        missing.length === 1
+          ? `Please fill in your ${missing[0]}.`
+          : `Please fill in: ${missing.join(", ")}.`,
     };
   }
 
@@ -71,46 +78,36 @@ export const createAccountAction = async (prevState, formData) => {
 
   const user = payload?.payload;
 
-  const account = await prisma.account.upsert({
-    where: {
-      userId: user.id,
-    },
+  const accountData = {
+    // personal
+    firstName: firstname,
+    lastName: lastname,
+    phoneNumber: phone,
+    secondEmail: secondemail,
+    dob: dob,
+    nhsNumber: nhs,
+    address: address,
+    zipCode: zip,
+    deliveryAddress: deliveryAddress,
+    deliveryZipCode: deliveryZip,
+  };
 
-    update: {
-      // personal
-      firstName: firstname,
-      lastName: lastname,
-      phoneNumber: phone,
-      secondEmail: secondemail,
-      dob: dob,
-      nhsNumber: nhs,
-      address: address,
-      zipCode: zip,
-      deliveryAddress: deliveryAddress,
-      deliveryZipCode: deliveryZip,
-    },
+  try {
+    await prisma.account.upsert({
+      where: { userId: user.id },
+      update: accountData,
+      create: { userId: user.id, ...accountData },
+    });
 
-    create: {
-      userId: user.id,
-
-      // personal
-      firstName: firstname,
-      lastName: lastname,
-      phoneNumber: phone,
-      secondEmail: secondemail,
-      dob: dob,
-      nhsNumber: nhs,
-      address: address,
-      zipCode: zip,
-      deliveryAddress: deliveryAddress,
-      deliveryZipCode: deliveryZip,
-    },
-  });
-
-  if (account) {
     return {
-      msg: "Account details saved successfullly!",
+      msg: "Account details saved successfully!",
       success: true,
+    };
+  } catch (err) {
+    console.error("createAccountAction error:", err);
+    return {
+      success: false,
+      msg: "Failed to save your details. Please try again.",
     };
   }
 };

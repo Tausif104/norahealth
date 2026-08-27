@@ -119,7 +119,7 @@ const AccountForm = ({ user }) => {
           selected={dob}
           onChange={setDob}
           name='dob'
-          placeholder='27 October 2025'
+          placeholder='Select date of birth'
           className='md:col-span-2'
           bg='bg-[#F6F5F4] border-0'
         />
