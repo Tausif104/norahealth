@@ -5,6 +5,7 @@ import { prisma } from "@/lib/client/prisma";
 import { cookies } from "next/headers";
 import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
+import { sendWelcomeEmail } from "@/lib/emailTemplate";
 const isAdminRole = (role) => role === "ADMIN" || role === "SUPERADMIN";
 
 const isSuperAdmin = (role) => role === "SUPERADMIN";
@@ -64,51 +65,60 @@ export const getAllUsersAction = async () => {
 
 // create an user action
 export const createUserAction = async (prevState, formData) => {
-  const email = formData.get("email");
-  const password = formData.get("password");
-  const isAdminUser = formData.get("isAdmin") === "true" ? true : false;
+  const rawEmail = formData.get("email");
+  const email =
+    typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+  const password = (formData.get("password") || "").toString();
+  const isAdminUser = formData.get("isAdmin") === "true";
 
-  if (!email || !password || !isAdminUser === undefined) {
-    return { success: false, msg: "All fields are required" };
+  if (!email || !password) {
+    return { success: false, msg: "Email and password are required." };
   }
 
+  // getAdminUser() already returns null for non-admins, so this is the only
+  // auth check needed. (The old `user.admin.isAdmin` check wrongly blocked
+  // admins whose token had isAdmin=false, and returned `message` instead of
+  // `msg`, so the form showed nothing — it looked like "nothing happened".)
   const user = await getAdminUser();
-
-  const isAdmin = user?.admin?.isAdmin || false;
-
-  if (!isAdmin) {
-    return { success: false, message: "Unauthorized. User is not admin" };
+  if (!user) {
+    return { success: false, msg: "Unauthorized. Please sign in as an admin." };
   }
 
-  const existingUser = await prisma.user.findUnique({
-    where: {
-      email: email,
-    },
-  });
+  try {
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return {
+        success: false,
+        msg: "Looks like this email already has an account.",
+      };
+    }
 
-  if (existingUser) {
-    return {
-      success: false,
-      msg: "Looks like this email already have an account.",
-    };
-  }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        isAdmin: isAdminUser,
+        role: isAdminUser ? "ADMIN" : "PATIENT",
+      },
+    });
 
-  const newUser = await prisma.user.create({
-    data: {
-      email: email,
-      password: hashedPassword,
-      isAdmin: isAdminUser,
-      role: isAdminUser ? "ADMIN" : "PATIENT",
-    },
-  });
+    // Welcome the new patient — never let an email failure block creation.
+    // Staff/admin accounts don't get the patient welcome email.
+    if (!isAdminUser) {
+      try {
+        await sendWelcomeEmail({ to: newUser.email });
+      } catch (welcomeErr) {
+        console.error("Welcome email failed (admin create):", welcomeErr);
+      }
+    }
 
-  if (newUser) {
     revalidatePath("/admin");
     return { success: true, msg: "User created successfully" };
-  } else {
-    return { success: false, msg: "Failed to create user" };
+  } catch (err) {
+    console.error("createUserAction error:", err);
+    return { success: false, msg: "Failed to create user. Please try again." };
   }
 };
 
