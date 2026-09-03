@@ -36,21 +36,18 @@ function escapeHtml(str) {
 }
 
 /**
- * Welcome email — sent once, right after a user signs up.
- *
- * NOTE: sign-up only collects an email + password (no name yet), so the
- * greeting is generic. Pass `name` if a name ever becomes available.
- *
- * ---- PLACEHOLDER COPY ----
- * The wording/subject below is a sensible default. The client is sending
- * their final welcome copy; when it arrives, swap the subject + the two
- * <p> blocks marked "COPY" and redeploy — nothing else needs to change.
+ * Welcome email — sent once the patient completes their Account Registration
+ * (that form is where we first have their name, so the greeting is
+ * personalised as "Hello <first name>,"). Copy supplied by the client.
  */
 export async function sendWelcomeEmail({ to, name }) {
-  const greetingName = firstNameOf(name); // "there" when no name
+  const greetingName = firstNameOf(name); // "there" as a safe fallback
+  // Full international number (44 + 7440126154); the client's draft link was
+  // missing the "44" country code, which would break the WhatsApp deep link.
   const whatsappLink = "https://wa.me/447440126154";
-  const whatsappNumber = "+44 7440126154";
-  const supportEmail = "pharmacy.fap80@nhs.net";
+  const orderOnlineLink = "https://www.norahealth.co.uk/booking/order";
+  const siteLink = "https://www.norahealth.co.uk";
+  const linkStyle = "color:#cd8936;text-decoration:underline;";
 
   const html = `
   <div style="font-family: Arial, sans-serif; background:#f9f9f9; padding:20px;">
@@ -62,36 +59,74 @@ export async function sendWelcomeEmail({ to, name }) {
       </tr>
 
       <tr>
-        <td style="padding:20px;font-size:18px;font-weight:bold;color:#333;">
+        <td style="padding:20px 20px 0;font-size:18px;font-weight:bold;color:#333;">
           Welcome to Nora Health
         </td>
       </tr>
 
       <tr>
-        <td style="padding:0 20px 20px;font-size:15px;color:#333;">
-          <p>Hi ${escapeHtml(greetingName)},</p>
+        <td style="padding:16px 20px 20px;font-size:15px;color:#333;line-height:1.6;">
+          <p>Hello ${escapeHtml(greetingName)},</p>
 
-          <!-- COPY (1/2) -->
           <p>
-            Thank you for creating an account with Nora Health. Your account is
-            now set up and ready to use. You can book appointments, order your
-            contraception online, and manage everything from your account at any
-            time.
+            Welcome to Nora Health — you have just joined the UK's simplest
+            ordering service for contraception.
           </p>
 
-          <!-- COPY (2/2) -->
           <p>
-            If you have any questions, message us on
-            <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" style="color:#cd8936;text-decoration:underline;">
-              WhatsApp
-            </a>
-            (${whatsappNumber}) or email us at
-            <a href="mailto:${supportEmail}" style="color:#cd8936;text-decoration:underline;">
-              ${supportEmail}
-            </a>.
+            Whether you need your regular supply, want to try a new pill or
+            require urgent protection (morning after pill), we get it to you
+            fast, discreetly and with zero hassle.
           </p>
 
-          <p style="margin-top:16px;">Warm regards,<br/>The Nora Health Team</p>
+          <p style="font-weight:bold;color:#cd8936;margin-top:24px;">
+            Option 1: Order via WhatsApp (Recommended)
+          </p>
+          <p>
+            We highly recommend using our WhatsApp service for the absolute
+            fastest experience. Chat directly with our team instantly:<br/>
+            👉 <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">Click here to order on WhatsApp</a>
+            (or text us at 07440 126 154)
+          </p>
+
+          <p style="font-weight:bold;color:#cd8936;margin-top:24px;">
+            Option 2: Order Online (Quick &amp; Easy)
+          </p>
+          <p>
+            Prefer to use our website? You can safely submit your details and
+            request your prescription through our secure online portal:<br/>
+            👉 <a href="${orderOnlineLink}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">Click here to order online at norahealth.co.uk</a>
+          </p>
+
+          <p style="font-weight:bold;margin-top:24px;">What you can order today:</p>
+          <ul style="padding-left:20px;margin:0;">
+            <li style="margin-bottom:6px;"><b>Regular repeat contraception:</b> Never run out of your daily pill, patch, or ring.</li>
+            <li style="margin-bottom:6px;"><b>New contraception:</b> Switch your method easily online or via chat.</li>
+            <li style="margin-bottom:6px;"><b>Emergency contraception:</b> Quick, confidential access to the morning-after pill.</li>
+          </ul>
+
+          <p style="font-weight:bold;margin-top:24px;">Our Promise To You:</p>
+          <ul style="padding-left:20px;margin:0;">
+            <li style="margin-bottom:6px;"><b>Total flexibility:</b> Order online or straight through WhatsApp.</li>
+            <li style="margin-bottom:6px;"><b>Fast &amp; reliable:</b> Secure Royal Mail 24-hour tracked delivery for next-day arrival.</li>
+            <li style="margin-bottom:6px;"><b>Zero stress:</b> No long pharmacy queues or waiting for appointments.</li>
+            <li style="margin-bottom:6px;"><b>Total transparency:</b> An online account to keep track of all of your orders.</li>
+          </ul>
+
+          <p style="margin-top:24px;">
+            Ready to start? Tap the WhatsApp link below to say hello or visit our
+            <a href="${orderOnlineLink}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">website</a>
+            to secure your next order.
+          </p>
+          <p>
+            👉 <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">Chat with us on WhatsApp</a>
+          </p>
+
+          <p style="margin-top:16px;">
+            Best health,<br/>
+            The Nora Health Team<br/>
+            <a href="${siteLink}" target="_blank" rel="noopener noreferrer" style="${linkStyle}">norahealth.co.uk</a>
+          </p>
         </td>
       </tr>
 
@@ -108,7 +143,7 @@ export async function sendWelcomeEmail({ to, name }) {
     from: "Nora Health <contact@norahealth.co.uk>",
     to,
     replyTo: "contact@norahealth.co.uk",
-    subject: "Welcome to Nora Health", // COPY: subject
+    subject: "Welcome to Nora Health",
     html,
   });
 }

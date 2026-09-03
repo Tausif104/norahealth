@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { loggedInUserAction } from "./user.action";
 import { prisma } from "@/lib/client/prisma";
 import { getAdminUser } from "./admin.action";
+import { sendWelcomeEmail } from "@/lib/emailTemplate";
 
 const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -99,8 +100,16 @@ export const createAccountAction = async (prevState, formData) => {
       create: { userId: user.id, ...accountData },
     });
 
+    // Send the personalised welcome email now that we have the patient's name.
+    // Never let an email failure block the save.
+    try {
+      await sendWelcomeEmail({ to: user.email, name: firstname });
+    } catch (welcomeErr) {
+      console.error("Welcome email failed (account registration):", welcomeErr);
+    }
+
     return {
-      msg: "Account details saved successfully!",
+      msg: "Your account has been created. Please check your email inbox (and spam folder). Thank you.",
       success: true,
     };
   } catch (err) {

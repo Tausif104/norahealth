@@ -9,7 +9,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import cloudinary from "@/lib/cloudinary";
 import { resend } from "@/lib/reset";
-import { sendWelcomeEmail } from "@/lib/emailTemplate";
 import { randomBytes, createHash } from "node:crypto"; // ✅ IMPORTANT
 
 // register action
@@ -57,13 +56,6 @@ export const registerAction = async (prevState, formData) => {
 
   // success message
   if (user) {
-    // Send the welcome email — but never let an email failure break signup.
-    try {
-      await sendWelcomeEmail({ to: user.email });
-    } catch (welcomeErr) {
-      console.error("Welcome email failed:", welcomeErr);
-    }
-
     // creating safe user
     const safeUser = {
       id: user.id,

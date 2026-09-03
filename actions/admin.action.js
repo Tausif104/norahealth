@@ -5,7 +5,6 @@ import { prisma } from "@/lib/client/prisma";
 import { cookies } from "next/headers";
 import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
-import { sendWelcomeEmail } from "@/lib/emailTemplate";
 const isAdminRole = (role) => role === "ADMIN" || role === "SUPERADMIN";
 
 const isSuperAdmin = (role) => role === "SUPERADMIN";
@@ -104,15 +103,9 @@ export const createUserAction = async (prevState, formData) => {
       },
     });
 
-    // Welcome the new patient — never let an email failure block creation.
-    // Staff/admin accounts don't get the patient welcome email.
-    if (!isAdminUser) {
-      try {
-        await sendWelcomeEmail({ to: newUser.email });
-      } catch (welcomeErr) {
-        console.error("Welcome email failed (admin create):", welcomeErr);
-      }
-    }
+    // Note: admin-created patients do not get the welcome email here — the
+    // welcome email is personalised ("Hello <first name>,") and is sent when a
+    // patient completes their own Account Registration, where the name exists.
 
     revalidatePath("/admin");
     return { success: true, msg: "User created successfully" };

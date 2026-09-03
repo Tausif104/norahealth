@@ -51,6 +51,15 @@ export default function DateField({
             mode='single'
             selected={selected}
             captionLayout='dropdown'
+            // Let the year dropdown reach back far enough to pick a date of
+            // birth, and never allow a future date (all uses here are past
+            // dates: DOB, last health-check dates, etc.). Without a year range
+            // the dropdown wouldn't go back past recent years, so people
+            // couldn't select their DOB and registration stalled.
+            startMonth={new Date(1920, 0)}
+            endMonth={new Date()}
+            defaultMonth={selected || new Date()}
+            disabled={{ after: new Date() }}
             onSelect={(date) => {
               onChange(date)
               setOpen(false)
