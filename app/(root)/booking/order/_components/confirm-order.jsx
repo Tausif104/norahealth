@@ -204,7 +204,7 @@ const ConfirmOrder = ({ userDetails }) => {
             {/* LEFT */}
             <div className="lg:col-span-2 min-w-0 flex flex-col gap-8">
               <div key={step} className="step-animate flex flex-col gap-6">
-                <h2 className="text-base lg:text-lg font-semibold text-[#0D060C] tracking-[-0.3px] whitespace-nowrap">
+                <h2 className="text-base lg:text-lg font-semibold text-[#0D060C] tracking-[-0.3px]">
                   {STEPS[step].title}
                 </h2>
 

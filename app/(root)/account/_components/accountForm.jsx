@@ -13,6 +13,26 @@ const AccountForm = ({ user }) => {
 
   const [dob, setDob] = useState(null);
 
+  // Controlled fields so the form keeps what the user typed if the server
+  // action returns a validation error. React 19 resets uncontrolled form
+  // fields after an action, which previously wiped the whole form and forced
+  // people to re-enter everything just because one field (e.g. DoB) was
+  // missing.
+  const [form, setForm] = useState({
+    firstname: "",
+    lastname: "",
+    phone: "",
+    secondemail: user?.email || "",
+    nhs: "",
+    address: "",
+    zip: "",
+    deliveryAddress: "",
+    deliveryZip: "",
+  });
+
+  const handleChange = (e) =>
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
   const initialState = {
     msg: "",
     success: false,
@@ -52,6 +72,8 @@ const AccountForm = ({ user }) => {
             type='text'
             id='firstName'
             placeholder='First name'
+            value={form.firstname}
+            onChange={handleChange}
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>
@@ -69,6 +91,8 @@ const AccountForm = ({ user }) => {
             name='lastname'
             id='lastName'
             placeholder='Last name'
+            value={form.lastname}
+            onChange={handleChange}
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>
@@ -86,6 +110,8 @@ const AccountForm = ({ user }) => {
             name='phone'
             id='phone'
             placeholder='Phone Number'
+            value={form.phone}
+            onChange={handleChange}
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>
@@ -102,7 +128,8 @@ const AccountForm = ({ user }) => {
             name='secondemail'
             type='email'
             id='email'
-            defaultValue={user?.email}
+            value={form.secondemail}
+            onChange={handleChange}
             placeholder='Email address'
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
@@ -134,6 +161,8 @@ const AccountForm = ({ user }) => {
             name='nhs'
             id='nhs'
             placeholder='10 Digits NHS Number'
+            value={form.nhs}
+            onChange={handleChange}
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>
@@ -151,6 +180,8 @@ const AccountForm = ({ user }) => {
             name='address'
             id='address'
             placeholder='Address'
+            value={form.address}
+            onChange={handleChange}
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>
@@ -165,6 +196,8 @@ const AccountForm = ({ user }) => {
             name='zip'
             id='zip'
             placeholder='Post code'
+            value={form.zip}
+            onChange={handleChange}
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>
@@ -181,6 +214,8 @@ const AccountForm = ({ user }) => {
             name='deliveryAddress'
             id='deliveryAddress'
             placeholder='Delivery Address'
+            value={form.deliveryAddress}
+            onChange={handleChange}
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>
@@ -198,6 +233,8 @@ const AccountForm = ({ user }) => {
             name='deliveryZip'
             id='deliveryZip'
             placeholder='Delivery Post code'
+            value={form.deliveryZip}
+            onChange={handleChange}
             className='bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[18px] px-[16px] rounded-[6px]'
           />
         </div>

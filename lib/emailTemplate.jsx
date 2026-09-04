@@ -100,7 +100,7 @@ export async function sendWelcomeEmail({ to, name }) {
 
           <p style="font-weight:bold;margin-top:24px;">What you can order today:</p>
           <ul style="padding-left:20px;margin:0;">
-            <li style="margin-bottom:6px;"><b>Regular repeat contraception:</b> Never run out of your daily pill, patch, or ring.</li>
+            <li style="margin-bottom:6px;"><b>Regular repeat contraception:</b> Never run out of your daily pill.</li>
             <li style="margin-bottom:6px;"><b>New contraception:</b> Switch your method easily online or via chat.</li>
             <li style="margin-bottom:6px;"><b>Emergency contraception:</b> Quick, confidential access to the morning-after pill.</li>
           </ul>
