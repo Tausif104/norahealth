@@ -9,7 +9,16 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import cloudinary from "@/lib/cloudinary";
 import { resend } from "@/lib/reset";
+import { sendWelcomeEmail } from "@/lib/emailTemplate";
 import { randomBytes, createHash } from "node:crypto"; // ✅ IMPORTANT
+
+// Parse a "yyyy-MM-dd" date input to a UTC-noon Date (avoids timezone drift).
+function parseYMD(ymd) {
+  if (typeof ymd !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return null;
+  const [y, m, d] = ymd.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d, 12));
+  return Number.isNaN(dt.getTime()) ? null : dt;
+}
 
 // register action
 export const registerAction = async (prevState, formData) => {
@@ -87,6 +96,131 @@ export const registerAction = async (prevState, formData) => {
       success: true,
     };
   }
+};
+
+// Single-step registration: create the login (User) AND the profile (Account)
+// together, so an account can never exist without its details. All profile
+// fields are collected on the sign-up form; nothing is saved unless the whole
+// form is valid.
+export const registerFullAction = async (prevState, formData) => {
+  const rawEmail = formData.get("email");
+  const email =
+    typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+  const password = (formData.get("password") || "").toString();
+  const confirm = (formData.get("confirm-password") || "").toString();
+  const firstname = (formData.get("firstname") || "").toString().trim();
+  const lastname = (formData.get("lastname") || "").toString().trim();
+  const phone = (formData.get("phone") || "").toString().trim();
+  const dobRaw = (formData.get("dob") || "").toString().trim();
+  const nhs = (formData.get("nhs") || "").toString().trim();
+  const address = (formData.get("address") || "").toString().trim();
+  const zip = (formData.get("zip") || "").toString().trim();
+  const deliveryAddress = (formData.get("deliveryAddress") || "").toString().trim();
+  const deliveryZip = (formData.get("deliveryZip") || "").toString().trim();
+
+  if (!email || !password) {
+    return { success: false, msg: "Please enter your email and a password." };
+  }
+  if (password !== confirm) {
+    return { success: false, msg: "Passwords do not match." };
+  }
+
+  // Tell the user exactly which profile field(s) are missing.
+  const missing = [];
+  if (!firstname) missing.push("First name");
+  if (!lastname) missing.push("Last name");
+  if (!phone) missing.push("Phone Number");
+  if (!dobRaw) missing.push("Date of Birth");
+  if (!address) missing.push("Address");
+  if (!zip) missing.push("Post code");
+  if (!deliveryAddress) missing.push("Delivery Address");
+  if (!deliveryZip) missing.push("Delivery Post code");
+  if (missing.length) {
+    return {
+      success: false,
+      msg:
+        missing.length === 1
+          ? `Please fill in your ${missing[0]}.`
+          : `Please fill in: ${missing.join(", ")}.`,
+    };
+  }
+
+  const dob = parseYMD(dobRaw);
+  if (!dob) {
+    return { success: false, msg: "Please provide a valid Date of Birth." };
+  }
+
+  const userExists = await prisma.user.findUnique({ where: { email } });
+  if (userExists) {
+    return {
+      success: false,
+      msg: "Looks like you already have an account. Just log in, or reset your password if you've forgotten it.",
+    };
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  let user;
+  try {
+    // User + Account created atomically — no login without a profile.
+    user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        account: {
+          create: {
+            firstName: firstname,
+            lastName: lastname,
+            phoneNumber: phone,
+            secondEmail: email,
+            dob,
+            nhsNumber: nhs,
+            address,
+            zipCode: zip,
+            deliveryAddress,
+            deliveryZipCode: deliveryZip,
+          },
+        },
+      },
+    });
+  } catch (err) {
+    console.error("registerFullAction error:", err);
+    return {
+      success: false,
+      msg: "Something went wrong creating your account. Please try again.",
+    };
+  }
+
+  // Welcome email — never let an email failure block the sign-up.
+  try {
+    await sendWelcomeEmail({ to: user.email, name: firstname });
+  } catch (welcomeErr) {
+    console.error("Welcome email failed (register):", welcomeErr);
+  }
+
+  const safeUser = {
+    id: user.id,
+    role: user.role,
+    email: user.email,
+    isAdmin: user.isAdmin,
+    createdAt: user.createdAt,
+  };
+  const token = await signToken(safeUser);
+  const cookieStore = await cookies();
+  cookieStore.set({
+    name: "auth_token",
+    value: token,
+    httpOnly: true,
+    secure: false,
+    path: "/",
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 30,
+  });
+
+  return {
+    success: true,
+    msg: "Your account has been created. Please check your email inbox (and spam folder). Thank you.",
+  };
 };
 
 // Login Action
