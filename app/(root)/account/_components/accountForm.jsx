@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import DateField from "@/components/global/DateField";
 import { useActionState } from "react";
 import { createAccountAction } from "@/actions/account.action";
@@ -13,11 +13,11 @@ const AccountForm = ({ user }) => {
 
   const [dob, setDob] = useState(null);
 
-  // Controlled fields so the form keeps what the user typed if the server
-  // action returns a validation error. React 19 resets uncontrolled form
-  // fields after an action, which previously wiped the whole form and forced
-  // people to re-enter everything just because one field (e.g. DoB) was
-  // missing.
+  // Controlled fields so the form keeps what the user typed. We submit via
+  // onSubmit + a manual dispatch (NOT the <form action> prop) because React 19
+  // automatically resets a form after its `action` runs — that reset wiped the
+  // whole form on a validation error, forcing people to re-enter everything
+  // just because one field (e.g. DoB) was missing.
   const [form, setForm] = useState({
     firstname: "",
     lastname: "",
@@ -43,6 +43,24 @@ const AccountForm = ({ user }) => {
     initialState
   );
 
+  const onSubmit = (e) => {
+    e.preventDefault(); // stop native submit + React's post-action form reset
+    const fd = new FormData();
+    fd.set("firstname", form.firstname);
+    fd.set("lastname", form.lastname);
+    fd.set("phone", form.phone);
+    fd.set("secondemail", form.secondemail);
+    fd.set("dob", dob ? format(dob, "yyyy-MM-dd") : "");
+    fd.set("nhs", form.nhs);
+    fd.set("address", form.address);
+    fd.set("zip", form.zip);
+    fd.set("deliveryAddress", form.deliveryAddress);
+    fd.set("deliveryZip", form.deliveryZip);
+    startTransition(() => {
+      action(fd);
+    });
+  };
+
   useEffect(() => {
     if (state.msg) {
       if (state.success) {
@@ -56,7 +74,7 @@ const AccountForm = ({ user }) => {
   }, [state.msg]);
 
   return (
-    <form action={action}>
+    <form onSubmit={onSubmit}>
       {/* PERSONAL DETAILS */}
       <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
         {/* First Name */}
@@ -135,11 +153,6 @@ const AccountForm = ({ user }) => {
           />
         </div>
 
-        <input
-          type='hidden'
-          name='dob'
-          value={dob ? format(dob, "yyyy-MM-dd") : ""}
-        />
         <DateField
           id='dob'
           label='Date of Birth'
