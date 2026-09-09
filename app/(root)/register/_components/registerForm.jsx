@@ -3,7 +3,7 @@
 import { useState, useEffect, startTransition } from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, LoaderIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, LoaderIcon } from "lucide-react";
 import { registerFullAction } from "@/actions/user.action";
 import DateField from "@/components/global/DateField";
 import { toast } from "sonner";
@@ -12,15 +12,23 @@ import { format } from "date-fns";
 const inputClass =
   "bg-[#F6F5F4] text-[#3A3D42] placeholder:text-[#3A3D42] w-full py-[16px] md:py-[18px] px-[16px] rounded-[6px] outline-none focus:ring-2 focus:ring-[#3A3D42]/40";
 
+const STEPS = [
+  { key: "personal", label: "Your details" },
+  { key: "address", label: "Address" },
+  { key: "login", label: "Login details" },
+];
+
 const RegisterForm = () => {
   const router = useRouter();
 
+  const [step, setStep] = useState(0);
   const [dob, setDob] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Controlled so nothing is lost on a validation error (React 19 auto-resets
-  // a <form action>, so we submit via onSubmit + a manual dispatch instead).
+  // Controlled so nothing is lost when moving between steps or on a validation
+  // error. All three steps live in one form; the account is created in one go
+  // on the final submit, so an account can never exist without full details.
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -44,8 +52,57 @@ const RegisterForm = () => {
     initialState
   );
 
+  const isLastStep = step === STEPS.length - 1;
+
+  const missingForStep = (idx) => {
+    const missing = [];
+    if (idx === 0) {
+      if (!form.firstname.trim()) missing.push("First name");
+      if (!form.lastname.trim()) missing.push("Last name");
+      if (!form.phone.trim()) missing.push("Phone Number");
+      if (!dob) missing.push("Date of Birth");
+    } else if (idx === 1) {
+      if (!form.address.trim()) missing.push("Address");
+      if (!form.zip.trim()) missing.push("Post code");
+      if (!form.deliveryAddress.trim()) missing.push("Delivery Address");
+      if (!form.deliveryZip.trim()) missing.push("Delivery Post code");
+    }
+    return missing;
+  };
+
+  const warnMissing = (missing) =>
+    toast.warning(
+      missing.length === 1
+        ? `Please fill in your ${missing[0]}.`
+        : `Please fill in: ${missing.join(", ")}.`
+    );
+
+  const goNext = () => {
+    const missing = missingForStep(step);
+    if (missing.length) {
+      warnMissing(missing);
+      return;
+    }
+    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  };
+
+  const goBack = () => setStep((s) => Math.max(s - 1, 0));
+
   const onSubmit = (e) => {
     e.preventDefault();
+    // Pressing Enter on an earlier step just advances instead of submitting.
+    if (!isLastStep) {
+      goNext();
+      return;
+    }
+    if (!form.email.trim() || !form.password || !form.confirm) {
+      toast.warning("Please enter your email and a password.");
+      return;
+    }
+    if (form.password !== form.confirm) {
+      toast.warning("Passwords do not match.");
+      return;
+    }
     const fd = new FormData();
     fd.set("email", form.email);
     fd.set("password", form.password);
@@ -78,246 +135,298 @@ const RegisterForm = () => {
 
   return (
     <form onSubmit={onSubmit}>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-        {/* Email */}
-        <div className='md:col-span-2'>
-          <label className='block text-base mb-2 text-[#0D060C]' htmlFor='email'>
-            Email address
-          </label>
-          <input
-            type='email'
-            id='email'
-            name='email'
-            placeholder='Email address'
-            value={form.email}
-            onChange={handleChange}
-            className={inputClass}
-          />
+      {/* Step header + progress */}
+      <div className='mb-6'>
+        <div className='flex items-center justify-between mb-3'>
+          <p className='text-sm font-medium text-[#3A3D42]'>
+            Step {step + 1} of {STEPS.length}
+          </p>
+          <p className='text-sm font-semibold text-[#0D060C]'>
+            {STEPS[step].label}
+          </p>
         </div>
-
-        {/* Password */}
-        <div className='relative'>
-          <label
-            className='block text-base mb-2 text-[#0D060C]'
-            htmlFor='password'
-          >
-            Password
-          </label>
-          <input
-            type={showPassword ? "text" : "password"}
-            id='password'
-            name='password'
-            placeholder='Password'
-            value={form.password}
-            onChange={handleChange}
-            className={`${inputClass} pr-[48px]`}
-          />
-          <span
-            className='absolute right-4 bottom-4 md:bottom-[18px] text-[#3A3D42] cursor-pointer'
-            onClick={() => setShowPassword((v) => !v)}
-          >
-            {showPassword ? <Eye /> : <EyeOff />}
-          </span>
-        </div>
-
-        {/* Confirm Password */}
-        <div className='relative'>
-          <label
-            className='block text-base mb-2 text-[#0D060C]'
-            htmlFor='Cpassword'
-          >
-            Confirm Password
-          </label>
-          <input
-            type={showConfirmPassword ? "text" : "password"}
-            id='Cpassword'
-            name='confirm'
-            placeholder='Confirm Password'
-            value={form.confirm}
-            onChange={handleChange}
-            className={`${inputClass} pr-[48px]`}
-          />
-          <span
-            className='absolute right-4 bottom-4 md:bottom-[18px] text-[#3A3D42] cursor-pointer'
-            onClick={() => setShowConfirmPassword((v) => !v)}
-          >
-            {showConfirmPassword ? <Eye /> : <EyeOff />}
-          </span>
-        </div>
-
-        {/* First name */}
-        <div>
-          <label
-            className='block text-base mb-2 text-[#0D060C]'
-            htmlFor='firstName'
-          >
-            First name
-          </label>
-          <input
-            type='text'
-            id='firstName'
-            name='firstname'
-            placeholder='First name'
-            value={form.firstname}
-            onChange={handleChange}
-            className={inputClass}
-          />
-        </div>
-
-        {/* Last name */}
-        <div>
-          <label
-            className='block text-base mb-2 text-[#0D060C]'
-            htmlFor='lastName'
-          >
-            Last name
-          </label>
-          <input
-            type='text'
-            id='lastName'
-            name='lastname'
-            placeholder='Last name'
-            value={form.lastname}
-            onChange={handleChange}
-            className={inputClass}
-          />
-        </div>
-
-        {/* Phone */}
-        <div>
-          <label className='block text-base mb-2 text-[#0D060C]' htmlFor='phone'>
-            Phone Number
-          </label>
-          <input
-            type='tel'
-            id='phone'
-            name='phone'
-            placeholder='Phone Number'
-            value={form.phone}
-            onChange={handleChange}
-            className={inputClass}
-          />
-        </div>
-
-        {/* Date of Birth */}
-        <DateField
-          id='dob'
-          label='Date of Birth'
-          selected={dob}
-          onChange={setDob}
-          name='dob'
-          placeholder='Select date of birth'
-          bg='bg-[#F6F5F4] border-0'
-        />
-
-        {/* Address */}
-        <div className='md:col-span-2'>
-          <label
-            className='block text-base mb-2 text-[#0D060C]'
-            htmlFor='address'
-          >
-            Address
-          </label>
-          <input
-            type='text'
-            id='address'
-            name='address'
-            placeholder='Address'
-            value={form.address}
-            onChange={handleChange}
-            className={inputClass}
-          />
-        </div>
-
-        {/* Post code */}
-        <div>
-          <label className='block text-base mb-2 text-[#0D060C]' htmlFor='zip'>
-            Post code
-          </label>
-          <input
-            type='text'
-            id='zip'
-            name='zip'
-            placeholder='Post code'
-            value={form.zip}
-            onChange={handleChange}
-            className={inputClass}
-          />
-        </div>
-
-        {/* NHS (Optional) */}
-        <div>
-          <label className='block text-base mb-2 text-[#0D060C]' htmlFor='nhs'>
-            NHS Number (Optional)
-          </label>
-          <input
-            type='text'
-            id='nhs'
-            name='nhs'
-            placeholder='10 Digits NHS Number'
-            value={form.nhs}
-            onChange={handleChange}
-            className={inputClass}
-          />
-        </div>
-
-        {/* Delivery Address */}
-        <div className='md:col-span-2'>
-          <label
-            className='block text-base mb-2 text-[#0D060C]'
-            htmlFor='deliveryAddress'
-          >
-            Delivery Address
-          </label>
-          <input
-            type='text'
-            id='deliveryAddress'
-            name='deliveryAddress'
-            placeholder='Delivery Address'
-            value={form.deliveryAddress}
-            onChange={handleChange}
-            className={inputClass}
-          />
-        </div>
-
-        {/* Delivery Post code */}
-        <div>
-          <label
-            className='block text-base mb-2 text-[#0D060C]'
-            htmlFor='deliveryZip'
-          >
-            Delivery Post code
-          </label>
-          <input
-            type='text'
-            id='deliveryZip'
-            name='deliveryZip'
-            placeholder='Delivery Post code'
-            value={form.deliveryZip}
-            onChange={handleChange}
-            className={inputClass}
-          />
+        <div className='flex gap-2'>
+          {STEPS.map((s, i) => (
+            <span
+              key={s.key}
+              className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
+                i <= step ? "bg-theme" : "bg-[#EEE0CF]"
+              }`}
+            />
+          ))}
         </div>
       </div>
 
-      <button
-        type='submit'
-        className='mt-8 text-white inline-block bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition group duration-300 w-full cursor-pointer'
-      >
-        <span className='flex items-center justify-center'>
-          {loading ? (
-            <span className='ml-2 -rotate-45 group-hover:rotate-0 transition duration-300'>
-              <LoaderIcon
-                role='status'
-                aria-label='Loading'
-                className='size-6 animate-spin mx-auto'
-              />
+      {/* STEP 1 — Personal details */}
+      {step === 0 && (
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+          <div>
+            <label
+              className='block text-base mb-2 text-[#0D060C]'
+              htmlFor='firstName'
+            >
+              First name
+            </label>
+            <input
+              type='text'
+              id='firstName'
+              name='firstname'
+              placeholder='First name'
+              value={form.firstname}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label
+              className='block text-base mb-2 text-[#0D060C]'
+              htmlFor='lastName'
+            >
+              Last name
+            </label>
+            <input
+              type='text'
+              id='lastName'
+              name='lastname'
+              placeholder='Last name'
+              value={form.lastname}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label
+              className='block text-base mb-2 text-[#0D060C]'
+              htmlFor='phone'
+            >
+              Phone Number
+            </label>
+            <input
+              type='tel'
+              id='phone'
+              name='phone'
+              placeholder='Phone Number'
+              value={form.phone}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
+
+          <DateField
+            id='dob'
+            label='Date of Birth'
+            selected={dob}
+            onChange={setDob}
+            name='dob'
+            placeholder='Select date of birth'
+            bg='bg-[#F6F5F4] border-0'
+          />
+
+          <div className='md:col-span-2'>
+            <label className='block text-base mb-2 text-[#0D060C]' htmlFor='nhs'>
+              NHS Number (Optional)
+            </label>
+            <input
+              type='text'
+              id='nhs'
+              name='nhs'
+              placeholder='10 Digits NHS Number'
+              value={form.nhs}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* STEP 2 — Address */}
+      {step === 1 && (
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+          <div className='md:col-span-2'>
+            <label
+              className='block text-base mb-2 text-[#0D060C]'
+              htmlFor='address'
+            >
+              Address
+            </label>
+            <input
+              type='text'
+              id='address'
+              name='address'
+              placeholder='Address'
+              value={form.address}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className='block text-base mb-2 text-[#0D060C]' htmlFor='zip'>
+              Post code
+            </label>
+            <input
+              type='text'
+              id='zip'
+              name='zip'
+              placeholder='Post code'
+              value={form.zip}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
+
+          <div className='md:col-span-2'>
+            <label
+              className='block text-base mb-2 text-[#0D060C]'
+              htmlFor='deliveryAddress'
+            >
+              Delivery Address
+            </label>
+            <input
+              type='text'
+              id='deliveryAddress'
+              name='deliveryAddress'
+              placeholder='Delivery Address'
+              value={form.deliveryAddress}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label
+              className='block text-base mb-2 text-[#0D060C]'
+              htmlFor='deliveryZip'
+            >
+              Delivery Post code
+            </label>
+            <input
+              type='text'
+              id='deliveryZip'
+              name='deliveryZip'
+              placeholder='Delivery Post code'
+              value={form.deliveryZip}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* STEP 3 — Login details */}
+      {step === 2 && (
+        <div className='grid grid-cols-1 gap-5'>
+          <div>
+            <label
+              className='block text-base mb-2 text-[#0D060C]'
+              htmlFor='email'
+            >
+              Email address
+            </label>
+            <input
+              type='email'
+              id='email'
+              name='email'
+              placeholder='Email address'
+              value={form.email}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
+
+          <div className='relative'>
+            <label
+              className='block text-base mb-2 text-[#0D060C]'
+              htmlFor='password'
+            >
+              Password
+            </label>
+            <input
+              type={showPassword ? "text" : "password"}
+              id='password'
+              name='password'
+              placeholder='Password'
+              value={form.password}
+              onChange={handleChange}
+              className={`${inputClass} pr-[48px]`}
+            />
+            <span
+              className='absolute right-4 bottom-4 md:bottom-[18px] text-[#3A3D42] cursor-pointer'
+              onClick={() => setShowPassword((v) => !v)}
+            >
+              {showPassword ? <Eye /> : <EyeOff />}
             </span>
-          ) : (
-            <span>Register</span>
-          )}
-        </span>
-      </button>
+          </div>
+
+          <div className='relative'>
+            <label
+              className='block text-base mb-2 text-[#0D060C]'
+              htmlFor='Cpassword'
+            >
+              Confirm Password
+            </label>
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              id='Cpassword'
+              name='confirm'
+              placeholder='Confirm Password'
+              value={form.confirm}
+              onChange={handleChange}
+              className={`${inputClass} pr-[48px]`}
+            />
+            <span
+              className='absolute right-4 bottom-4 md:bottom-[18px] text-[#3A3D42] cursor-pointer'
+              onClick={() => setShowConfirmPassword((v) => !v)}
+            >
+              {showConfirmPassword ? <Eye /> : <EyeOff />}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation buttons */}
+      <div className='mt-8 flex items-center gap-4'>
+        {step > 0 && (
+          <button
+            type='button'
+            onClick={goBack}
+            className='flex items-center gap-2 text-[#3A3D42] font-medium py-4 px-6 rounded-full border border-[#EEE0CF] hover:bg-[#F6F5F4] transition cursor-pointer'
+          >
+            <ArrowLeft className='size-5' />
+            Back
+          </button>
+        )}
+
+        {!isLastStep ? (
+          <button
+            type='button'
+            onClick={goNext}
+            className='group flex-1 flex items-center justify-center gap-2 text-white bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition duration-300 cursor-pointer'
+          >
+            Next
+            <ArrowRight className='size-5 transition-transform group-hover:translate-x-1' />
+          </button>
+        ) : (
+          <button
+            type='submit'
+            className='flex-1 text-white bg-theme text-[16px] font-medium py-4 px-9 rounded-full hover:bg-[#491F40] transition duration-300 cursor-pointer'
+          >
+            <span className='flex items-center justify-center'>
+              {loading ? (
+                <LoaderIcon
+                  role='status'
+                  aria-label='Loading'
+                  className='size-6 animate-spin mx-auto'
+                />
+              ) : (
+                <span>Register</span>
+              )}
+            </span>
+          </button>
+        )}
+      </div>
     </form>
   );
 };
